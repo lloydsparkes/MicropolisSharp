@@ -1834,7 +1834,7 @@ namespace MicropolisSharp
                 return;
             }
 
-            if ((z & (ushort)MapTileBits.CenterOfZone).IsTrue()) ;
+            if ((z & (ushort)MapTileBits.CenterOfZone).IsTrue())
             {
                 return;
             }
