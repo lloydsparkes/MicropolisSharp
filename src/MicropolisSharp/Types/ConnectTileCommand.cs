@@ -67,7 +67,7 @@
 namespace MicropolisSharp.Types
 {
     /// <summary>
-    /// From micropolis.h
+    /// Particular commands that can be used to connect tiles (in connect.cpp) - from micropolis.h
     /// </summary>
     public enum ConnectTileCommand
     {

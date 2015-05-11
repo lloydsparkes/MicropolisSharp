@@ -67,7 +67,15 @@
 namespace MicropolisSharp.Types
 {
     /// <summary>
-    /// From micropolis.h
+    /// MapTileCharacters - each character(ushort) represents a tile - from micropolis.h
+    /// 
+    /// TODO: Make this a specific type. Replace these - maybe configuration?
+    /// TODO: Make LOW/BASE and LAST/HIGH consistent everywhere?
+    /// TODO: Rename
+    /// TODO: Figure out what sprite groups really exist (maybe we can learn more by
+    ///         examining the actual sprites, and/or by using hexadecimal or bite-wise
+    ///         notation?) 
+    /// TODO: Add comments for each sprite (0--1023)
     /// </summary>
     public enum MapTileCharacters
     {

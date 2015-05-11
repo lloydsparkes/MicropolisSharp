@@ -67,7 +67,9 @@
 namespace MicropolisSharp.Types
 {
     /// <summary>
-    /// From micropolis.h
+    /// Game Levels - from micropolis.h
+    ///  
+    /// TODO: Rename from Levels
     /// </summary>
     public enum Levels
     {

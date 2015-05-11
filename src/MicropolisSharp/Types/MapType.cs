@@ -67,7 +67,7 @@
 namespace MicropolisSharp.Types
 {
     /// <summary>
-    /// From micropolis.h
+    /// Available Map Types - from micropolis.h
     /// </summary>
     public enum MapType
     {

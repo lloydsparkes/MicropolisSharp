@@ -67,20 +67,27 @@
 namespace MicropolisSharp.Types
 {
     /// <summary>
-    /// From micropolis.h
+    /// Status bits of a map tile - from micropolis.h
+    /// 
+    /// TODO: Remove this - put in as extension methods? 
+    /// 
+    /// Maybe when we have a MapTile type, these can be methods on it
+    /// TODO: How many of these bits can be derived from the displayed tile?
+    /// TODO: Decide what to do with #ANIMBIT (since sim-backend may not be the optimal place to do animation).
+    /// TODO: #ALLBITS should end with MASK.
     /// </summary>
     public enum MapTileBits
     {
-        Power = 0x8000, ///< bit 15, tile has power.
-        Conductivity = 0x4000, ///< bit 14. tile can conduct electricity.
-        Burnable = 0x2000, ///< bit 13, tile can be lit.
-        Bulldozable = 0x1000, ///< bit 12, tile is bulldozable.
-        Animated = 0x0800, ///< bit 11, tile is animated.
-        CenterOfZone = 0x0400, ///< bit 10, tile is the center tile of the zone.
+        Power = 0x8000,         ///< bit 15, tile has power.
+        Conductivity = 0x4000,  ///< bit 14. tile can conduct electricity.
+        Burnable = 0x2000,      ///< bit 13, tile can be lit.
+        Bulldozable = 0x1000,   ///< bit 12, tile is bulldozable.
+        Animated = 0x0800,      ///< bit 11, tile is animated.
+        CenterOfZone = 0x0400,  ///< bit 10, tile is the center tile of the zone.
 
         /// Mask for the bits-part of the tile
         AllBits = CenterOfZone | Animated | Bulldozable | Burnable | Conductivity | Power,
-        LowMask = 0x03ff, ///< Mask for the #MapTileCharacters part of the tile
+        LowMask = 0x03ff,       ///< Mask for the #MapTileCharacters part of the tile
 
         BulldozableOrBurnable = Bulldozable | Burnable,
         BurnableOrBulldozableOrConductive = Burnable | Bulldozable | Conductivity,

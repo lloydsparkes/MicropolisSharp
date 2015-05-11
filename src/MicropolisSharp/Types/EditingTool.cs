@@ -67,7 +67,11 @@
 namespace MicropolisSharp.Types
 {
     /// <summary>
-    /// From micropolis.h
+    /// Avaiable tools which the front end can try to apply to the backend from micropolis.h
+    /// 
+    /// TODO: Comment
+    /// TODO: Store more data
+    /// TODO: Maybe a specific type, with extra data loaded from configuration?
     /// </summary>
     public enum EditingTool
     {

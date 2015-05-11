@@ -67,7 +67,7 @@
 namespace MicropolisSharp.Types
 {
     /// <summary>
-    /// From micropolis.h
+    /// The types of sprites which can be overlayed onto the map - from micropolis.h
     /// </summary>
     public enum SpriteType
     {

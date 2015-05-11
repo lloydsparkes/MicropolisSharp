@@ -67,7 +67,7 @@
 namespace MicropolisSharp.Types
 {
     /// <summary>
-    /// From micropolis.h
+    /// Available Scenarios - from micropolis.h
     /// </summary>
     public enum Scenario
     {

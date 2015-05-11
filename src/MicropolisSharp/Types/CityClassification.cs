@@ -67,7 +67,7 @@
 namespace MicropolisSharp.Types
 {
     /// <summary>
-    /// From micropolis.h
+    /// Available classes of cities - from micropolis.h
     /// </summary>
     public enum CityClassification
     {

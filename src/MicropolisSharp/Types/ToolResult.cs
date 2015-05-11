@@ -67,7 +67,7 @@
 namespace MicropolisSharp.Types
 {
     /// <summary>
-    /// From micropolis.h
+    /// Tool result - The result from the action requested - from micropolis.h
     /// </summary>
     public enum ToolResult
     {

@@ -67,7 +67,7 @@
 namespace MicropolisSharp.Types
 {
     /// <summary>
-    /// From micropolis.h
+    /// Problems in the city where citizens vote on - from micropolis.h
     /// </summary>
     public enum CityVotingProblems
     {
@@ -79,6 +79,7 @@ namespace MicropolisSharp.Types
         Unemployment,             ///< Unemployment
         Fire,                     ///< Fire
 
+        //TODO: Remove the below items
         Count,              ///< Number of problems
 
         CountOfProblemsToComplainAbout = 4,   ///< Number of problems to complain about.

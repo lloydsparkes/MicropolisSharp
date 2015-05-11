@@ -64,12 +64,19 @@
  * CONSUMER, SO SOME OR ALL OF THE ABOVE EXCLUSIONS AND LIMITATIONS MAY
  * NOT APPLY TO YOU.
  */
+using System;
+
 namespace MicropolisSharp.Types
 {
     /// <summary>
-    /// From map_type.h/cpp
+    /// Generic Class for Maps (weridly not used by the main map)
+    /// 
+    /// Taken from map_type.h
+    /// 
+    /// TODO: Refactor
+    /// TODO: Tests
     /// </summary>
-    /// <typeparam name="DataType"></typeparam>
+    /// <typeparam name="DataType">The data type for each cell of the map</typeparam>
     public class Map<DataType>
         where DataType : struct
     {
@@ -80,8 +87,15 @@ namespace MicropolisSharp.Types
         public readonly int width;
         public readonly int height;
 
+        /// <summary>
+        /// TODO: Make this a two dimensional map? Maybe this is better given the logic in main.cpp (heatflow())
+        /// </summary>
         private DataType[] data;        
 
+        /// <summary>
+        /// Simple Initialiser - set defaults
+        /// </summary>
+        /// <param name="blockSize">The size of each block. I.e if 2 then each cell in this map represents 4 in the real map</param>
         public Map(int blockSize)
         {
             this.BlockSize = blockSize;
@@ -90,14 +104,24 @@ namespace MicropolisSharp.Types
             this.height = (Constants.WorldHeight + BlockSize - 1) / BlockSize;
             this.defaultValue = default(DataType);
             this.data = new DataType[this.width * this.height];
+            Fill(defaultValue);
         }
 
+        /// <summary>
+        /// Simple Initialiser - plus a specific default value for the map
+        /// </summary>
+        /// <param name="defaultValue"></param>
+        /// <param name="blockSize"></param>
         public Map(DataType defaultValue, int blockSize) : this(blockSize)
         {
             this.defaultValue = defaultValue;
             Fill(defaultValue);
         }
 
+        /// <summary>
+        /// Copy Constructor - copy from another map
+        /// </summary>
+        /// <param name="map"></param>
         public Map(Map<DataType> map) : this(map.BlockSize)
         {
             for (int i = 0; i < this.width * this.height; ++i)
@@ -106,11 +130,21 @@ namespace MicropolisSharp.Types
             }
         }
 
+        /// <summary>
+        /// Compare two maps - checks every cell
+        /// </summary>
+        /// <param name="other">The map to compare to</param>
+        /// <returns>True if every cell is the same</returns>
         public bool Compare(Map<DataType> other)
         {
             if(other == null)
             {
                 return false;
+            }
+
+            if(other == this)
+            {
+                return true;
             }
 
             if(other.BlockSize != this.BlockSize)
@@ -128,6 +162,10 @@ namespace MicropolisSharp.Types
             return true;
         }
 
+        /// <summary>
+        /// Fill the map with a particular value
+        /// </summary>
+        /// <param name="value">The value to set every cell to</param>
         public void Fill(DataType value)
         {
             for (int i = 0; i < this.width * this.height; ++i)
@@ -136,17 +174,38 @@ namespace MicropolisSharp.Types
             }
         }
 
+        /// <summary>
+        /// Clear the map - set every cell to the default value
+        /// </summary>
         public void Clear()
         {
             Fill(defaultValue);
         }
 
+        /// <summary>
+        /// Set a value on the map - with a local position
+        /// 
+        /// TODO: Remove this
+        /// </summary>
+        /// <param name="x">Position to set in the X axis</param>
+        /// <param name="y">Position to set in the Y axis</param>
+        /// <param name="value">The value to set</param>
+        [Obsolete("Use WorldSet - and ensure you change X/Y as required")]
         public void Set(int x, int y, DataType value)
         {
             if (OnMap(x, y))
                 data[x * height + y] = value;
         }
 
+        /// <summary>
+        /// Gets a value from the map - using a local position
+        /// 
+        /// TODO: Remove this
+        /// </summary>
+        /// <param name="x">Position to get in the X axis</param>
+        /// <param name="y">Position to get in the Y axis</param>
+        /// <returns></returns>
+        [Obsolete("Use WorldGet - and ensure you change X/Y as required")]
         public DataType Get(int x, int y)
         {
             if (OnMap(x, y))
@@ -155,11 +214,23 @@ namespace MicropolisSharp.Types
             return defaultValue;
         }
 
+        /// <summary>
+        /// Is the local position offered within the bounds of the map?
+        /// </summary>
+        /// <param name="x">Position X wanted</param>
+        /// <param name="y">Position Y wanted</param>
+        /// <returns>Returns true, if X,Y is on the map (local bounds)</returns>
         public bool OnMap(int x, int y)
         {
             return (x >= 0 && x < width) && (y >= 0 && y < height);
         }
 
+        /// <summary>
+        /// Sets the value at the World-Relative position in this map, to the given value
+        /// </summary>
+        /// <param name="x">Relative Position to set in the X axis</param>
+        /// <param name="y">Relative Position to set in the Y axis</param>
+        /// <param name="value">The value to set on the map</param>
         public void WorldSet(int x, int y, DataType value)
         {
             if (WorldOnMap(x, y))
@@ -170,6 +241,12 @@ namespace MicropolisSharp.Types
             }
         }
 
+        /// <summary>
+        /// Gets the value at the World-Relative position in this map
+        /// </summary>
+        /// <param name="x">Relative Position to get in the X axis</param>
+        /// <param name="y">Relative Position to get in the Y axis</param>
+        /// <returns>The value at the relative position</returns>
         public DataType WorldGet(int x, int y)
         {
             if (!WorldOnMap(x, y))
@@ -180,17 +257,33 @@ namespace MicropolisSharp.Types
             return data[x * height + y];
         }
 
+        /// <summary>
+        /// Is the relative position offered within the bounds of the map?
+        /// </summary>
+        /// <param name="x">Position X wanted</param>
+        /// <param name="y">Position Y wanted</param>
+        /// <returns>Returns true, if X,Y is on the map (relative world bounds)</returns>
         public bool WorldOnMap(int x, int y)
         {
             return (x >= 0 && x < Constants.WorldWidth) && (y >= 0 && y < Constants.WorldHeight);
         }
 
+        /// <summary>
+        /// Get the underlying data to manipulate directly
+        /// 
+        /// TODO: Remove / Hide this method - it was only used within memory / pointer based direct accesses.
+        /// </summary>
+        /// <returns>The underlying data array</returns>
+        [Obsolete]
         public DataType[] getBase()
         {
             return data;
         }
     }
 
+    /// <summary>
+    /// A map of DataType = Byte - BlockSize = 1
+    /// </summary>
     public class ByteMap1 : Map<byte>
     {
         public ByteMap1() : base(1) { }
@@ -198,6 +291,9 @@ namespace MicropolisSharp.Types
         public ByteMap1(ByteMap1 map) : base(map) { }
     }
 
+    /// <summary>
+    /// A map of DataType = Byte - BlockSize = 2
+    /// </summary>
     public class ByteMap2 : Map<byte>
     {
         public ByteMap2() : base(2) { }
@@ -205,6 +301,9 @@ namespace MicropolisSharp.Types
         public ByteMap2(ByteMap2 map) : base(map) { }
     }
 
+    /// <summary>
+    /// A map of DataType = Byte - BlockSize = 4
+    /// </summary>
     public class ByteMap4 : Map<byte>
     {
         public ByteMap4() : base(4) { }
@@ -212,6 +311,9 @@ namespace MicropolisSharp.Types
         public ByteMap4(ByteMap4 map) : base(map) { }
     }
 
+    /// <summary>
+    /// A map of DataType = Short - BlockSize = 8
+    /// </summary>
     public class ShortMap8 : Map<short>
     {
         public ShortMap8() : base(8) { }

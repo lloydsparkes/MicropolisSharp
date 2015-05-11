@@ -67,7 +67,7 @@
 namespace MicropolisSharp.Types
 {
     /// <summary>
-    /// From micropolis.h
+    /// Available types of historic data - from micropolis.h
     /// </summary>
     public enum HistoryType
     {

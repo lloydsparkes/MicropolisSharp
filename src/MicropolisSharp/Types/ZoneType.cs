@@ -67,7 +67,7 @@
 namespace MicropolisSharp.Types
 {
     /// <summary>
-    /// From micropolis.h
+    /// Available Zone Types - from micropolis.h
     /// </summary>
     public enum ZoneType
     {
@@ -75,6 +75,7 @@ namespace MicropolisSharp.Types
         Industrial,       ///< Industrial zone
         Residential,      ///< Residential zone
 
+        //TODO: Remove this / move it somewhere else - it doesnt make sense here
         NumberOfDestinations, ///< Number of available zones
     }
 }
