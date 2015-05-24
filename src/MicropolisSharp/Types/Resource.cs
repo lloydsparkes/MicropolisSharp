@@ -64,10 +64,15 @@
  * CONSUMER, SO SOME OR ALL OF THE ABOVE EXCLUSIONS AND LIMITATIONS MAY
  * NOT APPLY TO YOU.
  */
+using System;
+
 namespace MicropolisSharp.Types
 {
     /// <summary>
-    /// From resource.h
+    /// Resource of the game (a file with data loaded in memory). From micropolis.h
+    /// 
+    /// TODO: Remove the next variable - and rework all code to not use Linked Lists
+    /// TODO: Remove - Shouldnt be something for the game engine to utilise
     /// </summary>
     public class Resource
     {
@@ -75,6 +80,8 @@ namespace MicropolisSharp.Types
         public long Size { get; set; }
         public string Name { get; set; }
         public long Id { get; set; }
+
+        [Obsolete("No longer a linked list, Use Array Accessor")]
         public Resource Next { get; set; }
     }
 }

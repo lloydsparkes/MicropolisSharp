@@ -74,21 +74,73 @@ namespace MicropolisSharp
     /// </summary>
     public partial class Micropolis
     {
+
+        /// <summary>
+        /// TODO: Write Only Variable - can be removed?
+        /// </summary>
         public short NewMap { get; private set; }
 
+        /// <summary>
+        /// TODO: Write Only Variable - can be removed?
+        /// </summary>
         public short[] NewMapFlags { get; private set; }
 
+        /// <summary>
+        /// Center of the City - X
+        /// 
+        /// TODO: Turn into a Position
+        /// </summary>
         public short CityCenterX { get; private set; }
+
+        /// <summary>
+        /// Center of the City - Y
+        /// 
+        /// TODO: Turn into a Position
+        /// </summary>
         public short CityCenterY { get; private set; }
 
+        /// <summary>
+        /// Pollution Max - X
+        /// 
+        /// TODO: Turn into a Position
+        /// </summary>
         public short PollutionMaxX { get; private set; }
+
+        /// <summary>
+        /// Pollution Max - Y
+        /// 
+        /// TODO: Turn into a Position
+        /// </summary>
         public short PollutionMaxY { get; private set; }
 
+        /// <summary>
+        /// Crime Max- X
+        /// 
+        /// TODO: Turn into a Position
+        /// </summary>
         public short CrimeMaxX { get; private set; }
+
+        /// <summary>
+        /// Crime Max - Y
+        /// 
+        /// TODO: Turn into a Position
+        /// </summary>
         public short CrimeMaxY { get; private set; }
 
+        /// <summary>
+        /// Integer with bits 0..2 that control smoothing.
+        /// 
+        /// TODO: Variable is always \c 0. Can we delete the variable?
+        /// TODO: Introduce constants for the bits and/or a bool array.
+        /// </summary>
         public long DonDither { get; private set; }
 
+        /// <summary>
+        /// Smooth a station map.
+        /// 
+        ///  Used for smoothing fire station and police station coverage maps.
+        /// </summary>
+        /// <param name="map">Map to smooth.</param>
         private static void SmoothStationMap(ShortMap8 map)
         {
             short x, y, edge;
@@ -121,6 +173,11 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Make firerate map from firestation map.
+        /// 
+        /// TODO: Comment Seems wrong, whats a fire rate map
+        /// </summary>
         public void FireAnalysis()
         {
             SmoothStationMap(FireStationMap);
@@ -133,6 +190,9 @@ namespace MicropolisSharp
             NewMapFlags[(int)MapType.Dynamic] = 1;
         }
 
+        /// <summary>
+        /// The tempMap1 has MAP_BLOCKSIZE > 1, so we may be able to optimize the first x, y loop.
+        /// </summary>
         public void PopulationDensityScan()
         { 
             /*  sets: populationDensityMap, , , comRateMap  */
@@ -197,6 +257,12 @@ namespace MicropolisSharp
             NewMapFlags[(int)MapType.Dynamic] = 1;
         }
 
+        /// <summary>
+        /// Get population of a zone.
+        /// </summary>
+        /// <param name="pos">Position of the zone to count.</param>
+        /// <param name="tile">Tile of the zone.</param>
+        /// <returns>Population of the zone.</returns>
         public int GetPopulationDensity(Position pos, ushort tile)
         {
             int pop;
@@ -228,6 +294,9 @@ namespace MicropolisSharp
             return 0;
         }
 
+        /// <summary>
+        /// comefrom: simulate SpecialInit
+        /// </summary>
         public void PollutionTerrainLandValueScan()
         { /* Does pollution, terrain, land value */
             long ptot, LVtot;
@@ -356,6 +425,11 @@ namespace MicropolisSharp
             NewMapFlags[(int)MapType.Dynamic] = 1;
         }
 
+        /// <summary>
+        /// Return pollution of a tile value
+        /// </summary>
+        /// <param name="loc">Tile character</param>
+        /// <returns>Value of the pollution (0..255, bigger is worse)</returns>
         public int GetPollutionValue(int loc)
         {
             if (loc < (ushort)MapTileCharacters.POWERBASE)
@@ -407,6 +481,15 @@ namespace MicropolisSharp
             return 0;
         }
 
+        /// <summary>
+        /// Compute Manhattan distance between given world position and center of the city.
+        /// 
+        /// NOTE: For long distances (> 64), value 64 is returned.
+        /// TODO: Change to Position
+        /// </summary>
+        /// <param name="x">X world coordinate of given position.</param>
+        /// <param name="y">Y world coordinate of given position.</param>
+        /// <returns></returns>
         public int GetCityCenterDistance(int x, int y)
         {
             int xDis, yDis;
@@ -432,6 +515,9 @@ namespace MicropolisSharp
             return Math.Min(xDis + yDis, 64);
         }
 
+        /// <summary>
+        /// Smooth police station map and compute crime rate 
+        /// </summary>
         public void CrimeScan() {
             SmoothStationMap(PoliceStationMap);
             SmoothStationMap(PoliceStationMap);
@@ -489,6 +575,9 @@ namespace MicropolisSharp
             NewMapFlags[(int)MapType.Dynamic] = 1;
         }
 
+        /// <summary>
+        /// comefrom: pollutionTerrainLandValueScan
+        /// </summary>
         public void SmoothTerrain() {
             if ((DonDither & 1).IsTrue())
             {
@@ -545,6 +634,12 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Perform smoothing with or without dithering.
+        /// </summary>
+        /// <param name="srcMap">Source map.</param>
+        /// <param name="destMap">Destination map.</param>
+        /// <param name="dither">Function should apply dithering.</param>
         private static void smoothDitherMap(ByteMap2 srcMap, ByteMap2 destMap, bool dither)
         {
             if (dither)
@@ -605,9 +700,19 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Smooth Micropolis::tempMap1 to Micropolis::tempMap2 
+        /// </summary>
         public void DoSmooth1() { smoothDitherMap(TempMap1, TempMap2, (DonDither & 2).IsTrue()); }
+
+        /// <summary>
+        /// Smooth Micropolis::tempMap2 to Micropolis::tempMap1
+        /// </summary>
         public void DoSmooth2() { smoothDitherMap(TempMap2, TempMap1, (DonDither & 4).IsTrue()); }
 
+        /// <summary>
+        /// Compute distance to city center for the entire map.
+        /// </summary>
         public void ComputeComRateMap()
         {
             int x, y, z;

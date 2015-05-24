@@ -82,6 +82,14 @@ namespace MicropolisSharp
         private int absDist;
         private short spriteCycle;
 
+        /// <summary>
+        /// Create and initialize a sprite.
+        /// </summary>
+        /// <param name="name">Name of the sprite (always \c "").</param>
+        /// <param name="type">Type pf the sprite. @see SpriteType.</param>
+        /// <param name="x">X coordinate of the sprite (in pixels).</param>
+        /// <param name="y">Y coordinate of the sprite (in pixels).</param>
+        /// <returns>New sprite object.</returns>
         public SimSprite NewSprite(string name, SpriteType type, int x, int y)
         {
             SimSprite sprite;
@@ -107,6 +115,15 @@ namespace MicropolisSharp
             return sprite;
         }
 
+        /// <summary>
+        /// Re-initialize an existing sprite.
+        /// 
+        /// TODO: Make derived classes for each type.
+        /// TODO: Move code to (derived) #SimSprite methods.
+        /// </summary>
+        /// <param name="sprite">Sprite to re-use.</param>
+        /// <param name="x">New x coordinate of the sprite (in pixels?).</param>
+        /// <param name="y">New y coordinate of the sprite (in pixels?).</param>
         public void InitSprite(SimSprite sprite, int x, int y) {
             sprite.X = x;
             sprite.Y = y;
@@ -285,6 +302,9 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Destroy all sprites by de-activating them all (setting their SimSprite::frame to 0).
+        /// </summary>
         public void DestroyAllSprites()
         {
             foreach(SimSprite sprite in SpriteList)
@@ -293,6 +313,12 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Destroy the sprite by taking it out of the active list.
+        /// 
+        /// TODO: Break the connection between any views that are following this sprite.
+        /// </summary>
+        /// <param name="sprite">sprite Sprite to destroy.</param>
         public void DestorySprite(SimSprite sprite)
         {
             if (globalSprites[(int)sprite.Type] == sprite)
@@ -306,6 +332,11 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Return the sprite of the give type, if available.
+        /// </summary>
+        /// <param name="type">Type of the sprite.</param>
+        /// <returns>Pointer to the active sprite if avaiable, else \c NULL.</returns>
         public SimSprite GetSprite(SpriteType type)
         {
             SimSprite sprite = globalSprites[(int)type];
@@ -319,6 +350,13 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Make a sprite either by re-using the old one, or by making a new one.
+        /// </summary>
+        /// <param name="type">Sprite type of the new sprite.</param>
+        /// <param name="x">X coordinate of the new sprite.</param>
+        /// <param name="y">Y coordinate of the new sprite.</param>
+        /// <returns></returns>
         public SimSprite MakeSprite(SpriteType type, int x, int y)
         {
             SimSprite sprite;
@@ -335,6 +373,12 @@ namespace MicropolisSharp
             return sprite;
         }
 
+        /// <summary>
+        /// Get character from the map.
+        /// </summary>
+        /// <param name="x">X coordinate in pixels.</param>
+        /// <param name="y">Y coordinate in pixels.</param>
+        /// <returns>Map character if on-map, or \c -1 if off-map.</returns>
         public short GetChar(int x, int y)
         {     // Convert sprite coordinates to tile coordinates.
             x >>= 4;
@@ -350,6 +394,15 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Turn
+        /// 
+        /// TODO: Remove local magic constants and document the code.
+        /// TODO: Use Directions
+        /// </summary>
+        /// <param name="p">Present direction (1..8).</param>
+        /// <param name="d">Destination direction (1..8).</param>
+        /// <returns>New direction</returns>
         public short TurnTo(int p, int d)
         {
             if (p == d)
@@ -393,6 +446,16 @@ namespace MicropolisSharp
             return (short)p;
         }
 
+        /// <summary>
+        /// ????
+        /// 
+        /// TODO: Figure out what this function is doing
+        /// TODO: Remove local magic constants and document the code
+        /// </summary>
+        /// <param name="Tpoo"></param>
+        /// <param name="Told"></param>
+        /// <param name="Tnew"></param>
+        /// <returns></returns>
         public bool TryOther(int Tpoo, int Told, int Tnew)
         {
             int z;
@@ -418,6 +481,11 @@ namespace MicropolisSharp
             return false;
         }
 
+        /// <summary>
+        /// Check whether a sprite is still entirely on-map.
+        /// </summary>
+        /// <param name="sprite">Sprite to check.</param>
+        /// <returns>Sprite is at least partly off-map.</returns>
         public bool SpriteNotInBounds(SimSprite sprite)
         {
             int x = sprite.X + sprite.XHot;
@@ -426,6 +494,17 @@ namespace MicropolisSharp
             return x < 0 || y < 0 || x >= (Constants.WorldWidth << 4) || y >= (Constants.WorldHeight << 4);
         }
 
+        /// <summary>
+        /// Get direction (0..8?) to get from starting point to destination point.
+        /// 
+        /// TODO: Remove local magic constants and document the code.
+        /// TODO: Has a condition that never holds.
+        /// </summary>
+        /// <param name="orgX">X coordinate starting point.</param>
+        /// <param name="orgY">Y coordinate starting point.</param>
+        /// <param name="desX">X coordinate destination point.</param>
+        /// <param name="desY">Y coordinate destination point.</param>
+        /// <returns>Direction to go in.</returns>
         public short GetDir(int orgX, int orgY, int desX, int desY)
         {
             short[] Gdtab = { 0, 3, 2, 1, 3, 4, 5, 7, 6, 5, 7, 8, 1 };
@@ -478,13 +557,38 @@ namespace MicropolisSharp
             return Gdtab[z];
         }
 
+        /// <summary>
+        /// Compute Manhattan distance between two points.
+        /// 
+        /// TODO: Dont we have this function somewhere else already?
+        /// </summary>
+        /// <param name="x1">X coordinate first point.</param>
+        /// <param name="y1">Y coordinate first point.</param>
+        /// <param name="x2">X coordinate second point.</param>
+        /// <param name="y2">Y coordinate second point.</param>
+        /// <returns>Manhattan distance between both points.</returns>
         public int GetDistance(int x1, int y1, int x2, int y2) { return Math.Abs(x1 - x2) + Math.Abs(y1 - y2); }
 
+        /// <summary>
+        /// Check whether two sprites collide with each other.
+        /// </summary>
+        /// <param name="s1">First sprite.</param>
+        /// <param name="s2">Second sprite.</param>
+        /// <returns>Sprites are colliding.</returns>
         public bool CheckSpriteCollision(SimSprite s1, SimSprite s2)
         {
             return s1.Frame != 0 && s2.Frame != 0 && GetDistance(s1.X + s1.XHot, s1.Y + s1.YHot, s2.X + s2.XHot, s2.Y + s2.YHot) < 30;
         }
 
+        /// <summary>
+        /// Move all sprites.
+        /// 
+        /// Sprites with SimSprite::frame == 0 are removed.
+        /// 
+        /// TODO: It uses SimSprite::name[0] == '\0' as condition which seems stupid.
+        /// TODO: Micropolis::destroySprite modifies the Micropolis::spriteList
+        ///         while we loop over it.
+        /// </summary>
         public void MoveObjects()
         {
             if (!SimSpeed.IsTrue())
@@ -546,6 +650,12 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Move train sprite.
+        /// 
+        /// TODO: Remove local magic constants and document the code.
+        /// </summary>
+        /// <param name="sprite">Train sprite.</param>
         public void DoTrainSprite(SimSprite sprite)
         {     
             /* Offset in pixels of sprite x and y to map tile */
@@ -627,6 +737,12 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Move helicopter sprite.
+        /// 
+        /// TODO: Remove local magic constants and document the code.
+        /// </summary>
+        /// <param name="sprite">Helicopter sprite.</param>
         public void DoCopterSprite(SimSprite sprite)
         {
             short[] CDx = { 0, 0, 3, 5, 3, 0, -3, -5, -3 };
@@ -742,6 +858,15 @@ namespace MicropolisSharp
             sprite.Y += CDy[z];
         }
 
+        /// <summary>
+        /// Move airplane sprite.
+        /// 
+        /// TODO: Remove local magic constants and document the code.
+        /// TODO: absDist gets updated by Micropolis::getDir(), which is not always
+        ///         called before reading it(or worse, we just turned towards the old
+        ///         destination).
+        /// </summary>
+        /// <param name="sprite">Airplane sprite.</param>
         public void DoAirplaneSprite(SimSprite sprite)
         {
             short[] CDx = { 0, 0, 6, 8, 6, 0, -6, -8, -6, 8, 8, 8 };
@@ -813,6 +938,12 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Move ship sprite.
+        /// 
+        /// TODO: Remove local magic constants and document the code.
+        /// </summary>
+        /// <param name="sprite">Ship sprite.</param>
         public void DoShipSprite(SimSprite sprite)
         {
             short[] BDx = { 0, 0, 1, 1, 1, 0, -1, -1, -1 };
@@ -949,6 +1080,31 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Move monster sprite.
+        /// 
+        /// There are 16 monster sprite frames:
+        /// 
+        /// Frame 0: NorthEast Left Foot
+        /// Frame 1: NorthEast Both Feet
+        /// Frame 2: NorthEast Right Foot
+        /// Frame 3: SouthEast Right Foot
+        /// Frame 4: SouthEast Both Feet
+        /// Frame 5: SouthEast Left Foot
+        /// Frame 6: SouthWest Right Foot
+        /// Frame 7: SouthWest Both Feet
+        /// Frame 8: SouthWest Left Foot
+        /// Frame 9: NorthWest Left Foot
+        /// Frame 10: NorthWest Both Feet
+        /// Frame 11: NorthWest Right Foot
+        /// Frame 12: North Left Foot
+        /// Frame 13: East Left Foot
+        /// Frame 14: South Right Foot
+        /// Frame 15: West Right Foot
+        /// 
+        /// TODO: Remove local magic constants and document the code. 
+        /// </summary>
+        /// <param name="sprite">Monster sprite.</param>
         public void DoMonsterSprite(SimSprite sprite)
         {
             short[] Gx = { 2, 2, -2, -2, 0 };
@@ -1234,6 +1390,12 @@ namespace MicropolisSharp
             DestoryMapTile(sprite.X + 48, sprite.Y + 16);
         }
 
+        /// <summary>
+        /// Move tornado.
+        /// 
+        /// TODO: Remove local magic constants and document the code.
+        /// </summary>
+        /// <param name="sprite">Tornado sprite to move.</param>
         public void DoTornadoSprite(SimSprite sprite) {
             short[] CDx = { 2, 3, 2, 0, -2, -3 };
             short[] CDy = { -2, 0, 2, 3, 2, 0 };
@@ -1308,6 +1470,10 @@ namespace MicropolisSharp
             DestoryMapTile(sprite.X + 48, sprite.Y + 40);
         }
 
+        /// <summary>
+        /// 'Move' fire sprite.
+        /// </summary>
+        /// <param name="sprite">Fire sprite.</param>
         public void DoExplosionSprite(SimSprite sprite)
         {
             int x, y;
@@ -1341,6 +1507,12 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Move bus sprite.
+        /// 
+        /// TODO: Remove local magic constants and document the code.
+        /// </summary>
+        /// <param name="sprite">Bus sprite.</param>
         public void DoBusSprite(SimSprite sprite) {
             short[] Dx = { 0, 1, 0, -1, 0 };
             short[] Dy = { -1, 0, 1, 0, 0 };
@@ -1636,6 +1808,12 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Can one drive at the specified tile? 
+        /// </summary>
+        /// <param name="x">X position on the map</param>
+        /// <param name="y">Y position on the map</param>
+        /// <returns>0 if not, 1 if your can, -1 otherwise</returns>
         public int CanDriveOn(int x, int y)
         {
             ushort tile;
@@ -1662,6 +1840,12 @@ namespace MicropolisSharp
             return 0;
         }
 
+        /// <summary>
+        /// Handle explosion of sprite (mostly due to collision?).
+        /// 
+        /// TODO: Add a 'bus crashed' message to #MessageNumber.
+        /// </summary>
+        /// <param name="sprite">sprite that should explode.</param>
         public void ExplodeSprite(SimSprite sprite)
         {
             int x, y;
@@ -1720,6 +1904,11 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Destroy a map tile.
+        /// </summary>
+        /// <param name="ox">X coordinate in pixels.</param>
+        /// <param name="oy">Y coordinate in pixels.</param>
         public void DestoryMapTile(int ox, int oy) {
             int t, z, x, y;
 
@@ -1771,6 +1960,12 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Start a fire in a zone.
+        /// </summary>
+        /// <param name="Xloc">X coordinate in map coordinate.</param>
+        /// <param name="Yloc">Y coordinate in map coordinate.</param>
+        /// <param name="ch">Map character at (\a Xloc, \a Yloc).</param>
         public void StartFireInZone(int Xloc, int Yloc, int ch) {
             int Xtem, Ytem;
             short x, y, XYmax;
@@ -1814,6 +2009,11 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Start a fire at a single tile.
+        /// </summary>
+        /// <param name="x">X coordinate in map coordinate.</param>
+        /// <param name="y">Y coordinate in map coordinate.</param>
         public void StartFire(int x, int y)
         {
             int t, z;
@@ -1842,6 +2042,11 @@ namespace MicropolisSharp
             Map[x,y] = RandomFire();
         }
 
+        /// <summary>
+        /// Try to start a new train sprite at the given map tile.
+        /// </summary>
+        /// <param name="x">X coordinate in map coordinate.</param>
+        /// <param name="y">Y coordinate in map coordinate.</param>
         public void GenerateTrain(int x, int y)
         {
             if (TotalPop > 20 && GetSprite(SpriteType.Train) == null && GetRandom(25) == 0)
@@ -1850,6 +2055,11 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Try to start a new bus sprite at the given map tile.
+        /// </summary>
+        /// <param name="x">X coordinate in map coordinate.</param>
+        /// <param name="y">Y coordinate in map coordinate.</param>
         public void GenerateBus(int x, int y)
         {
             if (GetSprite(SpriteType.Bus) == null && GetRandom(25) == 0)
@@ -1858,6 +2068,9 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Try to construct a new ship sprite
+        /// </summary>
         public void GenerateShip()
         {
             int x, y;
@@ -1911,8 +2124,20 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Start a new ship sprite at the given map tile.
+        /// </summary>
+        /// <param name="x">X coordinate in map coordinate.</param>
+        /// <param name="y">Y coordinate in map coordinate.</param>
         public void MakeShipHere(int x, int y) { MakeSprite(SpriteType.Ship, (x << 4) - (48 - 1), (y << 4)); }
 
+        /// <summary>
+        /// Start a new monster sprite.
+        /// 
+        /// TODO: Make monster over land, because it disappears if it's made over water.
+        ///       Better yet make monster not disappear for a while after it's created,
+        ///       over land or water.Should never disappear prematurely.
+        /// </summary>
         public void MakeMonster()
         {
             int x, y, z, done = 0;
@@ -1949,12 +2174,23 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Start a new monster sprite at the given map tile.
+        /// </summary>
+        /// <param name="x">X coordinate in map coordinate.</param>
+        /// <param name="y">Y coordinate in map coordinate.</param>
         public void MakeMonsterAt(int x, int y)
         {
             MakeSprite(SpriteType.Monster, (x << 4) + 48, (y << 4));
             SendMessage(GeneralMessages.MESSAGE_MONSTER_SIGHTED, (short)(x + 5), (short)y, true, true);
         }
 
+        /// <summary>
+        /// Ensure a helicopter sprite exists.
+        /// 
+        /// If it does not exist, create one at the given coordinates.
+        /// </summary>
+        /// <param name="pos">Start position in map coordinates.</param>
         public void GenerateCopter(Position pos)
         {
             if (GetSprite(SpriteType.Helicopter) != null)
@@ -1965,6 +2201,12 @@ namespace MicropolisSharp
             MakeSprite(SpriteType.Helicopter, (pos.X << 4), (pos.Y << 4) + 30);
         }
 
+        /// <summary>
+        /// Ensure an airplane sprite exists.
+        /// 
+        /// If it does not exist, create one at the given coordinates.
+        /// </summary>
+        /// <param name="pos">Start position in map coordinates.</param>
         public void GeneratePlane(Position pos)
         {
             if (GetSprite(SpriteType.Airplane) != null)
@@ -1975,6 +2217,9 @@ namespace MicropolisSharp
             MakeSprite(SpriteType.Airplane, (short)((pos.X << 4) + 48), (short)((pos.Y << 4) + 12));
         }
 
+        /// <summary>
+        /// Ensure a tornado sprite exists.
+        /// </summary>
         public void MakeTornado()
         {
             int x, y;
@@ -1994,6 +2239,11 @@ namespace MicropolisSharp
             SendMessage(GeneralMessages.MESSAGE_TORNADO_SIGHTED, (short)((x >> 4) + 3), (short)((y >> 4) + 2), true, true);
         }
 
+        /// <summary>
+        /// Construct an explosion sprite.
+        /// </summary>
+        /// <param name="x">X coordinate in map coordinate.</param>
+        /// <param name="y">Y coordinate in map coordinate.</param>
         public void MakeExplosion(int x, int y)
         {
             if (Position.TestBounds(x, y))
@@ -2002,6 +2252,11 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Construct an explosion sprite.
+        /// </summary>
+        /// <param name="x">X coordinate in map coordinate.</param>
+        /// <param name="y">Y coordinate in map coordinate.</param>
         public void MakeExplosionAt(int x, int y) { NewSprite("", SpriteType.Explosion, x - 40, y - 16); }
     }
 }

@@ -87,6 +87,13 @@ namespace MicropolisSharp
             9999, // a huge short
         };
 
+        /// <summary>
+        /// Put a park down at the give tile.
+        /// </summary>
+        /// <param name="x">X coordinate of the tile.</param>
+        /// <param name="y">Y coordinate of the tile.</param>
+        /// <param name="effects">Storage of effects of putting down the park.</param>
+        /// <returns></returns>
         public ToolResult PutDownPark(int x, int y, ToolEffects effects)
         {
             short value = GetRandom(4);
@@ -112,6 +119,13 @@ namespace MicropolisSharp
             return ToolResult.Ok;
         }
 
+        /// <summary>
+        /// Put down a communication network.
+        /// </summary>
+        /// <param name="x">X coordinate of the tile.</param>
+        /// <param name="y">Y coordinate of the tile.</param>
+        /// <param name="effects">Storage of effects of putting down the park.</param>
+        /// <returns></returns>
 		public ToolResult PutDownNetwork(int x, int y, ToolEffects effects)
         {
             ushort tile = effects.GetMapTile(x, y);
@@ -137,6 +151,13 @@ namespace MicropolisSharp
             return ToolResult.Ok;
         }
 
+        /// <summary>
+        /// Put down a water tile.
+        /// </summary>
+        /// <param name="x">X coordinate of the tile.</param>
+        /// <param name="y">Y coordinate of the tile.</param>
+        /// <param name="effects">Storage of effects of putting down the park.</param>
+        /// <returns></returns>
         public ToolResult PutDownWater(int x, int y,
                                     ToolEffects effects)
         {
@@ -151,6 +172,13 @@ namespace MicropolisSharp
             return ToolResult.Ok;
         }
 
+        /// <summary>
+        /// Put down a land tile.
+        /// </summary>
+        /// <param name="x">X coordinate of the tile.</param>
+        /// <param name="y">Y coordinate of the tile.</param>
+        /// <param name="effects">Storage of effects of putting down the park.</param>
+        /// <returns></returns>
         public ToolResult PutDownLand(int x, int y, ToolEffects effects)
         {
             ushort tile = effects.GetMapTile(x, y);
@@ -164,6 +192,13 @@ namespace MicropolisSharp
             return ToolResult.Ok;
         }
 
+        /// <summary>
+        /// Put down a forest tile.
+        /// </summary>
+        /// <param name="x">X coordinate of the tile.</param>
+        /// <param name="y">Y coordinate of the tile.</param>
+        /// <param name="effects">Storage of effects of putting down the park.</param>
+        /// <returns></returns>
         public ToolResult PutDownForest(int x, int y, ToolEffects effects)
         {
             short[] dx = { -1, 0, 1, -1, 1, -1, 0, 1, };
@@ -187,6 +222,17 @@ namespace MicropolisSharp
             return ToolResult.Ok;
         }
 
+        /// <summary>
+        /// Compute where the 'center' (at (1,1)) of the zone is, depending on where the
+        /// user clicked.
+        /// 
+        /// Only inner tiles are recognized, and possibly not even complete (ie stadium
+        /// while game is playing).
+        /// </summary>
+        /// <param name="tileId">character value of the tile that the user clicked on.</param>
+        /// <param name="deltaHPtr">Pointer where horizontal position correction is written to.</param>
+        /// <param name="deltaVPtr">Pointer where vertical position correction is written to.</param>
+        /// <returns>Make this table driven.</returns>
         public short CheckBigZone(ushort tileId, ref int deltaHPtr, ref int deltaVPtr)
         {
             switch ((MapTileCharacters)tileId)
@@ -314,6 +360,11 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Can the tile be auto-bulldozed?.
+        /// </summary>
+        /// <param name="tileValue">Value of the tile.</param>
+        /// <returns>True if the tile can be auto-bulldozed, else \c false.</returns>
         public bool Tally(ushort tileValue)
         {
             return (tileValue >= (ushort)MapTileCharacters.FIRSTRIVEDGE && tileValue <= (ushort)MapTileCharacters.LASTRUBBLE) ||
@@ -321,6 +372,11 @@ namespace MicropolisSharp
            (tileValue >= (ushort)MapTileCharacters.TINYEXP && tileValue <= (ushort)MapTileCharacters.LASTTINYEXP + 2);
         }
 
+        /// <summary>
+        /// Return the size of the zone that the tile belongs to.
+        /// </summary>
+        /// <param name="tileValue">Value of the tile in the zone.</param>
+        /// <returns>Size of the zone if it is a known tile value, else \c 0.</returns>
         public int CheckSize(ushort tileValue)
         {
             // check for the normal com, resl, ind 3x3 zones & the fireDept & PoliceDept
@@ -341,6 +397,14 @@ namespace MicropolisSharp
             return 0;
         }
 
+        /// <summary>
+        /// Check and connect a new zone around the border.
+        /// </summary>
+        /// <param name="xMap">X coordinate of top-left tile.</param>
+        /// <param name="yMap">Y coordinate of top-left tile.</param>
+        /// <param name="sizeX">Horizontal size of the new zone.</param>
+        /// <param name="sizeY">Vertical size of the new zone.</param>
+        /// <param name="effects">Storage of the effects.</param>
         public void CheckBorder(int xMap, int yMap, int sizeX, int sizeY, ToolEffects effects)
         {
             short cnt;
@@ -370,6 +434,21 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Put down a building, starting at (\a leftX, \a topY) with size
+        /// (\a sizeX, \a sizeY).
+        /// 
+        /// All tiles are within world boundaries.
+        /// 
+        /// TODO: We should ask the buildings themselves how they should be drawn.
+        /// </summary>
+        /// <param name="leftX">Position of left column of tiles of the building.</param>
+        /// <param name="topY">Position of top row of tiles of the building.</param>
+        /// <param name="sizeX">Horizontal size of the building.</param>
+        /// <param name="sizeY">Vertical size of the building.</param>
+        /// <param name="baseTile">Tile value to use at the top-left position. Tiles are laid in column major mode</param>
+        /// <param name="aniFlag">Set animation flag at relative position (1, 2)</param>
+        /// <param name="effects">Storage of the effects.</param>
         public void PutBuilding(int leftX, int topY, int sizeX, int sizeY, ushort baseTile, bool aniFlag, ToolEffects effects)
         {
             for (int dy = 0; dy < sizeY; dy++)
@@ -400,6 +479,19 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Prepare the site where a building is about to be put down.
+        /// 
+        /// This function performs some basic sanity checks, and implements the
+        /// auto-bulldoze functionality to prepare the site.
+        /// All effects are stored in the \a effects object.
+        /// </summary>
+        /// <param name="leftX">Position of left column of tiles of the building.</param>
+        /// <param name="topY">Position of top row of tiles of the building.</param>
+        /// <param name="sizeX">Horizontal size of the building.</param>
+        /// <param name="sizeY">Vertical size of the building.</param>
+        /// <param name="effects">Storage of the effects.</param>
+        /// <returns>Result of preparation.</returns>
         public ToolResult PrepareBuildingSite(int leftX, int topY, int sizeX, int sizeY, ToolEffects effects)
         {
             // Check that the entire site is on the map
@@ -447,6 +539,14 @@ namespace MicropolisSharp
             return ToolResult.Ok;
         }
 
+        /// <summary>
+        /// Build a building.
+        /// </summary>
+        /// <param name="mapH">Horizontal position of the 'center' tile in the world.</param>
+        /// <param name="mapV">Vertical position of the 'center' tile in the world.</param>
+        /// <param name="buildingProps">Building properties of the building being constructed.</param>
+        /// <param name="effects">Storage of effects of putting down the building.</param>
+        /// <returns></returns>
         public ToolResult BuildBuilding(int mapH, int mapV, BuildingProperties buildingProps, ToolEffects effects)
         {
             mapH--; mapV--; // Move position to top-left
@@ -473,6 +573,21 @@ namespace MicropolisSharp
             return ToolResult.Ok;
         }
 
+        /// <summary>
+        /// Get string index for a status report on tile \a mapH, \a mapV on a
+        ///      given status category.
+        /// </summary>
+        /// <param name="catNo">
+        ///     catNo Category number:
+        ///      0: population density
+        ///      1: land value.
+        ///      2: crime rate.
+        ///      3: pollution.
+        ///      4: growth rate.
+        /// </param>
+        /// <param name="mapH">X coordinate of the tile.</param>
+        /// <param name="mapV">Y coordinate of the tile.</param>
+        /// <returns>Index into stri.202 file.</returns>
         public int GetDensity(short catNo, short mapH, short mapV)
         {
             int z;
@@ -517,6 +632,13 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Report about the status of a tile.
+        /// 
+        /// TODO: Program breaks for status on 'dirt'
+        /// </summary>
+        /// <param name="mapH">X coordinate of the tile.</param>
+        /// <param name="mapV">Y coordinate of the tile.</param>
         public void DoZoneStatus(short mapH, short mapV)
         {
             int tileCategory;
@@ -576,6 +698,17 @@ namespace MicropolisSharp
                 mapH, mapV);
         }
 
+        /// <summary>
+        /// Tell front-end to report on status of a tile.
+        /// </summary>
+        /// <param name="tileCategory">Category of the tile text index.</param>
+        /// <param name="s0">Population density text index.</param>
+        /// <param name="s1">Land value text index.</param>
+        /// <param name="s2">Crime rate text index.</param>
+        /// <param name="s3">Pollution text index.</param>
+        /// <param name="s4">Grow rate text index.</param>
+        /// <param name="x">X coordinate of the tile.</param>
+        /// <param name="y">Y coordinate of the tile.</param>
         public void DoShowZoneStatus(
             int tileCategory,
             int s0, int s1, int s2, int s3, int s4,
@@ -584,6 +717,13 @@ namespace MicropolisSharp
             Callback("showZoneStatus", "dddddddd", tileCategory.ToString(), s0.ToString(), s1.ToString(), s2.ToString(), s3.ToString(), s4.ToString(), x.ToString(), y.ToString());
         }
 
+        /// <summary>
+        /// Make a \a size by \a size tiles square of rubble
+        /// </summary>
+        /// <param name="x">Horizontal position of the left-most tile</param>
+        /// <param name="y">Vertical position of the left-most tile</param>
+        /// <param name="size">Size of the rubble square</param>
+        /// <param name="effects"></param>
         public void PutRubble(int x, int y, int size, ToolEffects effects)
         {
             for (int xx = x; xx < x + size; xx++)
@@ -605,11 +745,23 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Report to the front-end that a tool was used.
+        /// </summary>
+        /// <param name="name">Name of the tool.</param>
+        /// <param name="x">X coordinate of where the tool was applied.</param>
+        /// <param name="y">Y coordinate of where the tool was applied.</param>
         public void DidTool(String name, short x, short y)
         {
             Callback("didTool", "sdd", name.ToString(), x.ToString(), y.ToString());
         }
 
+        /// <summary>
+        /// Do query tool.
+        /// </summary>
+        /// <param name="x">X coordinate of the position of the query.</param>
+        /// <param name="y">Y coordinate of the position of the query.</param>
+        /// <returns></returns>
         public ToolResult QueryTool(short x, short y)
         {
             if (!(new Position(x,y)).TestBounds())
@@ -623,6 +775,12 @@ namespace MicropolisSharp
             return ToolResult.Ok;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="x">X coordinate of the position of the query.</param>
+        /// <param name="y">Y coordinate of the position of the query.</param>
+        /// <returns></returns>
         public ToolResult BulldozerTool(short x, short y)
         {
             ToolEffects effects = new ToolEffects(this);
@@ -637,6 +795,13 @@ namespace MicropolisSharp
             return result;
         }
 
+        /// <summary>
+        /// Apply Bulldozer Tool
+        /// </summary>
+        /// <param name="x">X coordinate of the position of the query.</param>
+        /// <param name="y">Y coordinate of the position of the query.</param>
+        /// <param name="effects">Y coordinate of the position of the query.</param>
+        /// <returns></returns>
         public ToolResult BulldozerTool(short x, short y, ToolEffects effects)
         {
             ToolResult result = ToolResult.Ok;
@@ -745,6 +910,13 @@ namespace MicropolisSharp
             return result;
         }
 
+        /// <summary>
+        /// Build a road at a tile.
+        /// </summary>
+        /// <param name="x">Horizontal position of the tile to lay road.</param>
+        /// <param name="y">Vertical position of the tile to lay road.</param>
+        /// <param name="effects">Storage of effects of laying raod at the tile.</param>
+        /// <returns></returns>
         public ToolResult RoadTool(short x, short y, ToolEffects effects)
         {
             if (!(new Position(x,y)).TestBounds())
@@ -765,6 +937,13 @@ namespace MicropolisSharp
             return result;
         }
 
+        /// <summary>
+        /// Build a rail track at a tile.
+        /// </summary>
+        /// <param name="x">Horizontal position of the tile to lay rail.</param>
+        /// <param name="y">Vertical position of the tile to lay rail.</param>
+        /// <param name="effects">Storage of effects of laying rail at the tile.</param>
+        /// <returns></returns>
         public ToolResult RailroadTool(short x, short y, ToolEffects effects)
         {
             if (!Position.TestBounds(x, y))
@@ -785,6 +964,13 @@ namespace MicropolisSharp
             return result;
         }
 
+        /// <summary>
+        /// Build a wire track at a tile.
+        /// </summary>
+        /// <param name="x">Horizontal position of the tile to lay wire.</param>
+        /// <param name="y">Vertical position of the tile to lay wire.</param>
+        /// <param name="effects">Storage of effects of laying wire at the tile.</param>
+        /// <returns></returns>
         public ToolResult WireTool(short x, short y, ToolEffects effects)
         {
             if (!Position.TestBounds(x, y))
@@ -805,6 +991,13 @@ namespace MicropolisSharp
             return result;
         }
 
+        /// <summary>
+        /// Build a park track at a tile.
+        /// </summary>
+        /// <param name="x">Horizontal position of the tile to lay park.</param>
+        /// <param name="y">Vertical position of the tile to lay park.</param>
+        /// <param name="effects">Storage of effects of laying park at the tile.</param>
+        /// <returns></returns>
         public ToolResult ParkTool(short x, short y, ToolEffects effects)
         {
             if (!Position.TestBounds(x, y))
@@ -825,6 +1018,14 @@ namespace MicropolisSharp
             return result;
         }
 
+        /// <summary>
+        /// Build a building track at a tile.
+        /// </summary>
+        /// <param name="x">Horizontal position of the tile to lay building.</param>
+        /// <param name="y">Vertical position of the tile to lay building.</param>
+        /// <param name="buildingProps">The property to build</param>
+        /// <param name="effects">Storage of effects of laying building at the tile.</param>
+        /// <returns></returns>
         public ToolResult BuildBuildingTool(short x, short y,
                                     BuildingProperties buildingProps,
                                     ToolEffects effects)
@@ -841,6 +1042,16 @@ namespace MicropolisSharp
             return result;
         }
 
+        /// <summary>
+        /// Put down a network
+        /// 
+        /// TODO: What is a network
+        /// TODO: Is this ever used
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="effects"></param>
+        /// <returns></returns>
         public ToolResult NetworkTool(short x, short y, ToolEffects effects)
         {
             if (!Position.TestBounds(x, y))
@@ -861,6 +1072,13 @@ namespace MicropolisSharp
             return result;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="effects"></param>
+        /// <returns></returns>
         public ToolResult WaterTool(short x, short y, ToolEffects effects)
         {
             if (!Position.TestBounds(x, y))
@@ -886,7 +1104,14 @@ namespace MicropolisSharp
             return result;
         }
 
-        ToolResult LandTool(short x, short y, ToolEffects effects)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="effects"></param>
+        /// <returns></returns>
+        public ToolResult LandTool(short x, short y, ToolEffects effects)
         {
             if (!Position.TestBounds(x, y))
             {
@@ -910,6 +1135,13 @@ namespace MicropolisSharp
             return result;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="effects"></param>
+        /// <returns></returns>
         public ToolResult ForestTool(short x, short y, ToolEffects effects)
         {
             ToolResult result = ToolResult.Ok;
@@ -955,6 +1187,13 @@ namespace MicropolisSharp
             return result;
         }
 
+        /// <summary>
+        /// Apply a tool.
+        /// </summary>
+        /// <param name="tool"></param>
+        /// <param name="tileX">X Horizontal position in the city map.</param>
+        /// <param name="tileY">Y Vertical position in the city map.</param>
+        /// <returns></returns>
         public ToolResult DoTool(EditingTool tool, short tileX, short tileY)
         {
             ToolEffects effects = new ToolEffects(this);
@@ -1092,6 +1331,14 @@ namespace MicropolisSharp
             InvalidateMaps();
         }
 
+        /// <summary>
+        /// Drag a tool from (\a fromX, \a fromY) to (\a toX, \a toY).
+        /// </summary>
+        /// <param name="tool">Tool being dragged.</param>
+        /// <param name="fromX">X Horizontal coordinate of the starting position.</param>
+        /// <param name="fromY">Y Vertical coordinate of the starting position.</param>
+        /// <param name="toX">X Horizontal coordinate of the ending position.</param>
+        /// <param name="toY">Y Vertical coordinate of the ending position.</param>
         public void ToolDrag(EditingTool tool,
                             short fromX, short fromY, short toX, short toY)
         {

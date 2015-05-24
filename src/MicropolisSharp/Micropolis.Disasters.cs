@@ -75,8 +75,16 @@ namespace MicropolisSharp
     {
         public short FloodCount { get; private set; }
 
+        /// <summary>
+        /// Let disasters happen.
+        /// 
+        /// TODO: Decide what to do with the 'nothing happens' disaster (since the
+        ///       chance that a disaster happens is expressed in the \c DisChance
+        ///       table).
+        /// </summary>
         private void DoDisasters()
-        { /* Chance of disasters at lev 0 1 2 */
+        { 
+            /* Chance of disasters at lev 0 1 2 */
             short[] DisChance = {
                 10 * 48, // Game level 0
                 5 * 48,  // Game level 1
@@ -146,6 +154,9 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Let disasters of the scenario happen
+        /// </summary>
         private void ScenarioDisaster()
         {
             switch (DisasterEvent)
@@ -205,6 +216,11 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Make a nuclear power plant melt
+        /// 
+        /// TODO: Randomize which Nuclear Power Plant melts down
+        /// </summary>
         public void MakeMeltdown()
         {
             short x, y;
@@ -222,6 +238,9 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Let a fire bomb explode at a random location
+        /// </summary>
         public void FireBomb()
         {
             int crashX = GetRandom(Constants.WorldWidth - 1);
@@ -230,6 +249,9 @@ namespace MicropolisSharp
             SendMessage(GeneralMessages.MESSAGE_FIREBOMBING, (short)crashX, (short)crashY, true, true);
         }
 
+        /// <summary>
+        /// Throw several bombs onto the city.
+        /// </summary>
         public void MakeFireBombs()
         {
             int count = 2 + (GetRandom16() & 1);
@@ -243,6 +265,9 @@ namespace MicropolisSharp
             // TODO: Schedule periodic fire bombs over time, every few ticks.
         }
 
+        /// <summary>
+        /// Change random tiles to fire or dirt as result of the earthquake
+        /// </summary>
         public void MakeEarthquake()
         {
             short x, y, z;
@@ -274,6 +299,9 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Start a fire at a random place, random disaster or scenario 
+        /// </summary>
         public void SetFire()
         {
             short x, y, z;
@@ -293,6 +321,9 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Start a fire at a random place, requested by user 
+        /// </summary>
         public void MakeFire()
         {
             short t, x, y, z;
@@ -316,6 +347,11 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Flood many tiles
+        /// 
+        /// TODO: Use Direction and some form of XYPosition class here
+        /// </summary>
         public void MakeFlood()
         {
             short[] Dx = { 0, 1, 0, -1 };
@@ -354,6 +390,11 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Is tile vulnerable for an earthquake?
+        /// </summary>
+        /// <param name="tem">Tile data</param>
+        /// <returns>Function returns true if tile is vulnerable, and false if not</returns>
         private bool Vulnerable(int tem)
         {
             int tem2 = tem & (short)MapTileBits.LowMask;
@@ -366,6 +407,12 @@ namespace MicropolisSharp
             return true;
         }
 
+        /// <summary>
+        /// Flood around the given position.
+        /// 
+        /// TODO: Use some form of rotating around a position.
+        /// </summary>
+        /// <param name="pos">Position around which to flood further.</param>
         private void DoFlood(Position pos)
         {
             short[] Dx = { 0, 1, 0, -1 };

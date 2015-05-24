@@ -75,40 +75,128 @@ namespace MicropolisSharp
     /// </summary>
     public partial class Micropolis
     {
+        /// <summary>
+        /// ???
+        /// </summary>
         public int SimLoops { get; private set; }
+
+        /// <summary>
+        /// The count of the current pass through the simulator loop.
+        /// </summary>
         public int SimPass { get; private set; }
+
+        /// <summary>
+        /// Is the simulation paused? 
+        /// 
+        /// TODO: Variable has reversed logic, maybe rename to sim running?
+        /// </summary>
         public bool SimPaused { get; private set; }
+
+        /// <summary>
+        /// Simulator Paused Speed
+        /// 
+        /// TODO: Again too, Variable has reversed logic
+        /// </summary>
         public int SimPausedSpeed { get; private set; }
+
+        /// <summary>
+        /// The number of passes through the simulator, loop to take each tick
+        /// </summary>
         public int SimPasses { get; private set; }
 
+        /// <summary>
+        /// TODO: Currently not used - should it be hooked up?
+        /// </summary>
         public bool TilesAnimated { get; private set; }
 
+        /// <summary>
+        /// TODO: Currently not used - should it be hooked up?
+        /// </summary>
         public bool DoMessages { get; private set; }
+
+        /// <summary>
+        /// Enable Animation - currently always true
+        /// 
+        /// TODO: Currently not used - should it be hooked up?
+        /// </summary>
         public bool DoAnimation { get; private set; }
+
+        /// <summary>
+        /// TODO: Currently not used - should it be hooked up?
+        /// </summary>
         public bool DoNotices { get; private set; }
 
+        /// <summary>
+        /// Filename of last city loaded
+        /// </summary>
         public string CityFileName { get; private set; }
+
+        /// <summary>
+        /// Name of the City
+        /// </summary>
         public string CityName { get; private set; }
 
+        /// <summary>
+        /// ????
+        /// </summary>
         public int HeatSteps { get; private set; }
+
+        /// <summary>
+        /// TODO: Always -7 - make constant
+        /// </summary>
         public int HeatFlow { get; private set; }
+
+        /// <summary>
+        /// ???
+        /// </summary>
         public int HeatRule { get; private set; }
+
+        /// <summary>
+        /// TODO: Always 3 - make constant
+        /// </summary>
         public int HeatWrap { get; private set; }
 
+        /// <summary>
+        /// TODO: Make Private / Internal
+        /// </summary>
         public short CellSrc { get; private set; }
+
+        /// <summary>
+        /// TODO: Make Private / Internal
+        /// </summary>
         public short CellDest { get; private set; }
+
+        /// <summary>
+        /// TODO: Make Private / Internal
+        /// </summary>
         public ushort[,] CellMap { get; private set; }
 
+        /// <summary>
+        /// Get version of Micropolis program.
+        /// 
+        /// TODO: Use this function or Eliminate it
+        /// </summary>
+        /// <returns>Textual version</returns>
         public string GetMicropolisVersion()
         {
             return "5.0";
         }
 
+        /// <summary>
+        /// Check whether \a dir points to a directory.
+        /// 
+        /// If not report an error
+        /// </summary>
+        /// <param name="dir">Directory to search.</param>
+        /// <returns>Directory has been found</returns>
         public static bool TestDirectory(string dir)
         {
             return Directory.Exists(dir);
         }
 
+        /// <summary>
+        /// Locate resource directory.
+        /// </summary>
         public void EnvironmentInit()
         {
             string simHome = Environment.GetEnvironmentVariable("SIMHOME");
@@ -129,6 +217,9 @@ namespace MicropolisSharp
             //TODO: Exception - cannot find res dir
         }
 
+        /// <summary>
+        /// Initialize for a simulation
+        /// </summary>
         public void SimInit()
         {
             SetEnableSound(true); // Enable sound
@@ -163,6 +254,11 @@ namespace MicropolisSharp
             SetPasses(1);
         }
 
+        /// <summary>
+        /// Update ??
+        /// 
+        /// TODO: WHat is the purpose of this function (along with, SimTick)
+        /// </summary>
         public void SimUpdate()
         {     
             
@@ -213,6 +309,12 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// ????
+        /// 
+        /// TODO: Why is Micropolis::cellSrc not allocated together with all the other variables
+        /// TODO: What is the purpose of this function?
+        /// </summary>
         public void SimHeat() {
             int x, y;
             int a = 0;
@@ -235,6 +337,28 @@ namespace MicropolisSharp
                 cellSrc = (short*)newPtr((WORLD_W + 2) * (WORLD_H + 2) * sizeof(short));
                 cellDst = (short*)&map[0][0];
             }**/
+
+            /*
+                *Copy wrapping edges:
+                *
+                *   0   ff f0 f1...fe ff f0
+                *
+                *   1   0f  00 01... 0e 0f     00
+                *   2   1f  10 11... 1e 1f     10
+                *       ..  .. ..     .. ..     ..
+                *       ef  e0 e1 ... ee ef     e0
+                *   h   ff f0 f1...fe ff f0
+                *
+                *   h+1 0f  00 01... 0e 0f     00
+                *
+                *   wrap value: effect:
+                *
+                *   0   no effect
+                *   1   copy future=>past, no wrap
+                *   2   no copy, wrap edges
+                *   3   copy future=>past, wrap edges
+                *   4   copy future=>past, same edges
+            */
 
             src = CellSrc + SRCCOL + 1;
             dst = CellSrc;
@@ -564,6 +688,10 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="doSim"></param>
         public void SimLoop(bool doSim)
         {
             if (HeatSteps.IsTrue())
@@ -595,6 +723,11 @@ namespace MicropolisSharp
             SimLoops++;
         }
 
+        /// <summary>
+        /// Move simulation forward
+        /// 
+        /// TODO: What is the purpose of this function? (along side SimUpdate)
+        /// </summary>
         public void SimTick()
         {
             if (SimSpeed.IsTrue())

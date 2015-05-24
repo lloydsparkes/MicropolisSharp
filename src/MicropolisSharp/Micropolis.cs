@@ -81,77 +81,337 @@ namespace MicropolisSharp
     {
         public ushort[,] Map { get; private set; }
         public long TotalFunds { get; private set; }
+
+        /// <summary>
+        /// Enable auto-bulldoze
+        /// 
+        /// When enabled, the game will silently clear tiles when the user
+        /// builds something on non-clear and bulldozable tiles
+        /// </summary>
         public bool AutoBulldoze { get; private set; }
+
+        /// <summary>
+        /// Enable auto budget
+        /// 
+        /// When enabled, the program will perform budgetting of the city
+        /// </summary>
         public bool AutoBudget { get; private set; }
 
         public long MessageLastTime { get; private set; }
+
+        /// <summary>
+        /// Difficulty level of the game
+        /// </summary>
         public Levels GameLevel { get; private set; } 
         public short InitSimLoad { get; private set; }
+
+        /// <summary>
+        /// The Scenario being played
+        /// </summary>
         public Scenario Scenario { get; private set; }
+
         public short SimSpeed { get; private set; }
         public short SimSpeedMeta { get; private set; }
+
+        /// <summary>
+        /// Enable Sound
+        /// 
+        /// TODO: Remove this, it shouldnt be here
+        /// </summary>
         public bool EnableSound { get; private set; }
+
+        /// <summary>
+        /// Enable Disasters
+        /// </summary>
         public bool EnableDisasters { get; private set; }
         public short MessageNumber { get; private set; }
+
+        /// <summary>
+        /// Should the Evaluation Window be shown to the user
+        /// </summary>
         public bool EvalChanged { get; private set; }
+
+        /// <summary>
+        /// TODO: Remove, Not used
+        /// </summary>
+        [Obsolete("Not used")]
         public short BlinkFlag { get; private set; }
 
-        //Population Counts
+        /// <summary>
+        /// Number of Road Tiles in the Game
+        /// 
+        /// Bridges = 4 tiles, High Traffic Density = 2 tiles
+        /// </summary>
         public int RoadTotal { get; private set; }
+
+        /// <summary>
+        /// Number of Train Rail tiles
+        /// 
+        /// Bridges = 4 tile?? TODO: Verify this, does this match up with roads
+        /// </summary>
         public int RailTotal { get; private set; }
+
+        /// <summary>
+        /// The number of fires
+        /// </summary>
         public int FirePop { get; private set; }
+
+        /// <summary>
+        /// Residential Zone Population (dependant on zone development)
+        /// </summary>
         public int ResPop { get; private set; }
+
+        /// <summary>
+        /// Commercial zone population (dependant on zone development)
+        /// </summary>
         public int ComPop { get; private set; }
+
+        /// <summary>
+        /// Industrial zone population (dependant on zone development)
+        /// </summary>
         public int IndPop { get; private set; }
+
+        /// <summary>
+        /// Total Population
+        /// </summary>
         public int TotalPop { get; private set; }
+
+        /// <summary>
+        /// Last total population (from last census??) Is this even still used?
+        /// </summary>
         public int TotalPopLast { get; private set; }
+
+        /// <summary>
+        /// Number of Residential Zone count
+        /// </summary>
         public int ResZonePop { get; private set; }
+
+        /// <summary>
+        /// Number of Commercial Zone count
+        /// </summary>
         public int ComZonePop { get; private set; }
+
+        /// <summary>
+        /// Number of Industrial Zone count
+        /// </summary>
         public int IndZonePop { get; private set; }
+
+        /// <summary>
+        /// Total of Res, Com, Ind Zone population
+        /// </summary>
         public int TotalZonePop { get; private set; }
 
+        /// <summary>
+        /// Number of Hospitals
+        /// </summary>
         public int HospitalPop { get; private set; }
+
+        /// <summary>
+        /// Number of Churches
+        /// </summary>
         public int ChurchPop { get; private set; }
+
+        /// <summary>
+        /// Faith Bias (what is this, what is it used for)
+        /// </summary>
         public int Faith { get; private set; }
+
+        /// <summary>
+        /// Number of Stadiums
+        /// </summary>
         public int StadiumPop { get; private set; }
 
+        /// <summary>
+        /// Police station Count
+        /// </summary>
         public int PoliceStationPop { get; private set; }
+
+        /// <summary>
+        /// Fire station Count
+        /// </summary>
         public int FireStationPop { get; private set; }
+
+        /// <summary>
+        /// Nuclear power station Count
+        /// </summary>
         public int NuclearPowerPop { get; private set; }
+
+        /// <summary>
+        /// Seaport Population
+        /// </summary>
         public int SeaportPop { get; private set; }
+
+        /// <summary>
+        /// Airport Count
+        /// </summary>
         public int AirportPop { get; private set; }
+
+        /// <summary>
+        /// Coal Power Plant Population
+        /// </summary>
         public int CoalPowerPop { get; private set; }
 
+        /// <summary>
+        /// Average Crime Level
+        /// 
+        /// Affected by land value, population density, police station distance.
+        /// </summary>
         public int CrimeAverage { get; private set; }
+
+        /// <summary>
+        /// Average Pollution Level
+        /// 
+        /// Affected by PollutionMem, which is effected by traffic, fire,
+        /// radioactivity, industrial zones, seaports, airports, power plants.
+        /// </summary>
         public int PollutionAverage { get; private set; }
+
+        /// <summary>
+        /// Land Value Average
+        /// 
+        /// Affected by distance from city center, development density (terrainMem), pollution, and crime.
+        /// </summary>
         public int LandValueAverage { get; private set; }
 
+        /// <summary>
+        /// City Time unit counter, increment every 16 runs through the simulator (at fast speed)
+        /// 
+        /// A time unit is 7.6 days
+        /// 4 units per month
+        /// 48 per year
+        /// 
+        /// Relative to the starting year
+        /// </summary>
         public long CityTime { get; private set; }
+
+        /// <summary>
+        /// TODO: Remove - Calculate on Demand
+        /// </summary>
+        [Obsolete("Calculate from CityTime")]
         public long CityMonth { get; private set; }
+
+        /// <summary>
+        /// TODO: Remove - Calculate on Demand
+        /// </summary>
+        [Obsolete("Calculate from CityTime")]
         public long CityYear { get; private set; }
+
+        /// <summary>
+        /// The year the game started on
+        /// </summary>
         public int StartingYear { get; private set; }
 
+        /// <summary>
+        /// 10 Year Residential History Maximum Value
+        /// </summary>
         public int ResHist10Max { get; private set; }
+
+        /// <summary>
+        /// 120 Year Residential History Maximum Value
+        /// </summary>
         public int ResHist120Max { get; private set; }
+
+        /// <summary>
+        /// 10 Year Commercial History Maximum Value
+        /// </summary>
         public int ComHist10Max { get; private set; }
+
+        /// <summary>
+        /// 120 Year Commercial History Maximum Value
+        /// </summary>
         public int ComHist120Max { get; private set; }
+
+        /// <summary>
+        /// 10 Year Industrial History Maximum Value
+        /// </summary>
         public int IndHist10Max { get; private set; }
+
+        /// <summary>
+        /// 120 Year Industrial History Maximum Value
+        /// </summary>
         public int IndHist120Max { get; private set; }
 
+        /// <summary>
+        /// The Census change flag
+        /// </summary>
         public bool CensusChanged { get; private set; }
 
+        /// <summary>
+        /// Road Spending (Actual)
+        /// </summary>
         public long RoadSpend { get; private set; }
+
+        /// <summary>
+        /// Police Spending (Actual)
+        /// </summary>
         public long PoliceSpend { get; private set; }
+
+        /// <summary>
+        /// Fire Spending (Actual)
+        /// </summary>
         public long FireSpend { get; private set; }
+
+        /// <summary>
+        /// Road Spending (Requirement)
+        /// </summary>
         public long RoadFund { get; private set; }
+
+        /// <summary>
+        /// Police Spending (Requirement)
+        /// </summary>
         public long PoliceFund { get; private set; }
+
+        /// <summary>
+        /// Fire Spending (Requirement)
+        /// </summary>
         public long FireFund { get; private set; }
+
+        /// <summary>
+        /// Ratio of Road spending over road funding time MAX_ROAD_EFFECT
+        /// 
+        /// TODO: Calculate this on demand
+        /// </summary>
+        [Obsolete("Calculate this on demand")]
         public long RoadEffect { get; private set; }
+
+        /// <summary>
+        /// Ratio of Police spending over road funding time MAX_POLICE_EFFECT
+        /// 
+        /// TODO: Calculate this on demand
+        /// </summary>
+        [Obsolete("Calculate this on demand")]
         public long PoliceEffect { get; private set; }
+
+        /// <summary>
+        /// Ratio of Fire spending over road funding time MAX_FIRE_EFFECT
+        /// 
+        /// TODO: Calculate this on demand
+        /// </summary>
+        [Obsolete("Calculate this on demand")]
         public long FireEffect { get; private set; }
+
+        /// <summary>
+        /// Funds from Taxes
+        /// 
+        /// Depends on Total Population, Average Lang Value, City Tax, and Game Level
+        /// </summary>
         public long TaxFund { get; private set; }
 
+        /// <summary>
+        /// City Tax Rate
+        /// </summary>
         public int CityTax { get; private set; }
+
+        /// <summary>
+        /// Tax port flat
+        /// 
+        /// Apparently never used - Collect Tax checks it
+        /// 
+        /// TODO: Apparently Tax Flag, is never set to true
+        /// TODO: Don should check old mac code to see if its ever set
+        /// TODO: Variable is always \c 0. Decide whether to keep it, and if yes, 
+        ///         create means to modify its value
+        /// </summary>
         public bool TaxFlag { get; private set; }
 
         //Histories
@@ -163,7 +423,9 @@ namespace MicropolisSharp
         public short[] CrimeHist;
         public short[] MiscHist;
 
-        //Maps
+        /// <summary>
+        /// The invalidateMaps method increases the map serial number every time the maps changes.
+        /// </summary>
         public int MapSerial { get; private set; }
 
         public ByteMap2 PopulationDensityMap { get; private set; }
@@ -184,19 +446,67 @@ namespace MicropolisSharp
         public ByteMap2 TempMap2 { get; private set; }
         public ByteMap2 TempMap3 { get; private set; }
 
+        /// <summary>
+        /// Do we need any more hospitals?
+        /// 
+        /// 0 - no, 1 - yes, -1 if too many
+        /// </summary>
         public int NeedHospital { get; private set; }
+
+        /// <summary>
+        /// Do we need any more churches
+        /// 
+        /// 0 - no, 1 - yes, -1 if too many
+        /// </summary>
         public int NeedChurch { get; private set; }
 
+        /// <summary>
+        /// Percentage of requested road and rail costs to funding level.
+        /// 
+        /// 0 - MAX ROAD EFFECT (restricted by budgetary constraints)
+        /// </summary>
         public float RoadPercentage { get; private set; }
+
+        /// <summary>
+        /// Percentage of requested road and rail costs to funding level.
+        /// 
+        /// 0 - MAX ROAD EFFECT (restricted by budgetary constraints)
+        /// </summary>
         public float PolicePercentage { get; private set; }
+
+        /// <summary>
+        /// Percentage of requested road and rail costs to funding level.
+        /// 
+        /// 0 - MAX ROAD EFFECT (restricted by budgetary constraints)
+        /// </summary>
         public float FirePercentage { get; private set; }
 
+        /// <summary>
+        /// Amount of Road Funding Granted
+        /// </summary>
         public long RoadValue { get; private set; }
+
+        /// <summary>
+        /// Amount of Police Funding Granted
+        /// </summary>
         public long PoliceValue { get; private set; }
+
+        /// <summary>
+        /// Amount of Fire Funding Granted
+        /// </summary>
         public long FireValue { get; private set; }
 
+        /// <summary>
+        /// Flag set when budget window needs to be updated
+        /// 
+        /// TODO: Change to Boolean
+        /// TODO: Encapsulate all flags like these in a single class to expose
+        /// </summary>
         public int MustDrawBudget { get; private set; }
 
+        /// <summary>
+        /// Simulator constructor.
+        /// </summary>
         public Micropolis()
         {
             PopulationDensityMap = new ByteMap2();
@@ -221,6 +531,9 @@ namespace MicropolisSharp
             init();
         }
 
+        /// <summary>
+        /// Initialize simulator variables to a sane default.
+        /// </summary>
         private void init()
         {     
             // short roadTotal;

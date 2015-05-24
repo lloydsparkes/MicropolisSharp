@@ -74,10 +74,29 @@ namespace MicropolisSharp
     /// </summary>
     public partial class Micropolis
     {
+        /// <summary>
+        /// TODO: Never used, can it be removed?
+        /// </summary>
         public bool HistoryInitialized { get; private set; }
+
+        /// <summary>
+        /// TODO: Write Only variable, can it be removed?
+        /// </summary>
         public int Graph10Max { get; private set; }
+
+        /// <summary>
+        /// TODO: Write Only Variable, can it be removed?
+        /// </summary>
         public int Graph120Max { get; private set; }
 
+        /// <summary>
+        /// Copy history data to new array, scaling as needed.
+        /// 
+        /// TODO: Why do we copy this data
+        /// </summary>
+        /// <param name="hist">Source history data.</param>
+        /// <param name="scale">Scale factor.</param>
+        /// <returns>Destination byte array.</returns>
         public char[] DrawMonth(short[] hist, float scale)
         {
             var result = new char[120];
@@ -91,8 +110,18 @@ namespace MicropolisSharp
             return result;
         }
 
+        /// <summary>
+        /// Set flag that graph data has been changed and graphs should be updated.
+        /// 
+        /// TODO: Rename Function
+        /// </summary>
         public void ChangeCensus() { CensusChanged = true; }
 
+        /// <summary>
+        /// If graph data has been changed, update all graphs.
+        /// 
+        /// If graphs have been changed, tell the user front-end about it.
+        /// </summary>
         public void GraphDoer()
         {
             if (CensusChanged)
@@ -102,6 +131,9 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Initialize graphs
+        /// </summary>
         public void InitGraphs()
         {
             if (!HistoryInitialized)
@@ -110,6 +142,9 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Compute various max ranges of graphs
+        /// </summary>
         public void InitGraphMax() {
             int x;
 
@@ -170,6 +205,13 @@ namespace MicropolisSharp
             Graph120Max = (short)Math.Max(ResHist120Max, Math.Max(ComHist120Max, IndHist120Max));
         }
 
+        /// <summary>
+        /// Get the minimal and maximal values of a historic graph.
+        /// </summary>
+        /// <param name="historyType">Type of history information. @see HistoryType</param>
+        /// <param name="historyScale">Scale of history data. @see HistoryScale</param>
+        /// <param name="minValResult">Pointer to variable to write minimal value to.</param>
+        /// <param name="maxValResult">Pointer to variable to write maximal value to.</param>
         public void GetHistoryRange(HistoryType historyType, HistoryScale historyScale, ref short minValResult, ref short maxValResult) {
             if (historyType < 0 || historyType >= HistoryType.Count || historyScale < 0 || historyScale >= HistoryScale.Count)
             {
@@ -233,6 +275,13 @@ namespace MicropolisSharp
             maxValResult = maxVal;
         }
 
+        /// <summary>
+        /// Get a value from the history tables.
+        /// </summary>
+        /// <param name="historyType">Type of history information. @see HistoryType</param>
+        /// <param name="historyScale">Scale of history data. @see HistoryScale</param>
+        /// <param name="historyIndex">Index in the data to obtain</param>
+        /// <returns>Historic data value of the requested graph</returns>
         public short GetHistory(HistoryType historyType, HistoryScale historyScale, int historyIndex) {
             if (historyType < 0 || historyType >= HistoryType.Count
                 || historyScale < 0 || historyScale >= HistoryScale.Count
@@ -286,6 +335,13 @@ namespace MicropolisSharp
             return result;
         }
 
+        /// <summary>
+        /// Store a value into the history tables.
+        /// </summary>
+        /// <param name="historyType">Type of history information. @see HistoryType</param>
+        /// <param name="historyScale">Scale of history data. @see HistoryScale</param>
+        /// <param name="historyIndex">Index in the data to obtain</param>
+        /// <param name="historyValue">Index in the value to store</param>
         public void SetHistory(HistoryType historyType, HistoryScale historyScale, int historyIndex, short historyValue)
         {
             if (historyType < 0 || historyType >= HistoryType.Count

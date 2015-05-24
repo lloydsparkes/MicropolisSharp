@@ -74,17 +74,82 @@ namespace MicropolisSharp
     /// </summary>
     public partial class Micropolis
     {
+        /// <summary>
+        /// Percentage of people who think the mayor is doing a good job
+        /// 
+        /// TODO: Rename Approval Rating
+        /// </summary>
         public short CityYes { get; private set; }
+
+        /// <summary>
+        /// Problem Votes
+        /// 
+        /// The number of votes for each problem
+        /// </summary>
         public int[] ProblemVotes { get; private set; }
+
+        /// <summary>
+        /// Order of taken problems
+        /// 
+        /// Contains index of ProblemVotes of taken problems in decrasing order
+        /// 
+        /// Entry of CVP_PROBLEM_COMPLAINTS means not used
+        /// </summary>
         public int[] ProblemOrder { get; private set; }
+
+        /// <summary>
+        /// The population of the City
+        /// </summary>
         public long CityPopulation { get; private set; }
+
+        /// <summary>
+        /// The change in the city population
+        /// </summary>
         public long CityPopDelta { get; private set; }
+
+        /// <summary>
+        /// City Assessed Value
+        /// 
+        /// Depends on roadTotal, railTotal, policeStationPop,
+        ///     fireStationPop, hospitalPop, stadiumPop, seaportPop,
+        ///     airportPop, coalPowerPop, and nuclearPowerPop, and their
+        ///     respective values.
+        /// </summary>
         public long CityAssessedValue { get; private set; }
+
+        /// <summary>
+        /// City Classification (based on size)
+        /// 
+        /// TODO: Make this Generated on Demand, BUT need to trigger notification when it changes
+        /// </summary>
         public CityClassification CityClassification { get; private set; }
+
+        /// <summary>
+        /// City Score
+        /// 
+        /// Affected by average of problems, residential cap, commercial cap,
+        ///     industrial cap, road effect, police effect, fire effect,
+        ///     residential valve, commercial valve, industrial valve, city
+        ///     population, delta city population, fires, tax rate, and unpowered
+        ///     zones.
+        /// </summary>
         public short CityScore { get; private set; }
+
+        /// <summary>
+        /// Change in City Score
+        /// </summary>
         public short CityScoreDelta { get; private set; }
+
+        /// <summary>
+        /// Average Traffic
+        /// </summary>
         public short TrafficAverage { get; private set; }
 
+        /// <summary>
+        /// Evaluate City
+        /// 
+        /// TODO: Handle lack of voting explicitly
+        /// </summary>
         public void CityEvaluation()
         {
             if (TotalPop > 0)
@@ -110,6 +175,9 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Initialise Evaluation Variables
+        /// </summary>
         public void EvalInit()
         {
             CityYes = 0;
@@ -129,6 +197,9 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Push new score to the user
+        /// </summary>
         public void DoScoreCard()
         {
             Callback("update", "s", "evaluation");
@@ -156,11 +227,17 @@ namespace MicropolisSharp
             //   Game Level: ${cityLevelStr[gameLevel]}
         }
 
+        /// <summary>
+        /// Request that new score is displayed to the user.
+        /// </summary>
         public void ChangeEval()
         {
             EvalChanged = true;
         }
 
+        /// <summary>
+        /// Update the score after being requested.
+        /// </summary>
         public void ScoreDoer()
         {
             if (EvalChanged)
@@ -170,6 +247,10 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Return number of problem in the city.
+        /// </summary>
+        /// <returns>Number of problems.</returns>
         public int CountProblems()
         {
             int i;
@@ -183,6 +264,11 @@ namespace MicropolisSharp
             return i;
         }
 
+        /// <summary>
+        /// Return the index of the \a i-th worst problem.
+        /// </summary>
+        /// <param name="i">Number of the problem.</param>
+        /// <returns>Index into the #problemOrder table of the \a i-th problem.</returns>
         public int GetProblemNumber(int i)
         {
             if (i < 0 || i >= (int)CityVotingProblems.CountOfProblemsToComplainAbout || ProblemOrder[i] == (int)CityVotingProblems.NumberOfProblems)
@@ -195,6 +281,11 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Return number of votes to solve the \a i-th worst problem.
+        /// </summary>
+        /// <param name="i">Number of the problem.</param>
+        /// <returns>Number of votes to solve the \a i-th worst problem.</returns>
         public int GetProblemVotes(int i)
         {
             if (i < 0 || i >= (int)CityVotingProblems.CountOfProblemsToComplainAbout || ProblemOrder[i] == (int)CityVotingProblems.NumberOfProblems)
@@ -207,6 +298,12 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Assess value of the city.
+        /// 
+        /// TODO: Make the function return the value, or rename it
+        /// TODO: Make the property utilise this
+        /// </summary>
         private void GetAssessedValue() {
             long z;
 
@@ -224,6 +321,9 @@ namespace MicropolisSharp
             CityAssessedValue = z * 1000;
         }
 
+        /// <summary>
+        /// Compute city population and city classification.
+        /// </summary>
         private void DoPopNum()
         {
             long oldCityPop = CityPopulation;
@@ -239,12 +339,23 @@ namespace MicropolisSharp
             CityClassification = GetCityClass(CityPopulation);
         }
 
+        /// <summary>
+        /// Compute city population.
+        /// </summary>
+        /// <returns></returns>
         private long GetPopulation()
         {
             long pop = (ResPop + (ComPop + IndPop) * 8L) * 20L;
             return pop;
         }
 
+        /// <summary>
+        /// Classify the city based on its population.
+        /// 
+        /// TODO: Put people counts into a table
+        /// </summary>
+        /// <param name="cityPopulation">Number of people in the city.</param>
+        /// <returns></returns>
         private CityClassification GetCityClass(long cityPopulation)
         {
             CityClassification cityClassification = CityClassification.Village;
@@ -273,6 +384,15 @@ namespace MicropolisSharp
             return cityClassification;
         }
 
+        /// <summary>
+        /// Evaluate problems of the city, take votes, and decide which are the most
+        ///     important ones.
+        /// 
+        /// problemTable contains severity of each problem,
+        /// problemVotes contains votes of each problem,
+        /// problemOrder contains (in decreasing order) the worst problems.
+        /// </summary>
+        /// <param name="problemTable">Storage of how bad each problem is.</param>
         private void DoProblems(int[] problemTable) {
             bool[] problemTaken = new bool[(int)CityVotingProblems.NumberOfProblems]; // Which problems are taken?
 
@@ -317,6 +437,12 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Vote on the problems of the city.
+        /// 
+        /// problemVotes contains the vote counts
+        /// </summary>
+        /// <param name="problemTable">Storage of how bad each problem is.</param>
         private void VoteProblems(int[] problemTable)
         {
             for (int z = 0; z < (int)CityVotingProblems.NumberOfProblems; z++)
@@ -343,6 +469,10 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Compute average traffic in the city.
+        /// </summary>
+        /// <returns>Value representing how large the traffic problem is</returns>
         private short GetTrafficAverage()
         {
             long trafficTotal;
@@ -367,6 +497,10 @@ namespace MicropolisSharp
             return TrafficAverage;
         }
 
+        /// <summary>
+        /// Compute severity of unemployment
+        /// </summary>
+        /// <returns>Value representing the severity of unemployment problems</returns>
         private short GetUnemployment()
         {
             int b = (ComPop + IndPop) * 8;
@@ -383,8 +517,16 @@ namespace MicropolisSharp
             return (short)Math.Min(b, (short)255);
         }
 
+        /// <summary>
+        /// Compute severity of fire
+        /// </summary>
+        /// <returns>Value representing the severity of fire problems</returns>
         private short GetFireSeverity() { return (short)Math.Min(FirePop * 5, 255); }
 
+        /// <summary>
+        /// Compute total score
+        /// </summary>
+        /// <param name="problemTable">Storage of how bad each problem is.</param>
         private void GetScore(int[] problemTable) {
             int x, z;
             short cityScoreLast;
@@ -492,6 +634,11 @@ namespace MicropolisSharp
             CityScoreDelta = (short)(CityScore - cityScoreLast);
         }
 
+        /// <summary>
+        /// Vote whether the mayor is doing a good job
+        /// 
+        /// cityYes contains the number of 'yes' votes
+        /// </summary>
         private void DoVotes()
         {
             int z;

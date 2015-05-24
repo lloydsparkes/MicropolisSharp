@@ -74,6 +74,10 @@ namespace MicropolisSharp
     /// </summary>
     public partial class Micropolis
     {
+        /// <summary>
+        /// Handle Zone
+        /// </summary>
+        /// <param name="pos">Position of the zone.</param>
         public void DoZone(Position pos)
         {  
             // Set Power Bit in Map from powerGridMap
@@ -130,6 +134,10 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Handle repairing or removing of hospitals and churches.
+        /// </summary>
+        /// <param name="pos"></param>
         public void DoHospitalChurch(Position pos) {
             ushort tile = (ushort)(Map[pos.X, pos.Y] & (ushort)MapTileBits.LowMask);
 
@@ -286,6 +294,10 @@ namespace MicropolisSharp
             }
         }     
                 
+        /// <summary>
+        /// If needed, add a new hospital or a new church.
+        /// </summary>
+        /// <param name="pos"></param>
         public void MakeHospital(Position pos)
         {
             if (NeedHospital > 0)
@@ -316,6 +328,11 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Compute land value at \a pos, taking pollution into account.
+        /// </summary>
+        /// <param name="pos"></param>
+        /// <returns>Indication of land-value adjusted for pollution (\c 0 => low value, \c 3 => high value)</returns>
         public short GetLandPollutionValue(Position pos)
         {
             short landVal;
@@ -341,6 +358,11 @@ namespace MicropolisSharp
             return 3;
         }
 
+        /// <summary>
+        /// Update the rate of growth at position \a pos by \a amount.
+        /// </summary>
+        /// <param name="pos">Position to modify.</param>
+        /// <param name="amount"> Amount of change (can both be positive and negative).</param>
         public void IncRateOfGrowth(Position pos, int amount)
         {
             int value = RateOfGrowthMap.WorldGet(pos.X, pos.Y);
@@ -349,6 +371,14 @@ namespace MicropolisSharp
             RateOfGrowthMap.WorldSet(pos.X, pos.Y, (short)value);
         }
 
+        /// <summary>
+        /// Put down a 3x3 zone around the center tile at \a pos..
+        /// 
+        /// TODO: This function allows partial on-map construction. Is that intentional? No!
+        /// </summary>
+        /// <param name="pos">Tile number of the top-left tile. @see MapTileCharacters</param>
+        /// <param name="baseTile">Build was a success.</param>
+        /// <returns>Build was a success.</returns>
         public bool ZonePlop(Position pos, int baseTile)
         {
             short z;
@@ -393,6 +423,11 @@ namespace MicropolisSharp
             return true;
         }
 
+        /// <summary>
+        /// Count the number of single tile houses in a residential zone.
+        /// </summary>
+        /// <param name="pos">Position of the residential zone.</param>
+        /// <returns>Number of single tile houses.</returns>
         public short DoFreePop(Position pos)
         {
             short count = 0;
@@ -415,6 +450,11 @@ namespace MicropolisSharp
             return count;
         }
 
+        /// <summary>
+        /// Copy the value of #powerGridMap at position \a pos to the map.
+        /// </summary>
+        /// <param name="pos">Position to copy.</param>
+        /// <returns>Does the tile have power?</returns>
         public bool SetZonePower(Position pos)
         {
             ushort mapValue = Map[pos.X,pos.Y];
@@ -438,6 +478,13 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Try to build a house at the zone at \a pos.
+        /// 
+        /// TODO: Have some form of looking around the center tile (like getFromMap())
+        /// </summary>
+        /// <param name="pos">Center tile of the zone.</param>
+        /// <param name="value">Value to build (land value?)</param>
         public void BuildHouse(Position pos, int value)
         {
             short z, score, hscore, BestLoc;
@@ -495,6 +542,12 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Evaluate suitability of the position for placing a new house.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns>Suitability.</returns>
         public short EvalLot(int x, int y)
         {
             ushort z;
@@ -528,6 +581,11 @@ namespace MicropolisSharp
             return score;
         }
 
+        /// <summary>
+        /// Handle residential zone.
+        /// </summary>
+        /// <param name="pos">Center tile of the residential zone.</param>
+        /// <param name="zonePower">Does the zone have power?</param>
         public void DoResidential(Position pos, bool zonePower) {
             short tpop, zscore, locvalve, value, TrfGood;
 
@@ -598,6 +656,12 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Perform residential immigration into the current residential tile.
+        /// </summary>
+        /// <param name="pos">Position of the tile.</param>
+        /// <param name="pop">Population ?</param>
+        /// <param name="value">Land value corrected for pollution.</param>
         public void DoResIn(Position pos, int pop, int value)
         {
             short pollution = PollutionDensityMap.WorldGet(pos.X, pos.Y);
@@ -636,6 +700,12 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Perform residential emigration from the current residential tile.
+        /// </summary>
+        /// <param name="pos">Position of the tile.</param>
+        /// <param name="pop">Population ?</param>
+        /// <param name="value">Land value corrected for pollution.</param>
         public void DoResOut(Position pos, int pop, int value)
         {
             short[] Brdr = { 0, 3, 6, 1, 4, 7, 2, 5, 8 };
@@ -695,12 +765,23 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Return population of a residential zone center tile (RZB, RZB+9, ..., HOSPITAL - 9).
+        /// </summary>
+        /// <param name="mapTile">mapTile Center tile of a residential zone.</param>
+        /// <returns>Population of the residential zone.</returns>
         public short GetResZonePop(ushort mapTile)
         {
             short CzDen = (short)(((mapTile - (short)MapTileCharacters.RZB) / 9) % 4);
             return (short)(CzDen * 8 + 16);
         }
 
+        /// <summary>
+        /// Put down a residential zone.
+        /// </summary>
+        /// <param name="pos">Center tile of the residential zone.</param>
+        /// <param name="den">Population density (0..3)</param>
+        /// <param name="value">Land value - pollution (0..3), higher is better.</param>
         public void ResPlop(Position pos, int den, int value)
         {
             short baseT;
@@ -709,6 +790,12 @@ namespace MicropolisSharp
             ZonePlop(pos, baseT);
         }
 
+        /// <summary>
+        /// Evaluate residential zone.
+        /// </summary>
+        /// <param name="pos"></param>
+        /// <param name="traf"></param>
+        /// <returns></returns>
         public short EvalRes(Position pos, int traf)
         {
             short value;
@@ -735,6 +822,11 @@ namespace MicropolisSharp
             return value;
         }
 
+        /// <summary>
+        /// Handle commercial zone.
+        /// </summary>
+        /// <param name="pos"></param>
+        /// <param name="zonePower"></param>
         public void DoCommercial(Position pos, bool zonePower) {
             int tpop, TrfGood;
             int zscore, locvalve, value;
@@ -792,6 +884,12 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Handle immigration of commercial zone.
+        /// </summary>
+        /// <param name="pos"></param>
+        /// <param name="pop"></param>
+        /// <param name="value"></param>
         public void DoComIn(Position pos, int pop, int value)
         {
             int z;
@@ -811,6 +909,12 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Handle emigration of commercial zone.
+        /// </summary>
+        /// <param name="pos"></param>
+        /// <param name="pop"></param>
+        /// <param name="value"></param>
         public void DoComOut(Position pos, int pop, int value)
         {
             if (pop > 1)
@@ -827,6 +931,11 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Get commercial zone population number.
+        /// </summary>
+        /// <param name="tile"></param>
+        /// <returns></returns>
         public short GetComZonePop(ushort tile)
         {
             if (tile == (ushort)MapTileCharacters.COMCLR)
@@ -838,6 +947,12 @@ namespace MicropolisSharp
             return (short)CzDen;
         }
 
+        /// <summary>
+        /// Build a commercial zone.
+        /// </summary>
+        /// <param name="pos"></param>
+        /// <param name="den"></param>
+        /// <param name="value"></param>
         public void ComPlop(Position pos, int den, int value)
         {
             int baseT;
@@ -846,6 +961,12 @@ namespace MicropolisSharp
             ZonePlop(pos, baseT);
         }
 
+        /// <summary>
+        /// Compute evaluation of a commercial zone.
+        /// </summary>
+        /// <param name="pos"></param>
+        /// <param name="traf"></param>
+        /// <returns></returns>
         public short EvalCom(Position pos, int traf)
         {
             short Value;
@@ -860,6 +981,11 @@ namespace MicropolisSharp
             return Value;
         }
 
+        /// <summary>
+        /// Handle industrial zone.
+        /// </summary>
+        /// <param name="pos"></param>
+        /// <param name="zonePower"></param>
         public void DoIndustrial(Position pos, bool zonePower) {
             int tpop, zscore, TrfGood;
 
@@ -910,6 +1036,12 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Handle immigration of industrial zone.
+        /// </summary>
+        /// <param name="pos"></param>
+        /// <param name="pop"></param>
+        /// <param name="value"></param>
         public void DoIndIn(Position pos, int pop, int value)
         {
             if (pop < 4)
@@ -919,6 +1051,12 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Handle industrial zone emigration.
+        /// </summary>
+        /// <param name="pos"></param>
+        /// <param name="pop"></param>
+        /// <param name="value"></param>
         public void DoIndOut(Position pos, int pop, int value)
         {
             if (pop > 1)
@@ -935,6 +1073,11 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Get the population value for the given industrial tile.
+        /// </summary>
+        /// <param name="tile">Center tile value of the industrial zone.</param>
+        /// <returns></returns>
         public short GetIndZonePop(ushort tile)
         {
             if (tile == (ushort)MapTileCharacters.INDCLR)
@@ -946,12 +1089,23 @@ namespace MicropolisSharp
             return (short)CzDen;
         }
 
+        /// <summary>
+        /// Place an industrial zone around center tile \a pos.
+        /// </summary>
+        /// <param name="pos">Center of the industrial zone.</param>
+        /// <param name="den">Population density of the industrial zone (0, 1, 2, or 3).</param>
+        /// <param name="value">Landvalue of the industrial zone (0 or 1).</param>
         public void IndPlop(Position pos, int den, int value)
         {
             int baseT = ((value * 4) + den) * 9 + (ushort)MapTileCharacters.IND1;
             ZonePlop(pos, baseT);
         }
 
+        /// <summary>
+        /// Compute evaluation of an industrial zone.
+        /// </summary>
+        /// <param name="traf">Result if traffic attempt.</param>
+        /// <returns>Evaluation value of the industrial zone.</returns>
         public short EvalInd(int traf)
         {
             if (traf < 0)

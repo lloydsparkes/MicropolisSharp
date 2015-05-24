@@ -64,13 +64,21 @@
  * CONSUMER, SO SOME OR ALL OF THE ABOVE EXCLUSIONS AND LIMITATIONS MAY
  * NOT APPLY TO YOU.
  */
+using System;
+
 namespace MicropolisSharp.Types
 {
     /// <summary>
-    /// From micropolis.h
+    /// Sprite in the simulator - From micropolis.h
+    /// 
+    /// TODO: is never set to anything else than \c "", and only used to detect a non-removed non-active sprite(in a non-robust way).
+    /// TODO: Remove next
+    /// TODO: Remove Linked List
+    /// TODO: Remove Completely as this isnt a game engine thing
     /// </summary>
     public class SimSprite
     {
+        [Obsolete("Removed - No longer access as a linked list, use array accessor")]
         public SimSprite Next { get; set; } ///< Pointer to next #SimSprite object in the list.
         public string Name{ get; set; } ///< Name of the sprite.
         public SpriteType Type{ get; set; } ///< Type of the sprite (TRA -- BUS).

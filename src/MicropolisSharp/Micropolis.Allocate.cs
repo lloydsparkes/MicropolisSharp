@@ -73,6 +73,9 @@ namespace MicropolisSharp
     /// </summary>
     public partial class Micropolis
     {
+        /// <summary>
+        /// Initialize and Allocate Arrays for the Maps, Histories
+        /// </summary>
         private void InitMapArrays()
         {
             Map = new ushort[Constants.WorldWidth, Constants.WorldHeight];
@@ -100,6 +103,9 @@ namespace MicropolisSharp
             ComRateMap = new ShortMap8();
         }
 
+        /// <summary>
+        /// Free / Clear all Map Arrays
+        /// </summary>
         private void destoryMapArrays()
         {
             InitMapArrays();

@@ -79,6 +79,13 @@ namespace MicropolisSharp
         private int trafMaxX;
         private int trafMaxY;
 
+        /// <summary>
+        /// Makes traffic starting from the road tile at \x, \y.
+        /// </summary>
+        /// <param name="x">Start x position of the attempt</param>
+        /// <param name="y">Start y position of the attempt</param>
+        /// <param name="dest">Zone type to go to.</param>
+        /// <returns>1 if connection found, 0 if not, -1 if no road connection</returns>
         public short MakeTrafficAt(int x, int y, ZoneType dest)
         {
             Position pos = new Position(x, y);
@@ -92,12 +99,25 @@ namespace MicropolisSharp
             return 0;                 /* traffic failed */
         }
 
+        /// <summary>
+        /// Find a connection over a road from position \a x \a y to a specified zone type.
+        /// </summary>
+        /// <param name="x">Start x position of the attempt</param>
+        /// <param name="y">Start y position of the attempt</param>
+        /// <param name="dest">Zone type to go to.</param>
+        /// <returns>1 if connection found, 0 if not, -1 if no road connection</returns>
         public short MakeTraffic(int x, int y, ZoneType dest)
         {
             Position startPos = new Position(x,y);
             return MakeTraffic(startPos, dest);
         }
 
+        /// <summary>
+        /// Find a connection over a road from \a startPos to a specified zone type.
+        /// </summary>
+        /// <param name="startPos">Start position of the attempt.</param>
+        /// <param name="dest">Zone type to go to.</param>
+        /// <returns>1 if connection found, 0 if not, -1 if no road connection</returns>
         public short MakeTraffic(Position startPos, ZoneType dest) {
             curMapStackPointer = 0; // Clear position stack
 
@@ -122,6 +142,9 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Update the #trafficDensityMap from the positions at the #curMapStackXY stack.
+        /// </summary>
         public void addToTrafficDensityMap()
         { /* For each saved position of the drive */
             while (curMapStackPointer > 0)
@@ -165,6 +188,10 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Push a position onto the position stack.
+        /// </summary>
+        /// <param name="pos">Position to push.</param>
         public void PushPos(Position pos)
         {
             //TODO: Fix & Enable Assert
@@ -175,6 +202,10 @@ namespace MicropolisSharp
             curMapStackXY[curMapStackPointer] = pos;
         }
 
+        /// <summary>
+        /// Pull top-most position from the position stack.
+        /// </summary>
+        /// <returns>Pulled position.</returns>
         public Position PullPos()
         {
             //TODO: Fix & Enable Assert
@@ -187,6 +218,13 @@ namespace MicropolisSharp
             return null;
         }
 
+        /// <summary>
+        /// Find a connection to a road at the perimeter.
+        /// 
+        /// TODO: We could randomize the search.
+        /// </summary>
+        /// <param name="pos">Starting position. Gets updated when a perimeter has been found.</param>
+        /// <returns>Indication that a connection has been found.</returns>
         public bool FindPerimeterRoad(Position pos)
         { /* look for road on edges of zone */
             short[] PerimX = { -1, 0, 1, 2, 2, 2, 1, 0, -1, -2, -2, -2 };
@@ -215,6 +253,13 @@ namespace MicropolisSharp
             return false;
         }
 
+        /// <summary>
+        /// Find a telecom connection at the perimeter.
+        /// 
+        /// TODO: Decide whether we want telecomm code.
+        /// </summary>
+        /// <param name="pos">Position to start searching.</param>
+        /// <returns>A telecom connection has been found.</returns>
         public bool FindPerimeterTelecom(Position pos)
         {     /* look for telecom on edges of zone */
             short[] PerimX = { -1, 0, 1, 2, 2, 2, 1, 0, -1, -2, -2, -2 };
@@ -242,6 +287,14 @@ namespace MicropolisSharp
             return false;
         }
 
+        /// <summary>
+        /// Try to drive to a destination.
+        /// 
+        /// TODO: The stack is popped, but position and dirLast is not updated
+        /// </summary>
+        /// <param name="startPos">Starting position.</param>
+        /// <param name="dest">Zonetype to drive to.</param>
+        /// <returns>Was drive succesful?</returns>
         public bool TryDrive(Position startPos, ZoneType dest) {
             Direction dirLast = Direction.Invalid;
             Position drivePos = new Position(startPos);
@@ -290,6 +343,12 @@ namespace MicropolisSharp
             return false; /* gone MAX_TRAFFIC_DISTANCE */
         }
 
+        /// <summary>
+        /// Try to drive one tile in a random direction.
+        /// </summary>
+        /// <param name="pos">Current position.</param>
+        /// <param name="dirLast">Forbidden direction for movement (to prevent reversing).</param>
+        /// <returns>Direction of movement, \c #DIR2_INVALID is returned if not moved.</returns>
         public Direction TryGo(Position pos, Direction dirLast) {
             Direction[] directions = new Direction[4];
 
@@ -340,6 +399,13 @@ namespace MicropolisSharp
             return directions[i];
         }
 
+        /// <summary>
+        /// Get neighbouring tile from the map.
+        /// </summary>
+        /// <param name="pos">Current position.</param>
+        /// <param name="dir">Direction of neighbouring tile, only horizontal and vertical directions are supported.</param>
+        /// <param name="defaultTile">Tile to return if off-map.</param>
+        /// <returns>The tile in the indicated direction. If tile is off-world or an incorrect direction is given, \c DIRT is returned.</returns>
         public ushort GetTileFromMap(Position pos, Direction dir, ushort defaultTile) {
             switch (dir)
             {
@@ -382,6 +448,12 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Has the journey arrived at its destination?
+        /// </summary>
+        /// <param name="pos">Current position.</param>
+        /// <param name="destZone">Zonetype to drive to.</param>
+        /// <returns>Destination has been reached.</returns>
         public bool DriveDone(Position pos, ZoneType destZone)
         { 
             // FIXME: Use macros to determine the zone type: residential, commercial or industrial.
@@ -435,6 +507,11 @@ namespace MicropolisSharp
             return false;
         }
 
+        /// <summary>
+        /// Can the given tile be used as road?
+        /// </summary>
+        /// <param name="mapValue">Value from the map.</param>
+        /// <returns>Indication that you can drive on the given tile</returns>
         public bool RoadTest(ushort mapValue)
         {
             ushort tile = (ushort)(mapValue & (ushort)MapTileBits.LowMask);

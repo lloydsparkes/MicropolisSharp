@@ -115,6 +115,9 @@ namespace MicropolisSharp
             DoUpdateHeads();
         }
 
+        /// <summary>
+        /// Set a flag that the funds display is out of date.
+        /// </summary>
         public void UpdateFunds()
         {
             MustUpdateFunds = true;
@@ -142,6 +145,9 @@ namespace MicropolisSharp
             UpdateDate();
         }
 
+        /// <summary>
+        /// TODO: Message is Wrong
+        /// </summary>
         public void UpdateDate()
         {
             int megalinium = 1000000;

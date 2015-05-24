@@ -76,6 +76,11 @@ namespace MicropolisSharp
         private int powerStackPointer = 0;
         private Position[] powerStackXY = new Position[Constants.PowerStackSize];
 
+        /// <summary>
+        /// Scan the map for powered tiles, and copy them to the Micropolis::powerGridMap array.
+        /// 
+        /// Also warns the user about using too much power ('buy another power plant').
+        /// </summary>
         public void DoPowerScan()
         {
             Direction anyDir, dir;
@@ -126,6 +131,14 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Check at position \a pos for a power-less conducting tile in the direction \a testDir.
+        /// 
+        /// TODO: Re-use something like Micropolis::getFromMap(), and fold this function into its caller.
+        /// </summary>
+        /// <param name="pos">Position to start from.</param>
+        /// <param name="testDir">Direction to investigate.</param>
+        /// <returns>Unpowered tile has been found in the indicated direction.</returns>
         public bool TestForConductive(Position pos, Direction testDir)
         {
             Position movedPos = new Position(pos);
@@ -144,6 +157,10 @@ namespace MicropolisSharp
             return false;
         }
 
+        /// <summary>
+        /// Push position \a pos onto the power stack if there is room.
+        /// </summary>
+        /// <param name="pos">Position to push.</param>
         public void PushPowerStack(Position pos)
         {
             if (powerStackPointer < (Constants.PowerStackSize - 2))
@@ -153,6 +170,12 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Pull a position from the power stack.
+        /// 
+        /// Stack must be non-empty (powerStackPointer > 0).
+        /// </summary>
+        /// <returns>Pulled position.</returns>
         public Position PullPowerStack()
         {
             //TODO: Make this an assert

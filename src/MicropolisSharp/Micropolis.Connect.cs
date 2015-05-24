@@ -94,6 +94,11 @@ namespace MicropolisSharp
             (ushort)MapTileCharacters.LVPOWER4, (ushort)MapTileCharacters.LVPOWER9, (ushort)MapTileCharacters.LVPOWER8, (ushort)MapTileCharacters.LVPOWER10
         };
 
+        /// <summary>
+        /// Remove road from the tile
+        /// </summary>
+        /// <param name="tile">The tile to remove the road from</param>
+        /// <returns></returns>
         private static ushort NeutralizeRoad(ushort tile)
         {
             if (tile >= 64 && tile <= 207)
@@ -103,6 +108,18 @@ namespace MicropolisSharp
             return tile;
         }
 
+        /// <summary>
+        /// Perform the command, and fix wire/road/rail/zone connections around it.
+        /// 
+        /// Store modification in the \a effects object.
+        /// 
+        /// TODO: Change X,Y to position
+        /// </summary>
+        /// <param name="x">X - Where to perform the command</param>
+        /// <param name="y">Y - Where to perform the command</param>
+        /// <param name="cmd">Command to perform</param>
+        /// <param name="effects">Modification collecting Objects</param>
+        /// <returns>The result</returns>
         public ToolResult ConnectTile(int x, int y, ConnectTileCommand cmd, ToolEffects effects)
         {
             ToolResult result = ToolResult.Ok;
@@ -189,6 +206,15 @@ namespace MicropolisSharp
             return result;
         }
 
+        /// <summary>
+        /// Bulldoze a tile (River or Dirt)
+        /// 
+        /// TODO: Change X,Y to position
+        /// </summary>
+        /// <param name="x">X - Where</param>
+        /// <param name="y">Y - Where</param>
+        /// <param name="effects">Modification Collecting Collection</param>
+        /// <returns>Tool Result</returns>
         public ToolResult LayDoze(int x, int y, ToolEffects effects)
         {
             ushort tile = effects.GetMapValue(x, y);
@@ -232,6 +258,15 @@ namespace MicropolisSharp
             return ToolResult.Ok;
         }
 
+        /// <summary>
+        /// Lay a road, and update the road around it
+        /// 
+        /// TODO: Change X,Y to a position
+        /// </summary>
+        /// <param name="x">X - Where</param>
+        /// <param name="y">Y - Where</param>
+        /// <param name="effects">Modification Collecting Collection</param>
+        /// <returns>Tool Result</returns>
         public ToolResult LayRoad(int x, int y, ToolEffects effects)
         {
             int cost = 10;
@@ -326,6 +361,15 @@ namespace MicropolisSharp
             return ToolResult.Ok;
         }
 
+        /// <summary>
+        /// Lay a rail, update the connections around it
+        /// 
+        /// TODO: Change X,Y to a position
+        /// </summary>
+        /// <param name="x">X -Where</param>
+        /// <param name="y">Y - Where</param>
+        /// <param name="effects">Modification Collecting Collection</param>
+        /// <returns>Tool Result</returns>
         public ToolResult LayRail(int x, int y, ToolEffects effects)
         {
             int cost = 20;
@@ -423,6 +467,15 @@ namespace MicropolisSharp
             return ToolResult.Ok;
         }
 
+        /// <summary>
+        /// Lay a wire, and update connections (rail, road, and wire) around it.
+        /// 
+        /// TODO: Change X,Y to a position
+        /// </summary>
+        /// <param name="x">X -Where</param>
+        /// <param name="y">Y - Where</param>
+        /// <param name="effects">Modification Collecting Collection</param>
+        /// <returns>Tool Result</returns>
         public ToolResult LayWire(int x, int y, ToolEffects effects)
         {
             int cost = 5;
@@ -534,6 +587,12 @@ namespace MicropolisSharp
             return ToolResult.Ok;
         }
 
+        /// <summary>
+        /// Update connections (rails, and wire connections) to a zone.
+        /// </summary>
+        /// <param name="x">X -Where</param>
+        /// <param name="y">Y - Where</param>
+        /// <param name="effects">Modification Collecting Collection</param>
         public void FixZone(int x, int y, ToolEffects effects)
         {
             FixSingle(x, y, effects);
@@ -559,6 +618,14 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Modify road, rails, and wire connections at a given tile.
+        /// 
+        /// TODO: Change X,Y to a position
+        /// </summary>
+        /// <param name="x">X -Where</param>
+        /// <param name="y">Y - Where</param>
+        /// <param name="effects">Modification Collecting Collection</param>
         public void FixSingle(int x, int y, ToolEffects effects)
         {
             ushort adjTile = 0;

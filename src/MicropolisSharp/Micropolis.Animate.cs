@@ -73,6 +73,13 @@ namespace MicropolisSharp
     /// </summary>
     public partial class Micropolis
     {
+        /// <summary>
+        /// Tile Animation table. For each tile, it states the next tile to display
+        /// 
+        /// TODO: Bug Tile 620 points to 852, should be 621
+        /// TODO: Generate Table below from doc/AnimationSequences.txt and doc/genAnimationTable.py
+        /// TODO: Translate genAnimationTable.py -> C#
+        /// </summary>
         static ushort[] animatedTiles = {
             0,   1,   2,   3,   4,   5,   6,   7,   8,   9,   10,  11,  12,  13,  14,  15,
             16,  17,  18,  19,  20,  21,  22,  23,  24,  25,  26,  27,  28,  29,  30,  31,
@@ -193,6 +200,7 @@ namespace MicropolisSharp
             ushort tMapPtr;
             int i;
 
+            //Animate the whole world
             for(int x = 0; x < Constants.WorldWidth; ++x)
             {
                 for (int y = 0; y < Constants.WorldHeight; ++y)

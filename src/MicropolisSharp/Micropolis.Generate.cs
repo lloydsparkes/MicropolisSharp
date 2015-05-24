@@ -69,21 +69,68 @@ using MicropolisSharp.Types;
 namespace MicropolisSharp
 {
     /// <summary>
-    /// Partial Class Containing the content of generate.cpp
+    /// Terrain Generator - generate.cpp
+    /// 
+    /// Features available incrementally as city building tools.
+    /// 
+    /// The user should be able to place water and trees, and it should
+    /// dynamically smooth the edges.
+    /// 
+    /// The user interface could restrict the user to only drawing
+    /// terrain before any zones were built, but it would be best if
+    /// the terrain editing tools worked properly when there were zones
+    /// built(by automatically bulldozing zones whose underlying
+    /// terrain it's modifying).
     /// </summary>
     public partial class Micropolis
     {
+        /// <summary>
+        /// Controls level of Tree Creation
+        /// 
+        /// -1 default, 0 never, >0 more
+        /// </summary>
         public int TerrainTreeLevel { get; private set; }
+
+        /// <summary>
+        /// Controls level of Lake Creation
+        /// 
+        /// -1 default, 0 never, >0 more
+        /// </summary>
         public int TerrainLakeLevel { get; private set; }
+
+        /// <summary>
+        /// Controls the level of river curviness
+        /// 
+        /// -1 default, 0 never, 1 curvier
+        /// </summary>
         public int TerrainCurveLevel { get; private set; }
+
+        /// <summary>
+        /// Controls how often to create an island
+        /// 
+        /// -1 10%, 0 never, 1 always create island
+        /// </summary>
         public int TerrainCreateIsland { get; private set; }
+
+        /// <summary>
+        /// The seed of the most recently generate city
+        /// </summary>
         public int GeneratedCitySeed { get; private set; }
 
+        /// <summary>
+        /// Create a new map for a city.
+        /// 
+        /// TODO: We use a random number generator to draw a seed for initializing the random number generator?
+        /// </summary>
         public void GenerateMap()
         {
             GenerateSomeCity(GetRandom16());
         }
 
+        /// <summary>
+        /// Generate a map for a city.
+        /// </summary>
+        /// <param name="seed">Random number generator initializing seed</param>
         public void GenerateSomeCity(int seed)
         {
             CityFileName = "";
@@ -106,6 +153,10 @@ namespace MicropolisSharp
             Callback("didGenerateMap", "");
         }
 
+        /// <summary>
+        /// Generate a map.
+        /// </summary>
+        /// <param name="seed">Initialization seed for the random generator.</param>
         private void GenerateMap(int seed)
         {
             GeneratedCitySeed = seed;
@@ -157,6 +208,9 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        ///  Clear the whole world to ::DIRT tiles
+        /// </summary>
         public void ClearMap()
         {
             short x, y;
@@ -170,6 +224,9 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Clear everything from all land
+        /// </summary>
         public void ClearUnnatural()
         {
             int x, y;
@@ -186,6 +243,9 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Construct a plain island as world, surrounded by 5 tiles of river.
+        /// </summary>
         private void MakeNakedIsland()
         {
             const int terrainIslandRadius = Constants.IslandRadius;
@@ -234,6 +294,9 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Construct a new world as an island
+        /// </summary>
         public void MakeIsland()
         {
             MakeNakedIsland();
@@ -241,6 +304,9 @@ namespace MicropolisSharp
             DoTrees();
         }
 
+        /// <summary>
+        /// Make a number of lakes, depending on the Micropolis::terrainLakeLevel.
+        /// </summary>
         private void MakeLakes()
         {
             int numLakes;
@@ -265,6 +331,10 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Make a random lake at \a pos.
+        /// </summary>
+        /// <param name="pos">Rough position of the lake.</param>
         public void MakeSingleLake(Position pos)
         {
             int numPlops = GetRandom(12) + 2;
@@ -286,6 +356,15 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Splash a bunch of trees down near (\a xloc, \a yloc).
+        /// 
+        /// Amount of trees is controlled by Micropolis::terrainTreeLevel.
+        /// 
+        /// TODO: Change X,Y to position
+        /// </summary>
+        /// <param name="xLoc">Horizontal position of starting point for splashing trees.</param>
+        /// <param name="yLoc">Vertical position of starting point for splashing trees.</param>
         public void TreeSplash(int xLoc, int yLoc)
         {
             int numTrees;
@@ -320,6 +399,9 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Splash trees around the world. 
+        /// </summary>
         private void DoTrees()
         {
             int Amount, x, xloc, yloc;
@@ -420,6 +502,14 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Temporary function to prevent breaking a lot of code.
+        /// 
+        /// TODO: Change X,Y for Position
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="preserve"></param>
         private void SmoothTreesAt(int x, int y, bool preserve)
         {
             ToolEffects effects = new ToolEffects(this);
@@ -428,6 +518,13 @@ namespace MicropolisSharp
             effects.ModifyWorld();
         }
 
+        /// <summary>
+        /// Smooth trees at a position.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="preserve"></param>
+        /// <param name="effects"></param>
         public void SmoothTreesAt(int x, int y, bool preserve, ToolEffects effects)
         {
             short[] dx = { -1, 0, 1, 0 };
@@ -478,7 +575,11 @@ namespace MicropolisSharp
                 }
             }
         }
-                
+
+        /// <summary>
+        /// Construct rivers.
+        /// </summary>
+        /// <param name="terrainPos">Coordinate to start making a river.</param>
         private void DoRivers(Position terrainPos)
         {
             Direction riverDir;   // Global direction of the river
@@ -494,6 +595,13 @@ namespace MicropolisSharp
             DoSRiver(terrainPos, riverDir, terrainDir);
         }
 
+        /// <summary>
+        /// Make a big river.
+        /// </summary>
+        /// <param name="riverPos">Start position of making a river.</param>
+        /// <param name="riverDir">Global direction of the river.</param>
+        /// <param name="terrainDir">Local direction of the terrain.</param>
+        /// <returns>Last used local terrain direction.</returns>
         private Direction DoBRiver(Position riverPos, Direction riverDir, Direction terrainDir)
         {
             int rate1, rate2;
@@ -535,6 +643,13 @@ namespace MicropolisSharp
             return terrainDir;
         }
 
+        /// <summary>
+        /// Make a small river.
+        /// </summary>
+        /// <param name="riverPos">Start position of making a river.</param>
+        /// <param name="riverDir">Global direction of the river.</param>
+        /// <param name="terrainDir">Local direction of the terrain.</param>
+        /// <returns>Last used local terrain direction.</returns>
         private Direction DoSRiver(Position riverPos, Direction riverDir, Direction terrainDir)
         {
             int rate1, rate2;
@@ -577,6 +692,12 @@ namespace MicropolisSharp
             return terrainDir;
         }
 
+        /// <summary>
+        /// Put \a mChar onto the map at position \a xLoc, \a yLoc if possible.
+        /// </summary>
+        /// <param name="mChar">Map value to put ont the map.</param>
+        /// <param name="xLoc">Horizontal position at the map to put \a mChar.</param>
+        /// <param name="yLoc">Vertical position at the map to put \a mChar.</param>
         private void PutOnMap(ushort mChar, int xLoc, int yLoc)
         {
             if (mChar == 0)
@@ -609,6 +730,10 @@ namespace MicropolisSharp
             Map[xLoc,yLoc] = mChar;
         }
 
+        /// <summary>
+        /// Put down a big river diamond-like shape.
+        /// </summary>
+        /// <param name="pos">Base coordinate of the blob (top-left position).</param>
         public void PlopBRiver(Position pos)
         {
             int x, y;
@@ -634,6 +759,10 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Put down a small river diamond-like shape.
+        /// </summary>
+        /// <param name="pos">Base coordinate of the blob (top-left position).</param>
         public void PlopSRiver(Position pos)
         {
             int x, y;

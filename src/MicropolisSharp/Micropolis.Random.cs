@@ -75,12 +75,23 @@ namespace MicropolisSharp
     {
         protected long nextRandom;
 
+        /// <summary>
+        /// Draw a random number (internal function).
+        /// 
+        /// TODO: Use Wolfram's fast cellular automata pseudo random number generator.
+        /// </summary>
+        /// <returns> Unsigned 16 bit random number.</returns>
         public int SimRandom()
         {
             nextRandom = nextRandom * 1103515245 + 12345;
             return (int)(nextRandom & 0xffff00) >> 8;
         }
 
+        /// <summary>
+        /// Draw a random number in a given range.
+        /// </summary>
+        /// <param name="range">range Upper bound of the range (inclusive).</param>
+        /// <returns>Random number between \c 0 and \a range (inclusive).</returns>
         public short GetRandom(short range)
         {
             int maxMultiple, rnum;
@@ -97,11 +108,19 @@ namespace MicropolisSharp
             return (short)(rnum % range);
         }
 
+        /// <summary>
+        /// Get random 16 bit number.
+        /// </summary>
+        /// <returns>Unsigned 16 bit random number.</returns>
         public int GetRandom16()
         {
             return SimRandom() & 0x0000ffff;
         }
 
+        /// <summary>
+        /// Get signed 16 bit random number.
+        /// </summary>
+        /// <returns></returns>
         public int GetRandom16Signed()
         {
             int i = GetRandom16();
@@ -114,6 +133,11 @@ namespace MicropolisSharp
             return i;
         }
 
+        /// <summary>
+        /// Get a random number within a given range, with a preference to smaller values.
+        /// </summary>
+        /// <param name="limit">Upper bound of the range (inclusive).</param>
+        /// <returns>Random number between \c 0 and \a limit (inclusive).</returns>
         public short GetERandom(short limit)
         {
             short z = GetRandom(limit);
@@ -122,11 +146,18 @@ namespace MicropolisSharp
             return Math.Min(z, x);
         }
 
+        /// <summary>
+        /// Set seed of the random number generator.
+        /// </summary>
+        /// <param name="seed">New seed.</param>
         public void SeedRandom(int seed)
         {
             nextRandom = seed;
         }
 
+        /// <summary>
+        /// Initialize the random number generator with a 'random' seed.
+        /// </summary>
         public void RandomlySeedRandom()
         {
             nextRandom = (new Random().Next());

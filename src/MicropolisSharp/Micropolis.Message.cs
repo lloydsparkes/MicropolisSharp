@@ -73,10 +73,26 @@ namespace MicropolisSharp
     /// </summary>
     public partial class Micropolis
     {
+        /// <summary>
+        /// The Cities Population, at the last classification check
+        /// </summary>
         public long CityPopulationLast { get; private set; }
+
+        /// <summary>
+        /// THe Last City Classification
+        /// </summary>
         public short CategoryLast { get; private set; }
+
+        /// <summary>
+        /// Enable Auto GO TO
+        /// 
+        /// When an important event happens, the map display will jump to location of the event
+        /// </summary>
         public bool AutoGoTo { get; private set; }
-        
+
+        /// <summary>
+        /// Check progress of the user, and send him messages about it.
+        /// </summary>
         public void SendMessages() {
             short PowerPop;
             float TM;
@@ -257,6 +273,16 @@ namespace MicropolisSharp
 
             }
         }
+
+        /// <summary>
+        /// Detect a change in city class, and produce a message if the player has
+        /// reached the next class.
+        /// 
+        /// TODO: This code is very closely related to DoPopNum - merge both in some way?
+        /// (This function gets called much more often however then doPopNum().
+        ///     Also, at the first call, the difference between thisCityPop and
+        ///     cityPop is huge.)
+        /// </summary>
         public void CheckGrowth() {
             if ((CityTime & 3) == 0)
             {
@@ -318,6 +344,12 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Compute score for each scenario
+        /// 
+        /// type CANNOT be SC_NONE
+        /// </summary>
+        /// <param name="type">Scenario used</param>
         public void DoScenarioScore(Scenario type) {
             GeneralMessages z = GeneralMessages.MESSAGE_SCENARIO_LOST;     /* you lose */
 
@@ -394,11 +426,29 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Send the user a message of an event that happens at a particular position in the city.
+        /// 
+        /// TODO: Change X,Y to position
+        /// </summary>
+        /// <param name="msgNum">Message number of the message to display.</param>
+        /// <param name="x">X coordinate of the position of the event.</param>
+        /// <param name="y">Y coordinate of the position of the event.</param>
+        /// <param name="picture">Flag that is true if a picture should be shown.</param>
+        /// <param name="important">Flag that is true if the message is important.</param>
         public void SendMessage(GeneralMessages msgNum, short x = -1, short y = -1, bool picture = false, bool important = false)
         {
             Callback("update", "sdddbb", "message", msgNum.ToString(), x.ToString(), y.ToString(), (picture ? 1 : 0).ToString(), (important ? 1 : 0).ToString());
         }
 
+        /// <summary>
+        /// Make a sound for message \a mesgNum if appropriate.
+        /// 
+        /// TODO: Change X,Y for position
+        /// </summary>
+        /// <param name="msgNum">Message number displayed.</param>
+        /// <param name="x">Horizontal coordinate in the city of the sound.</param>
+        /// <param name="y">Vertical coordinate in the city of the sound.</param>
         public void DoMakeSound(int msgNum, int x, int y) {
             //TODO: Reenable Asserts
             //assert(mesgNum >= 0);
@@ -453,8 +503,25 @@ namespace MicropolisSharp
 
             }
         }
+
+        /// <summary>
+        /// Tell the front-end that it should perform an auto-goto
+        /// 
+        /// TODO: Change X,Y for position
+        /// </summary>
+        /// <param name="x">Horizontal coordinate in the city of the sound.</param>
+        /// <param name="y">Vertical coordinate in the city of the sound.</param>
+        /// <param name="msg">Message</param>
         public void DoAutoGoTo(short x, short y, string msg) { Callback("autoGoto", "dd", x.ToString(), y.ToString()); }
+
+        /// <summary>
+        /// Tell the front-end that the player has lost the game 
+        /// </summary>
         public void DoLoseGame() { Callback("loseGame", ""); }
+
+        /// <summary>
+        /// Tell the front-end that the player has won the game
+        /// </summary>
         public void DoWinGame() { Callback("winGame", ""); }
     }
 }

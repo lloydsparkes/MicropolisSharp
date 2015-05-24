@@ -68,6 +68,8 @@ namespace MicropolisSharp.Types
 {
     /// <summary>
     /// From position.h/cpp
+    /// 
+    /// TODO: Implement Operators?
     /// </summary>
     public class Position
     {

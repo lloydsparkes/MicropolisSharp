@@ -76,12 +76,37 @@ namespace MicropolisSharp
     /// </summary>
     public partial class Micropolis
     {
+        /// <summary>
+        /// Name of the Micropolis Top Level Directory
+        /// </summary>
         protected string homeDir;
+
+        /// <summary>
+        /// Name of the sub directory where resources are
+        /// </summary>
         protected string resourceDir;
 
+        /// <summary>
+        /// TODO: Turn into a List
+        /// </summary>
         public Resource Resources { get; private set; }
+
+        /// <summary>
+        /// TODO: Turn into a List
+        /// </summary>
         public StringTable StringTables { get; private set; }
 
+        /// <summary>
+        /// Find the resource with the given name and identification.
+        /// 
+        /// TODO: Function is not safely handling strings
+        /// TODO: File handling is not safe across platforms
+        /// TODO: What is point of long id, when we cast it to int?
+        /// TODO: Remove the GOTO
+        /// </summary>
+        /// <param name="name">Name of the resource (a 4 character string)</param>
+        /// <param name="id">Identification of the resource.</param>
+        /// <returns>Pointer to the resource.</returns>
         public Resource GetResource(string name, long id)
         {
             Resource r = Resources;
@@ -125,6 +150,16 @@ namespace MicropolisSharp
             return r;
         }
 
+        /// <summary>
+        /// Get the text of a message.
+        /// 
+        /// TODO: Make the function safe
+        /// TODO: Out of range is not handled correctly
+        /// TODO: Why do we copy the text, why not return its address?
+        /// </summary>
+        /// <param name="id">Identification of the resource.</param>
+        /// <param name="num">Number of the string in the resource.</param>
+        /// <returns>Destination of the text (usually 256 characters long).</returns>
         public String GetIndString(long id, short num)
         {
             StringTable tp = StringTables;

@@ -75,6 +75,11 @@ namespace MicropolisSharp
     /// </summary>
     public partial class Micropolis
     {
+        /// <summary>
+        /// Swap upper and lower byte of all shorts in the array.
+        /// </summary>
+        /// <param name="bytes">Array with shorts.</param>
+        /// <returns></returns>
         private short swapShort(byte[] bytes)
         {
             if (BitConverter.IsLittleEndian)
@@ -85,6 +90,14 @@ namespace MicropolisSharp
             return BitConverter.ToInt16(bytes, 0); ;
         }
 
+        /// <summary>
+        /// Load an array of short values from file to memory.
+        /// 
+        /// Convert to the correct processor architecture, if necessary.
+        /// </summary>
+        /// <param name="buf">Buffer to put the loaded short values in.</param>
+        /// <param name="stream">The stream to read from</param>
+        /// <returns>Load was succesful</returns>
         private bool loadShort(ref short buf, BinaryReader stream)
         {
             byte[] bytes = stream.ReadBytes(sizeof(short));
@@ -106,6 +119,14 @@ namespace MicropolisSharp
             return result;
         }
 
+        /// <summary>
+        /// Save an array of short values from memory to file.
+        /// 
+        /// Convert to the correct endianness first, if necessary.
+        /// </summary>
+        /// <param name="buf">containing the short values to save.</param>
+        /// <param name="stream">The stream to save to</param>
+        /// <returns>Save was succesful</returns>
         private bool saveShort(short buf, BinaryWriter stream)
         {
             short toWrite = swapShort(BitConverter.GetBytes(buf));
@@ -122,6 +143,12 @@ namespace MicropolisSharp
             return true;
         }
 
+        /// <summary>
+        /// Swap upper and lower words of all longs in the array.
+        /// </summary>
+        /// <param name="shorts">Array with longs.</param>
+        /// <param name="indexOfFirst"></param>
+        /// <returns></returns>
         private int halfSwapLong(short[] shorts, int indexOfFirst)
         {
             byte[] bytes = new byte[4];
@@ -154,6 +181,12 @@ namespace MicropolisSharp
             output[outputIndex+1] = BitConverter.ToInt16(short2, 0);
         }
 
+        /// <summary>
+        /// Load a city file from a given filename and (optionally) directory.
+        /// </summary>
+        /// <param name="filename">Name of the file to load.</param>
+        /// <param name="dir">If not \c NULL, name of the directory containing the file.</param>
+        /// <returns>Load was succesful</returns>
         public bool LoadFileDir(string filename, string dir)
         {
             BinaryReader f;
@@ -206,6 +239,11 @@ namespace MicropolisSharp
             return result;
         }
 
+        /// <summary>
+        /// Load a file, and initialize the game variables.
+        /// </summary>
+        /// <param name="filename">Name of the file to load.</param>
+        /// <returns>Load was succesfull.</returns>
         public bool LoadFile(string filename) {
             int n;
 
@@ -267,6 +305,11 @@ namespace MicropolisSharp
             return true;
         }
 
+        /// <summary>
+        /// Save a game to disk.
+        /// </summary>
+        /// <param name="filename">Name of the file to use for storing the game.</param>
+        /// <returns>The game was saved successfully.</returns>
         public bool SaveFile(string filename) {
             long n;
 
@@ -318,6 +361,10 @@ namespace MicropolisSharp
             return result;
         }
 
+        /// <summary>
+        /// Load a scenario.
+        /// </summary>
+        /// <param name="s">Scenario to load.</param>
         public void LoadScenario(Scenario s) {
             string name = null;
             string fname = null;
@@ -412,8 +459,19 @@ namespace MicropolisSharp
             DidLoadScenario();
         }
 
+        /// <summary>
+        /// Report to the front-end that the scenario was loaded.
+        /// </summary>
         public void DidLoadScenario() { Callback("didLoadScenario", ""); }
 
+        /// <summary>
+        /// Try to load a new game from disk.
+        /// 
+        /// TODO: In what state is the game left when loading fails?
+        /// TODO: String normalization code is duplicated in Micropolis::saveCityAs(). Extract to a sub-function.
+        /// </summary>
+        /// <param name="filename">Name of the file to load.</param>
+        /// <returns>Game was loaded successfully.</returns>
         public bool LoadCity(string filename)
         {
             if (LoadFile(filename))
@@ -443,10 +501,20 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Report to the frontend that the game was successfully loaded.
+        /// </summary>
         public void DidLoadCity() { Callback("didLoadCity", ""); }
 
+        /// <summary>
+        /// Report to the frontend that the game failed to load.
+        /// </summary>
+        /// <param name="message">File that attempted to load</param>
         public void DidntLoadCity(string message) { Callback("didntLoadCity", "s", message); }
 
+        /// <summary>
+        /// Try to save the game.
+        /// </summary>
         public void SaveCity()
         {
             if (CityFileName.Length > 0)
@@ -472,10 +540,28 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Report to the frontend that the city is being saved.
+        /// </summary>
         public void DoSaveCityAs() { Callback("saveCityAs", ""); }
+
+        /// <summary>
+        /// Report to the frontend that the city was saved successfully.
+        /// </summary>
         public void DidSaveCity() { Callback("didSaveCity", ""); }
+
+        /// <summary>
+        /// Report to the frontend that the city could not be saved.
+        /// </summary>
+        /// <param name="message">Name of the file used</param>
         public void DidntSaveCity(string message) { Callback("didntSaveCity", "s", message); }
 
+        /// <summary>
+        /// Save the city under a new name (?)
+        /// 
+        /// TODO: String normalization code is duplicated in Micropolis::loadCity(). Extract to a sub-function.
+        /// </summary>
+        /// <param name="filename">Name of the file to use for storing the game.</param>
         public void SaveCityAs(string filename)
         {
             CityFileName = filename;

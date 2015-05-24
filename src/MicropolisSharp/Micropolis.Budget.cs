@@ -84,16 +84,28 @@ namespace MicropolisSharp
             MustDrawBudget = 1;
         }
 
+        /// <summary>
+        /// Game decided to show the budget window
+        /// </summary>
         public void DoBudget()
         {
             DoBudgetNow(false);
         }
 
+        /// <summary>
+        /// User queried the budget window
+        /// </summary>
         public void DoBudgetFromMenu()
         {
             DoBudgetNow(true);
         }
 
+        /// <summary>
+        /// Handle the budget window
+        /// 
+        /// TODO: Simplify this code, Instead of this nested mess, make a sequence of assigning fund to road / fire / police
+        /// </summary>
+        /// <param name="fromMenu">Was the budget, requested by the User</param>
         public void DoBudgetNow(bool fromMenu)
         {
             long fireInt = (int)(FireFund * FirePercentage);

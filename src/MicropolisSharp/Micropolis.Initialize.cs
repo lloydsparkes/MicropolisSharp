@@ -73,6 +73,9 @@ namespace MicropolisSharp
     /// </summary>
     public partial class Micropolis
     {
+        /// <summary>
+        /// Reset many game state variables
+        /// </summary>
         public void InitWillStuff()
         {
             RandomlySeedRandom();
@@ -113,11 +116,21 @@ namespace MicropolisSharp
             DoUpdateHeads();
         }
 
+        /// <summary>
+        /// Reset all maps in the simulator.
+        /// 
+        /// TODO: What do to with an empty function
+        /// </summary>
         public void ResetMapState()
         {
             //NO OP
         }
 
+        /// <summary>
+        /// Reset all tools in the simulator editor.
+        /// 
+        /// TODO: What do to with an empty function
+        /// </summary>
         public void ResetEditorState()
         {
             //NO OP

@@ -78,20 +78,52 @@ namespace MicropolisSharp
         public short CrimeRamp { get; private set; }
         public short PollutionRamp { get; private set; }
 
+        /// <summary>
+        /// Block Residential Growth
+        /// </summary>
         public bool ResCap { get; private set; }
+
+        /// <summary>
+        /// Block Commercial Growth
+        /// </summary>
         public bool ComCap { get; private set; }
+
+        /// <summary>
+        /// Block Industrial Growth
+        /// </summary>
         public bool IndCap { get; private set; }
 
         public short CashFlow { get; private set; }
         public float ExternalMarket { get; private set; }
 
+        /// <summary>
+        /// The disaster for which a count-down is running
+        /// </summary>
         public Scenario DisasterEvent { get; private set; }
+
+        /// <summary>
+        /// Count Down Timer for the Disaster
+        /// </summary>
         public short DisasterWait { get; private set; }
 
+        /// <summary>
+        /// The type of score table to use
+        /// </summary>
         public Scenario ScoreType { get; private set; }
+
+        /// <summary>
+        /// The time to wait before computing the score
+        /// </summary>
         public short scoreWait { get; private set; }
 
+        /// <summary>
+        /// Number of powered tiles in all zones
+        /// </summary>
         public short PoweredZoneCount { get; private set; }
+
+        /// <summary>
+        /// Number of unpowered tiles in all zones
+        /// </summary>
         public short UnpoweredZoneCount { get; private set; }
 
         public bool NewPower { get; private set; }
@@ -100,12 +132,31 @@ namespace MicropolisSharp
         public short SimCycle { get; private set; }
         public short PhaseCycle { get; private set; }
         public short SpeedCycle { get; private set; }
+
+        /// <summary>
+        /// Do we need to perform the initial city evaluation
+        /// </summary>
         public bool DoInitialEval { get; private set; }
 
+
+        /// <summary>
+        /// TODO: Make Private
+        /// </summary>
         public short ResValve { get; private set; }
+
+        /// <summary>
+        /// TODO: Make Private
+        /// </summary>
         public short ComValve { get; private set; }
+
+        /// <summary>
+        /// TODO: Make Private
+        /// </summary>
         public short IndValve { get; private set; }
 
+        /// <summary>
+        /// comefrom: doEditWindow scoreDoer doMapInFront graphDoer doNilEvent
+        /// </summary>
         public void SimFrame()
         {
             if (SimSpeed == 0)
@@ -131,6 +182,9 @@ namespace MicropolisSharp
             Simulate();
         }
 
+        /// <summary>
+        /// comefrom: simFrame
+        /// </summary>
         public void Simulate() {
             short[] speedPowerScan = { 2,  4,  5 };
             short[] SpeedPollutionTerrainLandValueScan = { 2,  7, 17 };
@@ -290,6 +344,11 @@ namespace MicropolisSharp
             PhaseCycle = (short)((PhaseCycle + 1) & 15);
         }
 
+        /// <summary>
+        /// Initialize simulation.
+        /// 
+        /// TODO: Create constants for initSimLoad.
+        /// </summary>
         public void DoSimInit()
         {
             PhaseCycle = 0;
@@ -322,6 +381,9 @@ namespace MicropolisSharp
             DoInitialEval = true;
         }
 
+        /// <summary>
+        /// Copy bits from powerGridMap to the #PWRBIT in the map for all zones in the world.
+        /// </summary>
         public void DoNilPower()
         {
             int x, y;
@@ -339,6 +401,9 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Decrease traffic memory
+        /// </summary>
         public void DecTrafficMap()
         {     
             /* tends to empty trafficDensityMap */
@@ -372,6 +437,11 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Decrease rate of grow.
+        /// 
+        /// TODO: Limiting rate should not be done here, but when we add a new value to it.
+        /// </summary>
         public void DecRateOfGrowthMap()
         {     
             /* tends to empty rateOfGrowthMap */
@@ -405,6 +475,9 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// comefrom: doSimInit
+        /// </summary>
         public void InitSimMemory() {
             SetCommonInits();
 
@@ -440,6 +513,9 @@ namespace MicropolisSharp
             InitSimLoad = 0;
         }
 
+        /// <summary>
+        /// comefrom: doSimInit
+        /// </summary>
         public void SimLoadInit()
         { 
             // Disaster delay table for each scenario
@@ -556,6 +632,9 @@ namespace MicropolisSharp
             InitSimLoad = 0;
         }
 
+        /// <summary>
+        /// comefrom: initSimMemory simLoadInit
+        /// </summary>
         public void SetCommonInits()
         {
             EvalInit();
@@ -566,6 +645,9 @@ namespace MicropolisSharp
             TaxFund = 0;
         }
 
+        /// <summary>
+        /// comefrom: simulate doSimInit
+        /// </summary>
         public void SetValves() { /// @todo Break the tax table out into configurable parameters.
             short[] taxTable = {
                         200, 150, 120, 100, 80, 50, 30, 0, -10, -40, -100,
@@ -711,6 +793,9 @@ namespace MicropolisSharp
             ValveFlag = true;
         }
 
+        /// <summary>
+        /// comefrom: simulate doSimInit
+        /// </summary>
         public void ClearCensus()
         {
             PoweredZoneCount = 0;
@@ -741,8 +826,16 @@ namespace MicropolisSharp
             //policeStationEffectMap.clear(); // Added in rev293 
         }
 
+        /// <summary>
+        /// Take monthly snaphsot of all relevant data for the historic graphs.
+        /// Also update variables that control building new churches and hospitals.
+        /// 
+        /// TODO: Rename to takeMonthlyCensus (or takeMonthlySnaphshot?).
+        /// TODO: A lot of this max stuff is also done in graph.cpp
+        /// </summary>
         public void Take10Census()
-        { // TODO: Make configurable parameters.
+        { 
+            // TODO: Make configurable parameters.
             int resPopDenom = 8;
 
             int x;
@@ -822,8 +915,12 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        ///  comefrom: simulate
+        /// </summary>
         public void Take120Census()
-        { // TODO: Make configurable parameters.
+        { 
+            // TODO: Make configurable parameters.
             int resPopDenom = 8;
 
             /* Long Term Graphs */
@@ -862,6 +959,16 @@ namespace MicropolisSharp
             ChangeCensus();
         }
 
+        /// <summary>
+        /// Collect taxes
+        /// 
+        /// TODO:Function seems to be doing different things depending on
+        ///         Micropolis::totalPop value.With an non-empty city it does fund
+        ///         calculations. For an empty city, it immediately sets effects of
+        ///         funding, which seems inconsistent at least, and may be wrong
+        /// TODO: If Micropolis::taxFlag is set, no variable is touched which seems
+        ///         non-robust at least
+        /// </summary>
         public void CollectTax()
         {
             int z;
@@ -913,6 +1020,16 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Update effects of (possibly reduced) funding
+        /// 
+        /// It updates effects with respect to roads, police, and fire.
+        /// 
+        /// TODO: This function should probably not be used when #totalPop is
+        ///        clear(ie with an empty) city.See also bugs of #collectTax()
+        /// TODO: I think this should be called after loading a city, or any
+        ///        time anything it depends on changes.
+        /// </summary>
         public void UpdateFundEffects()
         {     // Compute road effects of funding
             RoadEffect = Constants.MaxRoadEffect;
@@ -941,6 +1058,11 @@ namespace MicropolisSharp
             MustDrawBudget = 1;
         }
 
+        /// <summary>
+        /// comefrom: simulate doSimInit
+        /// </summary>
+        /// <param name="x1"></param>
+        /// <param name="x2"></param>
         public void mapScan(int x1, int x2) {
             int x, y;
 
@@ -1025,6 +1147,12 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Handle rail track.
+        /// 
+        /// Generate a train, and handle road deteriorating effects.
+        /// </summary>
+        /// <param name="pos">Position of the rail.</param>
         public void DoRail(Position pos)
         {
             RailTotal++;
@@ -1063,6 +1191,10 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Handle decay of radio-active tile
+        /// </summary>
+        /// <param name="pos">Position of the radio-active tile.</param>
         public void DoRadTile(Position pos)
         {
             if ((GetRandom16() & 4095) == 0)
@@ -1071,6 +1203,10 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Handle road tile.
+        /// </summary>
+        /// <param name="pos">Position of the road.</param>
         public void DoRoad(Position pos) {
             int tden, z;
             short[] densityTable = { (short)MapTileCharacters.ROADBASE, (short)MapTileCharacters.LTRFBASE, (short)MapTileCharacters.HTRFBASE };
@@ -1151,6 +1287,15 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Handle a bridge.
+        /// 
+        /// TODO: What does this function return
+        /// TODO: Discover the structure of all of its magic constants
+        /// </summary>
+        /// <param name="pos">Position of the bridge.</param>
+        /// <param name="tile">Tile value of the bridge.</param>
+        /// <returns>????</returns>
         public bool DoBridge(Position pos, ushort tile) {
             short[] HDx = { -2, 2, -2, -1, 0, 1, 2 };
             short[] HDy = { -1, -1, 0, 0, 0, 0, 0 };
@@ -1293,6 +1438,11 @@ namespace MicropolisSharp
             return false;
         }
 
+        /// <summary>
+        /// Compute distance to nearest boat from a given bridge.
+        /// </summary>
+        /// <param name="pos">Position of bridge.</param>
+        /// <returns>Distance to nearest boat.</returns>
         public int GetBoatDistance(Position pos)
         {
             int sprDist;
@@ -1315,6 +1465,14 @@ namespace MicropolisSharp
             return dist;
         }
 
+        /// <summary>
+        /// Handle tile being on fire.
+        /// 
+        /// TODO: Needs a notion of iterative neighbour tiles computing.
+        /// TODO: Use a getFromMap()-like function here.
+        /// TODO: Extract constants of fire station effectiveness from here.
+        /// </summary>
+        /// <param name="pos">Position of the fire.</param>
         public void DoFire(Position pos) {
             short[] DX = { -1, 0, 1, 0 };
             short[] DY = { 0, -1, 0, 1 };
@@ -1379,6 +1537,13 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Handle a zone on fire.
+        /// 
+        /// Decreases rate of growth of the zone, and makes remaining tiles bulldozable.
+        /// </summary>
+        /// <param name="pos">Position of the zone on fire.</param>
+        /// <param name="ch">Character of the zone.</param>
         public void FireZone(Position pos, ushort ch)
         {
             int XYmax;
@@ -1429,6 +1594,12 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Repair a zone at \a pos.
+        /// </summary>
+        /// <param name="pos">Center-tile position of the zone.</param>
+        /// <param name="zCent">Value of the center tile.</param>
+        /// <param name="zSize">Size of the zone (in both directions).</param>
         public void RepairZone(Position pos, ushort zCent, short zSize)
         {
             ushort tile = (ushort)(zCent - 2 - zSize);
@@ -1470,6 +1641,11 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Update special zones.
+        /// </summary>
+        /// <param name="pos">Position of the zone.</param>
+        /// <param name="powerOn">Zone is powered.</param>
         public void DoSpecialZone(Position pos, bool powerOn)
         {     // Bigger numbers reduce chance of nuclear melt down
             short[] meltdownTable = { 30000, 20000, 10000 };
@@ -1669,6 +1845,11 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Draw a stadium (either full or empty).
+        /// </summary>
+        /// <param name="center">Center tile position of the stadium.</param>
+        /// <param name="z">Base tile value.</param>
         public void DrawStadium(Position center, ushort z)
         {
             int x, y;
@@ -1687,6 +1868,10 @@ namespace MicropolisSharp
             Map[center.X, center.Y] |= (ushort)MapTileBits.CenterOfZone | (ushort)MapTileBits.Power;
         }
 
+        /// <summary>
+        /// Generate a airplane or helicopter every now and then.
+        /// </summary>
+        /// <param name="pos">Position of the airport to start from.</param>
         public void DoAirport(Position pos)
         {
             if (GetRandom(5) == 0)
@@ -1701,6 +1886,10 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Draw coal smoke tiles around given position (of a coal power plant).
+        /// </summary>
+        /// <param name="pos">Center tile of the coal power plant</param>
         public void CoalSmoke(Position pos)
         {
             short[] SmTb = {
@@ -1717,6 +1906,10 @@ namespace MicropolisSharp
             }
         }
 
+        /// <summary>
+        /// Perform a nuclear melt-down disaster
+        /// </summary>
+        /// <param name="pos">Position of the nuclear power plant that melts.</param>
         public void DoMeltdown(Position pos)
         {
             MakeExplosion(pos.X - 1, pos.Y - 1);
