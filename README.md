@@ -24,7 +24,7 @@ Send me a message, or raise pull requests, this project is in the very early sta
 
 ## General Todo List (In Priority Order)
 
-* Finishing Copying the comments over from the original code
+* ~~Finishing Copying the comments over from the original code~~
 * Re-Enable Asserts
 * Real Types for the MapTile
 * Rework the MapTile Characters & MapTile Bits to significantly improve the code
