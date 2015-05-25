@@ -66,6 +66,7 @@
  */
 using MicropolisSharp.Types;
 using System;
+using System.Diagnostics;
 
 namespace MicropolisSharp
 {
@@ -609,9 +610,8 @@ namespace MicropolisSharp
 
             if (Scenario != Scenario.None)
             {
-                //TODO: Reenable Asserts
-                //assert(LENGTH_OF(disasterWaitTable) == SC_COUNT);
-                //assert(LENGTH_OF(scoreWaitTable) == SC_COUNT);
+                Debug.Assert(disasterWaitTable.Length == (int)Scenario.Count);
+                Debug.Assert(scoreWaitTable.Length == (int)Scenario.Count);
 
                 DisasterEvent = Scenario;
                 DisasterWait = disasterWaitTable[(int)DisasterEvent];
@@ -657,8 +657,7 @@ namespace MicropolisSharp
                         1.2f, 1.1f, 0.98f,
                     };
 
-            //TODO: Reenable Asserts
-            //assert(LEVEL_COUNT == LENGTH_OF(extMarketParamTable));
+            Debug.Assert((int)Levels.Count == extMarketParamTable.Length);
 
             /// @todo Make configurable parameters.
             short resPopDenom = 8;
@@ -728,8 +727,7 @@ namespace MicropolisSharp
 
             projectedComPop = internalMarket * laborBase;
 
-            //TODO: Reenable asserts
-            //assert(gameLevel >= LEVEL_FIRST && gameLevel <= LEVEL_LAST);
+            Debug.Assert(GameLevel >= Levels.First && GameLevel <= Levels.Last);
             projectedIndPop = IndPop * laborBase * extMarketParamTable[(int)GameLevel];
             projectedIndPop = Math.Max(projectedIndPop, projectedIndPopMin);
 
@@ -979,9 +977,8 @@ namespace MicropolisSharp
             float[] RLevels = { 0.7f, 0.9f, 1.2f };
             float[] FLevels = { 1.4f, 1.2f, 0.8f };
 
-            //TODO: Check Asserts
-            //assert(LEVEL_COUNT == LENGTH_OF(RLevels));
-            //assert(LEVEL_COUNT == LENGTH_OF(FLevels));
+            Debug.Assert((int)Levels.Count == RLevels.Length);
+            Debug.Assert((int)Levels.Count == FLevels.Length);
 
             CashFlow = 0;
 
@@ -1170,8 +1167,7 @@ namespace MicropolisSharp
                     if (!(curValue & (ushort)MapTileBits.Conductivity).IsTrue())
                     {
                         // Otherwise the '(getRandom16() & 31)' makes no sense
-                        //TODO: Reeenable Asserts
-                        //assert(MAX_ROAD_EFFECT == 32);
+                        Debug.Assert(Constants.MaxRoadEffect == 32);
 
                         if (RoadEffect < (GetRandom16() & 31))
                         {
@@ -1225,8 +1221,7 @@ namespace MicropolisSharp
                 {
                     if (!(mapValue & (ushort)MapTileBits.Conductivity).IsTrue())
                     {
-                        //TODO: Reenable Assets
-                        //assert(MAX_ROAD_EFFECT == 32); // Otherwise the '(getRandom16() & 31)' makes no sense
+                        Debug.Assert(Constants.MaxRoadEffect == 32); // Otherwise the '(getRandom16() & 31)' makes no sense
                         if (RoadEffect < (GetRandom16() & 31))
                         {
                             if ((tile & 15) < 2 || (tile & 15) == 15)
@@ -1671,8 +1666,7 @@ namespace MicropolisSharp
 
                 case MapTileCharacters.NUCLEAR:
 
-                    //TODO: Reenable Asserts
-                    //assert(LEVEL_COUNT == LENGTH_OF(meltdownTable));
+                    Debug.Assert((int)Levels.Count == meltdownTable.Length);
 
                     if (EnableDisasters && !GetRandom(meltdownTable[(int)GameLevel]).IsTrue())
                     {

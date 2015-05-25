@@ -65,6 +65,7 @@
  * NOT APPLY TO YOU.
  */
 using MicropolisSharp.Types;
+using System.Diagnostics;
 
 namespace MicropolisSharp
 {
@@ -131,8 +132,7 @@ namespace MicropolisSharp
             }
             else if (total > 0)
             {
-                //TODO: Reenable Asserts
-                //assert(yumDuckets <= total);
+                Debug.Assert(yumDuckets <= total);
 
                 // Not enough yumDuckets to fund everything.
                 // First spend on roads, then on fire, then on police.
@@ -262,10 +262,9 @@ namespace MicropolisSharp
 
             }
             else
-            {
-                //TODO: Reenable Assets
-                //assert(yumDuckets == total);
-                //assert(total == 0);
+            { 
+                Debug.Assert(yumDuckets == total);
+                Debug.Assert(total == 0);
 
                 // Zero funding, so no values but full percentages.
 

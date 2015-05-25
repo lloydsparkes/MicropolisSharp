@@ -65,6 +65,7 @@
  * NOT APPLY TO YOU.
  */
 using MicropolisSharp.Types;
+using System.Diagnostics;
 
 namespace MicropolisSharp
 {
@@ -450,8 +451,7 @@ namespace MicropolisSharp
         /// <param name="x">Horizontal coordinate in the city of the sound.</param>
         /// <param name="y">Vertical coordinate in the city of the sound.</param>
         public void DoMakeSound(int msgNum, int x, int y) {
-            //TODO: Reenable Asserts
-            //assert(mesgNum >= 0);
+            Debug.Assert(msgNum >= 0);
 
             switch ((GeneralMessages)msgNum)
             {

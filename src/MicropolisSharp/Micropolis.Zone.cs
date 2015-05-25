@@ -223,8 +223,7 @@ namespace MicropolisSharp
                             churchNumber = 7;
                             break;
                         default:
-                            //TODO: Reenable Asserts
-                            //assert(0); // Unexpected church tile
+                            Debug.Assert(0); // Unexpected church tile
                             break;
                     }
 

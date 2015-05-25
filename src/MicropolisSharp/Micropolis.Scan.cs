@@ -66,6 +66,7 @@
  */
 using MicropolisSharp.Types;
 using System;
+using System.Diagnostics;
 
 namespace MicropolisSharp
 {
@@ -223,9 +224,8 @@ namespace MicropolisSharp
             DoSmooth2(); // tempMap2 -> tempMap1
             DoSmooth1(); // tempMap1 -> tempMap2
 
-            //TODO: Redo Asserts
-            //assert(populationDensityMap.MAP_W == tempMap2.MAP_W);
-            //assert(populationDensityMap.MAP_H == tempMap2.MAP_H);
+            Debug.Assert(PopulationDensityMap.width == TempMap2.width);
+            Debug.Assert(PopulationDensityMap.height == TempMap2.height);
 
             // Copy tempMap2 to populationDensityMap, multiplying by 2
             for(int x = 0; x < PopulationDensityMap.width; x++)

@@ -66,6 +66,7 @@
  */
 using MicropolisSharp.Types;
 using System;
+using System.Diagnostics;
 
 namespace MicropolisSharp
 {
@@ -170,8 +171,7 @@ namespace MicropolisSharp
         /// <param name="level"></param>
         public void SetGameLevel(Levels level)
         {
-            //TODO: Reenabled Asserts
-            //assert(level >= Levels.First && level <= Levels.Last);
+            Debug.Assert(level >= Levels.First && level <= Levels.Last);
             GameLevel = level;
             UpdateGameLevel();
         }

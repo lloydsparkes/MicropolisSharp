@@ -65,6 +65,7 @@
  * NOT APPLY TO YOU.
  */
 using MicropolisSharp.Types;
+using System.Diagnostics;
 
 namespace MicropolisSharp
 {
@@ -90,8 +91,7 @@ namespace MicropolisSharp
                 5 * 48,  // Game level 1
                 60 // Game level 2
             };
-            //TODO: Reenable Asserts
-            //assert(LEVEL_COUNT == LENGTH_OF(DisChance));
+            Debug.Assert((int)Levels.Count == DisChance.Length);
 
             if (FloodCount.IsTrue())
             {
