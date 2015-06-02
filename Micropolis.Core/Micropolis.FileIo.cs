@@ -217,13 +217,13 @@ namespace MicropolisSharp
             using (BinaryReader reader = new BinaryReader(File.OpenRead(filename)))
             {
                 result = result &&
-                  loadShorts(ref ResHist, Constants.HistoryLength, reader) &&
-                  loadShorts(ref ComHist, Constants.HistoryLength, reader) &&
-                  loadShorts(ref IndHist, Constants.HistoryLength, reader) &&
-                  loadShorts(ref CrimeHist, Constants.HistoryLength, reader) &&
-                  loadShorts(ref PollutionHist, Constants.HistoryLength, reader) &&
-                  loadShorts(ref MoneyHist, Constants.HistoryLength, reader) &&
-                  loadShorts(ref MiscHist, Constants.MiscHistoryLength, reader);
+                  loadShorts(ref ResHist, Constants.HistoryLength/2, reader) &&
+                  loadShorts(ref ComHist, Constants.HistoryLength/2, reader) &&
+                  loadShorts(ref IndHist, Constants.HistoryLength/2, reader) &&
+                  loadShorts(ref CrimeHist, Constants.HistoryLength/2, reader) &&
+                  loadShorts(ref PollutionHist, Constants.HistoryLength/2, reader) &&
+                  loadShorts(ref MoneyHist, Constants.HistoryLength/2, reader) &&
+                  loadShorts(ref MiscHist, Constants.MiscHistoryLength/2, reader);
 
                 for(int x = 0; x < Map.GetLength(0); x++)
                 {

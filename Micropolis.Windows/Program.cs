@@ -15,6 +15,7 @@ namespace Micropolis.Windows
         static void Main()
         {
             using (var game = new Micropolis.Basic.Micropolis())
+            //using(var game = new Micropolis.Basic.MicropolisMapDrawer())
                 game.Run();
         }
     }

@@ -46,6 +46,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="AnimatedTileDrawer.cs" />
+    <Compile Include="MapLoader\MapReader.cs" />
+    <Compile Include="MicropolisMapDrawer.cs" />
     <Compile Include="Micropolis.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
