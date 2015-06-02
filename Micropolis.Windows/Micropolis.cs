@@ -78,7 +78,9 @@ namespace Micropolis.Basic
             simulator.InitGame();
             simulator.SimInit();
             simulator.LoadFile(filePath);
-            
+            simulator.SetSpeed(2);
+            simulator.DoSimInit();
+
             //Window.AllowUserResizing = true;
 
             base.Initialize();
@@ -283,7 +285,9 @@ namespace Micropolis.Basic
             }*/
 
             // TODO: Add your update logic here
-            simulator.Simulate();
+            simulator.SimTick();
+            simulator.AnimateTiles();
+            
             foreach(var a in animatedTiles.Values){
                 a.Update();
             }

@@ -225,9 +225,9 @@ namespace MicropolisSharp
                   loadShorts(ref MoneyHist, Constants.HistoryLength, reader) &&
                   loadShorts(ref MiscHist, Constants.MiscHistoryLength, reader);
 
-                for(int x = 0; x < Constants.WorldWidth; ++x)
+                for(int x = 0; x < Map.GetLength(0); x++)
                 {
-                    for(int y = 0; y < Constants.WorldHeight; ++y)
+                    for(int y = 0; y < Map.GetLength(1); y++)
                     {
                         short temp = (short)Map[x, y];
                         result = result && loadShort(ref temp, reader);

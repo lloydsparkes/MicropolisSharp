@@ -461,7 +461,7 @@ namespace MicropolisSharp
                     voteCount++;
                 }
                 problem++;
-                if (problem > (int)CityVotingProblems.NumberOfProblems)
+                if (problem > (int)CityVotingProblems.NumberOfProblems - 1)
                 {
                     problem = 0;
                 }

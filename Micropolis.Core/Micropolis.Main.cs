@@ -66,6 +66,7 @@
  */
 using MicropolisSharp.Types;
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace MicropolisSharp
@@ -222,6 +223,8 @@ namespace MicropolisSharp
         /// </summary>
         public void SimInit()
         {
+            SpriteList = new List<SimSprite>();
+
             SetEnableSound(true); // Enable sound
             MustUpdateOptions = true; // Update options displayed at user
             Scenario = Scenario.None;

@@ -129,7 +129,7 @@ namespace MicropolisSharp
         public static bool IsFalse<T>(this T value)
             where T : IComparable
         {
-            if (value.CompareTo(0) == 0)
+            if (value.CompareTo(default(T)) == 0)
             {
                 return true;
             }
