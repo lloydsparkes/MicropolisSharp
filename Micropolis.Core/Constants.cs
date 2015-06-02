@@ -151,12 +151,12 @@ namespace MicropolisSharp
         /// <summary>
         /// The length of the History Storage Array (Max Number of History Items)
         /// </summary>
-        public const int HistoryLength = 480;
+        public const int HistoryLength = 240;
 
         /// <summary>
         /// The length of the Misc History Storage Array (Max Number of Misc History Items)
         /// </summary>
-        public const int MiscHistoryLength = 240;
+        public const int MiscHistoryLength = 120;
 
         /// <summary>
         /// The length of the history tables
