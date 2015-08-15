@@ -166,7 +166,7 @@ namespace MicropolisSharp
             if (powerStackPointer < (Constants.PowerStackSize - 2))
             {
                 powerStackPointer++;
-                powerStackXY[powerStackPointer] = pos;
+                powerStackXY[powerStackPointer] = new Position(pos);
             }
         }
 

@@ -22,6 +22,7 @@ namespace Micropolis.Basic
         Dictionary<int, AnimatedTileDrawer> animatedTiles = new Dictionary<int, AnimatedTileDrawer>();
         Texture2D rect2x2;
         Texture2D commercial, residential, industrial;
+        SpriteFont font;
 
         Texture2D plopperCurrent;
         bool isInPloppingMode = false;
@@ -38,6 +39,8 @@ namespace Micropolis.Basic
         int maxOffsetX = 0;
         int maxOffsetY = 0;
 
+        Point mousePoint = new Point(0, 0);
+
         MicropolisSharp.Micropolis simulator;
 
         public Micropolis() : base()
@@ -53,6 +56,7 @@ namespace Micropolis.Basic
             Content.RootDirectory = "Content";
 
             this.Window.ClientSizeChanged += Window_ClientSizeChanged;
+            this.IsMouseVisible = true;
         }
 
         void Window_ClientSizeChanged(object sender, EventArgs e)
@@ -122,6 +126,7 @@ namespace Micropolis.Basic
             commercial = Content.Load<Texture2D>("com");
             residential = Content.Load<Texture2D>("res");
             industrial = Content.Load<Texture2D>("ind");
+            font = Content.Load<SpriteFont>("font");
         }
 
         /// <summary>
@@ -147,103 +152,43 @@ namespace Micropolis.Basic
 
             KeyboardState state = Keyboard.GetState();
 
-            if (!isInPloppingMode)
+            if (state.IsKeyDown(Keys.Down))
             {
-                if (state.IsKeyDown(Keys.Down))
-                {
-                    offsetPositionY++;
-                    if (offsetPositionY > maxOffsetY)
-                    {
-                        offsetPositionY--;
-                    }
-                }
-                if (state.IsKeyDown(Keys.Up))
+                offsetPositionY++;
+                if (offsetPositionY > maxOffsetY)
                 {
                     offsetPositionY--;
-                    if (offsetPositionY < 1)
-                    {
-                        offsetPositionY = 1;
-                    }
                 }
-                if (state.IsKeyDown(Keys.Right))
+            }
+            if (state.IsKeyDown(Keys.Up))
+            {
+                offsetPositionY--;
+                if (offsetPositionY < 1)
                 {
-                    offsetPositionX++;
-                    if (offsetPositionX > maxOffsetX)
-                    {
-                        offsetPositionX--;
-                    }
+                    offsetPositionY = 1;
                 }
-                if (state.IsKeyDown(Keys.Left))
+            }
+            if (state.IsKeyDown(Keys.Right))
+            {
+                offsetPositionX++;
+                if (offsetPositionX > maxOffsetX)
                 {
                     offsetPositionX--;
-                    if (offsetPositionX < 1)
-                    {
-                        offsetPositionX = 1;
-                    }
                 }
             }
-            else
+            if (state.IsKeyDown(Keys.Left))
             {
-                if (state.IsKeyDown(Keys.Down))
+                offsetPositionX--;
+                if (offsetPositionX < 1)
                 {
-                    ploppingY++;
-                    if (ploppingY > gridSizeHeight)
-                    {
-                        ploppingY--;
-                    }
-                }
-                if (state.IsKeyDown(Keys.Up))
-                {
-                    ploppingY--;
-                    if (ploppingY < 0)
-                    {
-                        ploppingY = 0;
-                    }
-                }
-                if (state.IsKeyDown(Keys.Right))
-                {
-                    ploppingX++;
-                    if (ploppingX > gridSizeWidth)
-                    {
-                        ploppingX--;
-                    }
-                }
-                if (state.IsKeyDown(Keys.Left))
-                {
-                    ploppingX--;
-                    if (ploppingX < 0)
-                    {
-                        ploppingX = 0;
-                    }
+                    offsetPositionX = 1;
                 }
             }
 
-            if (state.IsKeyDown(Keys.R))
-            {
-                isInPloppingMode = true;
-                plopperCurrent = residential;
-                resetPloppingPoint();
-            }
-
-            if (state.IsKeyDown(Keys.C))
-            {
-                isInPloppingMode = true;
-                plopperCurrent = commercial;
-                resetPloppingPoint();
-            }
-
-            if (state.IsKeyDown(Keys.I))
-            {
-                isInPloppingMode = true;
-                plopperCurrent = industrial;
-                resetPloppingPoint();
-            }
-
-            if (state.IsKeyDown(Keys.D))
-            {
-                isInPloppingMode = false;
-            }
-
+            MouseState mState = Mouse.GetState();
+            mousePoint.X = mState.X;
+            mousePoint.Y = mState.Y;
+         
             /*if (state.GetPressedKeys().Length > 0)
             {
                 var key = state.GetPressedKeys()[0];
@@ -331,8 +276,19 @@ namespace Micropolis.Basic
                 }
             }
 
-            /*
-            if (miniMap != null)
+            /* Output Debug Information */
+            spriteBatch.Draw(rect2x2, new Rectangle(new Point(0, 0), new Point(150, 0)), Color.Wheat);
+
+            int mapPosX = (mousePoint.X / 16) + offsetPositionX;
+            int mapPosY = (mousePoint.Y / 16) + offsetPositionY;
+
+            mapPosX = mapPosX < 0 ? 0 : mapPosX;
+            mapPosY = mapPosY < 0 ? 0 : mapPosY;
+
+            spriteBatch.DrawString(font, String.Format("X: {0}, Y: {1}, V:{2}", mapPosX, mapPosY, simulator.Map[mapPosX, mapPosY]), new Vector2(5, 5), Color.Red);
+
+         
+            if (simulator.GetPowerGridMapBuffer() != null)
             {
 
                 //2. Draw Additional Map - Top Right Corner - 4px per point
@@ -346,12 +302,12 @@ namespace Micropolis.Basic
                         int actualX = (x - miniMapX) / 2;
                         int actualY = y / 2;
 
-                        int value = miniMap[actualX, actualY];
+                        int value = simulator.PowerGridMap.WorldGet(actualX, actualY);
 
-                        spriteBatch.Draw(rect2x2, new Vector2(x, y), Color.FromNonPremultiplied(value, 0, 0, 255));
+                        spriteBatch.Draw(rect2x2, new Vector2(x, y), value > 0 ? Color.Red : Color.Black);
                     }
                 }
-            }*/
+            }
 
             if (isInPloppingMode)
             {
