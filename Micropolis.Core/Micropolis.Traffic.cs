@@ -199,7 +199,7 @@ namespace MicropolisSharp
             curMapStackPointer++;
             if (curMapStackPointer > Constants.MaxTrafficDistance)
                 return;
-            curMapStackXY[curMapStackPointer] = pos;
+            curMapStackXY[curMapStackPointer] = new Position(pos);
         }
 
         /// <summary>
