@@ -599,8 +599,10 @@ namespace MicropolisSharp
 
             spriteCycle++;
 
-            foreach(SimSprite sprite in SpriteList)
+            for(int i = 0; i < SpriteList.Count; i++)
             {
+                SimSprite sprite = SpriteList[i];
+
                 if (sprite.Frame > 0)
                 {
                     switch (sprite.Type)
@@ -908,8 +910,10 @@ namespace MicropolisSharp
                 bool explode = false;
 
                 /* Check whether another sprite is near enough to collide with */
-                foreach(SimSprite s in SpriteList)
+                for(int i = 0; i < SpriteList.Count; i++)
                 {
+                    SimSprite s = SpriteList[i];
+
                     if (s.Frame == 0 || s == sprite)
                     {
                         /* Non-active sprite, or self: skip */

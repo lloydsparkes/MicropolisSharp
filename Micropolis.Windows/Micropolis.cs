@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System.IO;
+using Micropolis.Windows.Layers;
 
 namespace Micropolis.Basic
 {
@@ -12,34 +13,12 @@ namespace Micropolis.Basic
     /// </summary>
     public class Micropolis : Game
     {
-        private const int TILE_SIZE = 16;
-        private const int WORLD_WIDTH = 120;
-        private const int WORLD_HEIGHT = 100;
-
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-        TileDrawer tiles;
-        Dictionary<int, AnimatedTileDrawer> animatedTiles = new Dictionary<int, AnimatedTileDrawer>();
         Texture2D rect2x2;
-        Texture2D commercial, residential, industrial;
         SpriteFont font;
 
-        Texture2D plopperCurrent;
-        bool isInPloppingMode = false;
-        int ploppingX = 1;
-        int ploppingY = 1;
-        int maxPloppingX = 1;
-        int maxPloppingY = 1;
-
-        int gridSizeWidth = 1280 / TILE_SIZE;
-        int gridSizeHeight = 768 / TILE_SIZE;
-
-        int offsetPositionX = 0;
-        int offsetPositionY = 0;
-        int maxOffsetX = 0;
-        int maxOffsetY = 0;
-
-        Point mousePoint = new Point(0, 0);
+        private MapLayer _mapLayer;
 
         MicropolisSharp.Micropolis simulator;
 
@@ -49,9 +28,6 @@ namespace Micropolis.Basic
             graphics = new GraphicsDeviceManager(this);
             graphics.PreferredBackBufferWidth = 1280;
             graphics.PreferredBackBufferHeight = 768;
-
-            maxOffsetX = WORLD_WIDTH - gridSizeWidth;
-            maxOffsetY = WORLD_HEIGHT - gridSizeHeight;
 
             Content.RootDirectory = "Content";
 
@@ -64,8 +40,10 @@ namespace Micropolis.Basic
             graphics.PreferredBackBufferWidth = Window.ClientBounds.Width;
             graphics.PreferredBackBufferHeight = Window.ClientBounds.Height;
 
-            int gridSizeWidth = Window.ClientBounds.Width / TILE_SIZE;
-            int gridSizeHeight = Window.ClientBounds.Height / TILE_SIZE;
+            if (_mapLayer != null)
+            {
+                _mapLayer.Resize(Window.ClientBounds.Width, Window.ClientBounds.Height);
+            }
         }
 
         /// <summary>
@@ -85,7 +63,8 @@ namespace Micropolis.Basic
             simulator.SetSpeed(2);
             simulator.DoSimInit();
 
-            //Window.AllowUserResizing = true;
+            _mapLayer = new MapLayer(simulator);
+            _mapLayer.Resize(Window.ClientBounds.Width, Window.ClientBounds.Height);
 
             base.Initialize();
         }
@@ -104,28 +83,8 @@ namespace Micropolis.Basic
             for (int i = 0; i < data.Length; ++i) data[i] = Color.White;
             rect2x2.SetData(data);
 
-            tiles = new TileDrawer(Content.Load<Texture2D>("tiles"));
-            for (int i = 81; i < 96; i++)
-            {
-                var anim = new AnimatedTileDrawer(tiles, i, 16, 4);
-                foreach(var id in anim.FrameIndex)
-                {
-                    animatedTiles.Add(id, anim);
-                }
-            }
+            _mapLayer.LoadContent(Content);
 
-            for (int i = 145; i < 160; i++)
-            {
-                var anim = new AnimatedTileDrawer(tiles, i, 16, 4);
-                foreach (var id in anim.FrameIndex)
-                {
-                    animatedTiles.Add(id, anim);
-                }
-            }
-
-            commercial = Content.Load<Texture2D>("com");
-            residential = Content.Load<Texture2D>("res");
-            industrial = Content.Load<Texture2D>("ind");
             font = Content.Load<SpriteFont>("font");
         }
 
@@ -154,98 +113,30 @@ namespace Micropolis.Basic
 
             if (state.IsKeyDown(Keys.Down))
             {
-                offsetPositionY++;
-                if (offsetPositionY > maxOffsetY)
-                {
-                    offsetPositionY--;
-                }
+                _mapLayer.MoveWindow(0, 1);
             }
             if (state.IsKeyDown(Keys.Up))
             {
-                offsetPositionY--;
-                if (offsetPositionY < 1)
-                {
-                    offsetPositionY = 1;
-                }
+                _mapLayer.MoveWindow(0, -1);
             }
             if (state.IsKeyDown(Keys.Right))
             {
-                offsetPositionX++;
-                if (offsetPositionX > maxOffsetX)
-                {
-                    offsetPositionX--;
-                }
+                _mapLayer.MoveWindow(1, 0);
             }
             if (state.IsKeyDown(Keys.Left))
             {
-                offsetPositionX--;
-                if (offsetPositionX < 1)
-                {
-                    offsetPositionX = 1;
-                }
+                _mapLayer.MoveWindow(-1, 0);
             }
 
-            MouseState mState = Mouse.GetState();
-            mousePoint.X = mState.X;
-            mousePoint.Y = mState.Y;
-         
-            /*if (state.GetPressedKeys().Length > 0)
+            if (gameTime.ElapsedGameTime.Milliseconds % 16 == 0)
             {
-                var key = state.GetPressedKeys()[0];
-                switch (key)
-                {
-                    case Keys.D0:
-                        miniMap = null;
-                        break;
-                    case Keys.D1:
-                        miniMap = simulator.State.PopulationDensityMap;
-                        break;
-                    case Keys.D2:
-                        miniMap = simulator.State.PollutionMap;
-                        break;
-                    case Keys.D3:
-                        miniMap = simulator.State.CrimeMap;
-                        break;
-                    case Keys.D4:
-                        miniMap = simulator.State.FireEffectMap;
-                        break;
-                    case Keys.D5:
-                        miniMap = simulator.State.PoliceEffectMap;
-                        break;
-                    case Keys.D6:
-                        miniMap = simulator.State.LandValueMap;
-                        break;
-                    case Keys.D7:
-                        miniMap = simulator.State.TerrainMap;
-                        break;
-                    case Keys.D8:
-                        miniMap = null;
-                        break;
-                    case Keys.D9:
-                        miniMap = null;
-                        break;
-                    default:
-                        break;
-                }
-            }*/
+                simulator.SimTick();
+                simulator.AnimateTiles();
 
-            // TODO: Add your update logic here
-            simulator.SimTick();
-            simulator.AnimateTiles();
-            
-            foreach(var a in animatedTiles.Values){
-                a.Update();
+                _mapLayer.Update();
             }
 
             base.Update(gameTime);
-        }
-
-        private void resetPloppingPoint()
-        {
-            ploppingX = (gridSizeWidth / 2);
-            ploppingY = (gridSizeHeight / 2);
-            maxPloppingX = gridSizeWidth - 2;
-            maxPloppingY = gridSizeHeight - 2;
         }
 
         /// <summary>
@@ -258,36 +149,9 @@ namespace Micropolis.Basic
 
             spriteBatch.Begin();
 
-            //1. Draw Main Map
-            for (int x = offsetPositionX; x < simulator.Map.GetLength(0); x++)
-            {
-                for (int y = offsetPositionY; y < simulator.Map.GetLength(1); y++)
-                {
-                    int tileId = simulator.Map[x, y] & 1023;
-
-                    if ((simulator.Map[x, y] & 2048) == 2048 && animatedTiles.ContainsKey(tileId))
-                    {
-                        animatedTiles[tileId].DrawTile(spriteBatch, new Vector2((x - offsetPositionX) * 16, (y - offsetPositionY) * 16));
-                    }
-                    else
-                    {
-                        tiles.DrawTile(tileId, spriteBatch, new Vector2((x - offsetPositionX) * 16, (y - offsetPositionY) * 16), Color.White);
-                    }
-                }
-            }
-
-            /* Output Debug Information */
-            spriteBatch.Draw(rect2x2, new Rectangle(new Point(0, 0), new Point(150, 0)), Color.Wheat);
-
-            int mapPosX = (mousePoint.X / 16) + offsetPositionX;
-            int mapPosY = (mousePoint.Y / 16) + offsetPositionY;
-
-            mapPosX = mapPosX < 0 ? 0 : mapPosX;
-            mapPosY = mapPosY < 0 ? 0 : mapPosY;
-
-            spriteBatch.DrawString(font, String.Format("X: {0}, Y: {1}, V:{2}", mapPosX, mapPosY, simulator.Map[mapPosX, mapPosY]), new Vector2(5, 5), Color.Red);
-
-         
+            _mapLayer.Draw(spriteBatch);
+                  
+            /*   
             if (simulator.GetPowerGridMapBuffer() != null)
             {
 
@@ -308,14 +172,7 @@ namespace Micropolis.Basic
                     }
                 }
             }
-
-            if (isInPloppingMode)
-            {
-                int x = (int)(((ploppingX) * TILE_SIZE) - TILE_SIZE);
-                int y = (int)(((ploppingY) * TILE_SIZE) - TILE_SIZE);
-
-                spriteBatch.Draw(plopperCurrent, new Vector2(x, y), Color.White);
-            }
+            */
 
             spriteBatch.End();
 

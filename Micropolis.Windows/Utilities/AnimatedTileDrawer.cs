@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Micropolis.Basic
+namespace Micropolis.Utilities
 {
     public class AnimatedTileDrawer
     {
