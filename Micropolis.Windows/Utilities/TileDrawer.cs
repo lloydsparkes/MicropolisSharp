@@ -33,7 +33,33 @@ namespace Micropolis.Utilities
                 throw new Exception("Invalid Grid Tile");
             }
 
-            batch.Draw(_tileSheet, drawPosition, new Rectangle(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE), overrideColor);
+            batch.Draw(_tileSheet, Normalise(drawPosition), ClippedRectange(drawPosition, new Rectangle(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE)), overrideColor);
+        }
+
+        private Rectangle ClippedRectange(Vector2 drawPosition, Rectangle original)
+        {
+            int x = original.X;
+            int y = original.Y;
+            int w = original.Width;
+            int h = original.Height;
+
+            if(drawPosition.X < 0)
+            {
+                x = (int)(x -drawPosition.X); // x - dp.X == x + Abs(dp.X) because dp.X < 0
+                w = (int)(w + drawPosition.X);
+            }
+            if (drawPosition.Y < 0)
+            {
+                y = (int)(y - drawPosition.Y); // x - dp.X == x + Abs(dp.X) because dp.X < 0
+                h = (int)(h + drawPosition.Y);
+            }
+
+            return new Rectangle(x, y, w, h);
+        }
+
+        private Vector2 Normalise(Vector2 drawPosition)
+        {
+            return new Vector2(Math.Max(drawPosition.X, 0), Math.Max(drawPosition.Y, 0));
         }
 
         internal void DrawAnimatedTile(int tileId, int cycle, SpriteBatch spriteBatch, Vector2 vector2)

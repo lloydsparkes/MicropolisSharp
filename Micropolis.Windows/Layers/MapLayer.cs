@@ -18,13 +18,17 @@ namespace Micropolis.Windows.Layers
         private Dictionary<int, AnimatedTileDrawer> animatedTiles = new Dictionary<int, AnimatedTileDrawer>();
         private SpriteLayer _spriteLayer;
 
-        private Point drawingOffset;
+        private Point panelSize = new Point(0, 0); //Abs in Pixels
+        private Point drawingPosition = new Point(0, 0); //Abs in Pixels (allows for partial cells)
+        private int gridWidth = 0;
+        private int gridHeight = 0;
+        private Point firstCell = new Point(0, 0);
+        private Point lastCell = new Point(0, 0);
 
         public MapLayer(MicropolisSharp.Micropolis simulator)
         {
             _simulator = simulator;
             _spriteLayer = new SpriteLayer(simulator);
-            _spriteLayer.DrawingOffset = drawingOffset;
         }
 
         public void LoadContent(ContentManager contentManager)
@@ -53,34 +57,55 @@ namespace Micropolis.Windows.Layers
 
         public void Resize(int width, int height)
         {
+            panelSize = new Point(width, height);
+            gridWidth = width / 16;
+            gridHeight = height / 16;
 
+            gridWidth = width % 16 == 0 ? gridWidth : gridWidth + 1;
+            gridHeight = height % 16 == 0 ? gridHeight : gridHeight + 1;
+
+            UpdateGrid();
         }
 
         public void MoveWindow(int dx, int dy)
         {
+            drawingPosition.X += (dx * 16);
+            drawingPosition.Y += (dy * 16);
 
+            drawingPosition.X = Math.Max(0, Math.Min(drawingPosition.X, (119 - gridWidth) * 16));
+            drawingPosition.Y = Math.Max(0, Math.Min(drawingPosition.Y, (99 - gridHeight) * 16));
+
+            _spriteLayer.DrawingOffset = drawingPosition;
+
+            UpdateGrid();
+        }
+
+        private void UpdateGrid()
+        {
+            firstCell = new Point(drawingPosition.X / 16, drawingPosition.Y / 16);
+            lastCell = new Point(firstCell.X + gridWidth, firstCell.Y + gridHeight);
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            for (int x = drawingOffset.X; x < _simulator.Map.GetLength(0); x++)
+            for (int x = firstCell.X; x < lastCell.X; x++)
             {
-                for (int y = drawingOffset.Y; y < _simulator.Map.GetLength(1); y++)
+                for (int y = firstCell.Y; y < lastCell.Y; y++)
                 {
                     int tileId = _simulator.Map[x, y] & 1023;
 
                     if ((_simulator.Map[x, y] & 2048) == 2048 && animatedTiles.ContainsKey(tileId))
                     {
-                        animatedTiles[tileId].DrawTile(spriteBatch, new Vector2((x - drawingOffset.X) * 16, (y - drawingOffset.Y) * 16));
+                        animatedTiles[tileId].DrawTile(spriteBatch, new Vector2((x * 16) - drawingPosition.X, (y * 16) - drawingPosition.Y));
                     }
                     else
                     {
-                        tiles.DrawTile(tileId, spriteBatch, new Vector2((x - drawingOffset.X) * 16, (y - drawingOffset.Y) * 16), Color.White);
+                        tiles.DrawTile(tileId, spriteBatch, new Vector2((x * 16) - drawingPosition.X, (y * 16) - drawingPosition.Y), Color.White);
                     }
                 }
             }
 
-            //_spriteLayer.Draw(spriteBatch);
+            _spriteLayer.Draw(spriteBatch);
         }
 
         public void Update()

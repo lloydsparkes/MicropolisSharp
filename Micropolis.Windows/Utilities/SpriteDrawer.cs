@@ -20,11 +20,11 @@ namespace Micropolis.Windows.Utilities
 
         public void Draw(SimSprite sprite, SpriteBatch spriteBatch, Point drawingOffset)
         {
-            //TODO: Optimise for things which are not on the screen
-            Point realOffset = new Point(drawingOffset.X * 16, drawingOffset.Y * 16);
-
-            Console.WriteLine("Sprite: {0} X:{1} Y:{2} - Act: X:{3} Y: {4}", sprite.Type, sprite.X, sprite.Y, sprite.X - realOffset.X, sprite.Y - realOffset.Y);
-            spriteBatch.Draw(_spritesheet, new Vector2(sprite.X - realOffset.X, sprite.Y - realOffset.Y),
+            if(sprite.X - drawingOffset.X < 0 || sprite.Y - drawingOffset.Y < 0)
+            {
+                return;
+            }
+            spriteBatch.Draw(_spritesheet, new Vector2(sprite.X - drawingOffset.X, sprite.Y - drawingOffset.Y),
                 GetFrameRect(sprite), Color.White);
         }
 

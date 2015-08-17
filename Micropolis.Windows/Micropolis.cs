@@ -19,6 +19,7 @@ namespace Micropolis.Basic
         SpriteFont font;
 
         private MapLayer _mapLayer;
+        private Boolean hasChanged = false;
 
         MicropolisSharp.Micropolis simulator;
 
@@ -44,6 +45,7 @@ namespace Micropolis.Basic
             {
                 _mapLayer.Resize(Window.ClientBounds.Width, Window.ClientBounds.Height);
             }
+            hasChanged = true;
         }
 
         /// <summary>
@@ -104,7 +106,11 @@ namespace Micropolis.Basic
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            graphics.ApplyChanges();
+            if (hasChanged)
+            {
+                hasChanged = false;
+                graphics.ApplyChanges();
+            }
 
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
