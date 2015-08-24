@@ -169,7 +169,7 @@ namespace MicropolisSharp
         {
             //TODO: Implement Call Backs - its not fullr requires atm
             //throw new NotImplementedException();
-            Debug.WriteLine("Callback Called: " + name + ", vars: " + String.Join(",", values));
+            //Debug.WriteLine("Callback Called: " + name + ", vars: " + String.Join(",", values));
         }
 
         /// <summary>

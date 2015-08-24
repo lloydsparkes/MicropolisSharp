@@ -78,6 +78,12 @@ namespace MicropolisSharp.Types
     /// </summary>
     public class SimSprite
     {
+        public SimSprite()
+        {
+            Id = Guid.NewGuid().ToString().Substring(0, 8);
+        }
+
+        public String Id { get; private set; }
         [Obsolete("Removed - No longer access as a linked list, use array accessor")]
         public SimSprite Next { get; set; } ///< Pointer to next #SimSprite object in the list.
         public string Name{ get; set; } ///< Name of the sprite.
@@ -105,5 +111,10 @@ namespace MicropolisSharp.Types
         public int Turn{ get; set; }
         public int Accel{ get; set; }
         public int Speed{ get; set; }
+
+        public override string ToString()
+        {
+            return $"Id: {Id}, Name: {Name}, Type: {Type}, Frame: {Frame}, X: {X}, Y: {Y}, Width: {Width}, Height: {Height}, XOffset: {XOffset}, YOffset: {YOffset}, XHot: {XHot}, YHot: {YHot}, OrigX: {OrigX}, OrigY: {OrigY}, DestX: {DestX}, DestY: {DestY}, Count: {Count}, SoundCount: {SoundCount}, Dir: {Dir}, NewDir: {NewDir}, Step: {Step}, Flag: {Flag}, Control: {Control}, Turn: {Turn}, Accel: {Accel}, Speed: {Speed}";
+        }
     }
 }

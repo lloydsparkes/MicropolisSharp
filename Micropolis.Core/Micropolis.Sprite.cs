@@ -1083,6 +1083,7 @@ namespace MicropolisSharp
                 }
 
             }
+            Console.WriteLine("Ship Sprite: " + sprite.ToString());
         }
 
         /// <summary>
