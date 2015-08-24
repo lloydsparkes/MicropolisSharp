@@ -84,7 +84,7 @@ namespace Micropolis.Windows.Layers
         private void UpdateGrid()
         {
             firstCell = new Point(drawingPosition.X / 16, drawingPosition.Y / 16);
-            lastCell = new Point(firstCell.X + gridWidth, firstCell.Y + gridHeight);
+            lastCell = new Point(Math.Min(119, firstCell.X + gridWidth), Math.Min(99, firstCell.Y + gridHeight));
         }
 
         public void Draw(SpriteBatch spriteBatch)
