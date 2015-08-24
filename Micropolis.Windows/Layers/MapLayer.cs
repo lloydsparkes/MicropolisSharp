@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using System;
+using MicropolisSharp.Types;
 
 namespace Micropolis.Windows.Layers
 {
@@ -93,6 +94,13 @@ namespace Micropolis.Windows.Layers
                 for (int y = firstCell.Y; y < lastCell.Y; y++)
                 {
                     int tileId = _simulator.Map[x, y] & 1023;
+
+                    int original = _simulator.Map[x, y];
+
+                    if ((original & (int)MapTileBits.CenterOfZone) > 0 && (original & (int)MapTileBits.Power) == 0)
+                    {
+                        tileId = (int)MapTileCharacters.LIGHTNINGBOLT;
+                    }
 
                     if ((_simulator.Map[x, y] & 2048) == 2048 && animatedTiles.ContainsKey(tileId))
                     {
