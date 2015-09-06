@@ -363,14 +363,30 @@ namespace MicropolisSharp
                 *   4   copy future=>past, same edges
             */
 
+            //FROM case#3 from old switch on HeatWrap
             src = CellSrc + SRCCOL + 1;
             dst = CellSrc;
 
+            for (x = 0; x < Constants.WorldWidth; x++)
+            {
+                SimHeat_MemCopy(src, dst, Constants.WorldHeight, CellMap, Map);
+                SimHeat_CopyPosition(src - 1, src + (Constants.WorldHeight - 1), CellMap, CellMap);
+                SimHeat_CopyPosition(src + Constants.WorldHeight, src, CellMap, CellMap);
+                src += SRCCOL;
+                dst += DSTCOL;
+            }
+            SimHeat_MemCopy(CellSrc, CellSrc + (SRCCOL * Constants.WorldWidth), SRCCOL, CellMap, CellMap);
+            SimHeat_MemCopy(CellSrc + SRCCOL * (Constants.WorldWidth + 1), CellSrc + SRCCOL, SRCCOL, CellMap, CellMap);
+            //END FROM case#3 from old switch on HeatWrap
+
+            /* DEAD CODE - case 3 - extracted
             switch (HeatWrap)
             {
                 case 0:
+                    throw new NotSupportedException("HeatWrap should always be #3 - So #0 should never be entered");
                     break;
                 case 1:
+                    throw new NotSupportedException("HeatWrap should always be #3 - So #1 should never be entered");
                     //Copy one map onto the other from the starting index.
                     //Copy a row at a time
                     for (x = 0; x < Constants.WorldWidth; x++)
@@ -382,6 +398,7 @@ namespace MicropolisSharp
                     }
                     break;
                 case 2:
+                    throw new NotSupportedException("HeatWrap should always be #3 - So #2 should never be entered");
                     for (x = 0; x < Constants.WorldWidth; x++)
                     {
                         SimHeat_CopyPosition(src - 1, src + (Constants.WorldHeight - 1), CellMap, CellMap);
@@ -414,6 +431,7 @@ namespace MicropolisSharp
                     //memcpy(cellSrc + SRCCOL * (Constants.WorldWidth + 1), cellSrc + SRCCOL, SRCCOL * sizeof(short));
                     break;
                 case 4:
+                    throw new NotSupportedException("HeatWrap should always be #3 - So #4 should never be entered");
                     SimHeat_CopyPosition(src, dst, CellMap, Map);
                     //src[0] = dst[0];
                     SimHeat_CopyPosition(src + (1 + Constants.WorldHeight), dst + (1 - Constants.WorldHeight), CellMap, Map);
@@ -441,10 +459,99 @@ namespace MicropolisSharp
 
                     break;
                 default:
+                    throw new NotSupportedException("HeatWrap should always be #3 - So #default should never be entered");
                     //not_reached(307, "..\\src\\main.cpp");
                     break;
-            }
+            }*/
 
+            //FROM case#0 from old switch on HeatRule
+            src = CellSrc;
+            dst = CellDest;
+            for (x = 0; x < Constants.WorldWidth;)
+            {
+                short nw, n, ne, w, c, e, sw, s, se;
+                src = CellSrc + (x * SRCCOL);
+                dst = CellDest + (x * DSTCOL);
+
+                w = (short)SimHeat_GetValue(CellMap, src);
+                //w = src[0];
+                c = (short)SimHeat_GetValue(CellMap, src + SRCCOL);
+                //c = src[SRCCOL];
+                e = (short)SimHeat_GetValue(CellMap, src + (2 * SRCCOL));
+                //e = src[2 * SRCCOL];
+                sw = (short)SimHeat_GetValue(CellMap, src + 1);
+                //sw = src[1];
+                s = (short)SimHeat_GetValue(CellMap, src + (SRCCOL + 1));
+                //s = src[SRCCOL + 1];
+                se = (short)SimHeat_GetValue(CellMap, src + ((2 * SRCCOL) + 1));
+                //se = src[(2 * SRCCOL) + 1];
+
+                for (y = 0; y < Constants.WorldHeight; y++)
+                {
+                    nw = w;
+                    w = sw;
+                    sw = (short)SimHeat_GetValue(CellMap, src + 2);
+                    //sw = src[2];
+                    n = c;
+                    c = s;
+                    s = (short)SimHeat_GetValue(CellMap, src + (SRCCOL + 2));
+                    //s = src[SRCCOL + 2];
+                    ne = e;
+                    e = se;
+                    se = (short)SimHeat_GetValue(CellMap, src + ((2 * SRCCOL) + 2));
+                    //se = src[(2 * SRCCOL) + 2];
+                    {
+                        a += nw + n + ne + w + e + sw + s + se + fl;
+                        SimHeat_SetValue(Map, dst, (ushort)(((a >> 3) & (ushort)MapTileBits.LowMask) | (ushort)MapTileBits.Animated | (ushort)MapTileBits.Burnable | (ushort)MapTileBits.Bulldozable));
+                        //dst[0] = ((a >> 3) & LOMASK) | ANIMBIT | BURNBIT | BULLBIT;
+                        a &= 7;
+                    }
+                    src++;
+                    dst++;
+                }
+                x++;
+                src = CellSrc + ((x + 1) * SRCCOL) - 3;
+                dst = CellDest + ((x + 1) * DSTCOL) - 1;
+                nw = (short)SimHeat_GetValue(CellMap, src + 1);
+                //nw = src[1]; 
+                n = (short)SimHeat_GetValue(CellMap, src + (SRCCOL + 1));
+                //n = src[SRCCOL + 1];
+                ne = (short)SimHeat_GetValue(CellMap, src + ((2 * SRCCOL) + 1));
+                //ne = src[(2 * SRCCOL) + 1];
+                w = (short)SimHeat_GetValue(CellMap, src + 2);
+                //w = src[2]; 
+                c = (short)SimHeat_GetValue(CellMap, src + (SRCCOL + 2));
+                //c = src[SRCCOL + 2];
+                e = (short)SimHeat_GetValue(CellMap, src + ((2 * SRCCOL) + 2));
+                //e = src[(2 * SRCCOL) + 2];
+                for (y = Constants.WorldHeight - 1; y >= 0; y--)
+                {
+                    sw = w;
+                    w = nw;
+                    nw = (short)SimHeat_GetValue(CellMap, src);
+                    //nw = src[0];
+                    s = c;
+                    c = n;
+                    n = (short)SimHeat_GetValue(CellMap, src + (SRCCOL));
+                    //n = src[SRCCOL];
+                    se = e;
+                    e = ne;
+                    ne = (short)SimHeat_GetValue(CellMap, src + (2 * SRCCOL));
+                    //ne = src[2 * SRCCOL];
+                    {
+                        a += nw + n + ne + w + e + sw + s + se + fl;
+                        SimHeat_SetValue(Map, dst, (ushort)(((a >> 3) & (ushort)MapTileBits.LowMask) | (ushort)MapTileBits.Animated | (ushort)MapTileBits.Burnable | (ushort)MapTileBits.Bulldozable));
+                        //dst[0] = ((a >> 3) & LOMASK) | ANIMBIT | BURNBIT | BULLBIT;
+                        a &= 7;
+                    }
+                    src--;
+                    dst--;
+                }
+                x++;
+            };
+            //END FROM case#0 from old switch on HeatRule
+
+            /* DEAD CODE due to HeatRule == 0 as a constant
             switch (HeatRule)
             {
 
@@ -536,7 +643,7 @@ namespace MicropolisSharp
                     break;
 
                 case 1:
-
+                    throw new NotSupportedException("HeatRule should always be #1 - So #1 should never be entered");
                     src = CellSrc;
                     dst = CellDest;
                     for (x = 0; x < Constants.WorldWidth;)
@@ -689,6 +796,7 @@ namespace MicropolisSharp
                     //not_reached(397, "..\\src\\main.cpp");
                     break;
             }
+            */
         }
 
         /// <summary>
