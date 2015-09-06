@@ -145,32 +145,8 @@ namespace MicropolisSharp
         /// <summary>
         /// TODO: Always -7 - make constant
         /// </summary>
+        [Obsolete]
         public int HeatFlow { get; private set; }
-
-        /// <summary>
-        /// ???
-        /// </summary>
-        public int HeatRule { get; private set; }
-
-        /// <summary>
-        /// TODO: Always 3 - make constant
-        /// </summary>
-        public int HeatWrap { get; private set; }
-
-        /// <summary>
-        /// TODO: Make Private / Internal
-        /// </summary>
-        public short CellSrc { get; private set; }
-
-        /// <summary>
-        /// TODO: Make Private / Internal
-        /// </summary>
-        public short CellDest { get; private set; }
-
-        /// <summary>
-        /// TODO: Make Private / Internal
-        /// </summary>
-        public ushort[,] CellMap { get; private set; }
 
         /// <summary>
         /// Get version of Micropolis program.
@@ -329,10 +305,10 @@ namespace MicropolisSharp
 
             //cellSrc, cellDst, src, dst, - are all pointers to arrays;
             //In c# they will just be indexes to positions in said array
-            CellSrc = 0;
-            CellDest = 0;
+            const int CellSrc = 0;
+            const int CellDest = 0;
 
-            CellMap = new ushort[Constants.WorldWidth + 2, Constants.WorldHeight * 2];
+            ushort[,] CellMap = new ushort[Constants.WorldWidth + 2, Constants.WorldHeight * 2];
 
             /** - See above initialization
             if (cellSrc == 0)
@@ -363,21 +339,50 @@ namespace MicropolisSharp
                 *   4   copy future=>past, same edges
             */
 
-            //FROM case#3 from old switch on HeatWrap
+            /**
+             * What does this code do? 
+             * It builds up a Second Map which has wrapped edges.
+             *
+             * e.g. A B       ->   D C D C
+             *      C D            B A B A
+             *                     D C D C
+             *                     B A B A
+             */
+            //FROM case#3 from old switch on HeatWrap --  3   copy future=>past, wrap edges
             src = CellSrc + SRCCOL + 1;
             dst = CellSrc;
 
             for (x = 0; x < Constants.WorldWidth; x++)
             {
+                //Copy a column from Map -> to a Offset in CellMap (Cell Map seems to have a boundary around it
                 SimHeat_MemCopy(src, dst, Constants.WorldHeight, CellMap, Map);
+                //Wrap the Edges
                 SimHeat_CopyPosition(src - 1, src + (Constants.WorldHeight - 1), CellMap, CellMap);
                 SimHeat_CopyPosition(src + Constants.WorldHeight, src, CellMap, CellMap);
                 src += SRCCOL;
                 dst += DSTCOL;
             }
+            //Copy the map from CellMap into CellMap again (so its there twice - wrapped)
             SimHeat_MemCopy(CellSrc, CellSrc + (SRCCOL * Constants.WorldWidth), SRCCOL, CellMap, CellMap);
+            //Wrap Edges
             SimHeat_MemCopy(CellSrc + SRCCOL * (Constants.WorldWidth + 1), CellSrc + SRCCOL, SRCCOL, CellMap, CellMap);
             //END FROM case#3 from old switch on HeatWrap
+
+            /**
+             * What does this code do? 
+             * Reads a Cube Cube out of the Map - Applies a mutuation to it - Cube Application Order Matters!
+             *
+             * Step 1 -> Read Cube with Center Index @ 0 -> MutationFunction -> Set Result to Center Index @ 0
+             * Step 1 -> Read Cube with Center Index @ 1 -> MutationFunction -> Set Result to Center Index @ 1
+             * 
+             * Center Index @ 0 = if the map was represented a 1D array, then 0,0 = 0, 0,1 = 1 etc.
+             * 
+             * From a 2D persective, it snakes through the map for e.g
+             *
+             *  A B         -> A C D B is the order the cubes are processed in
+             *  C D
+             *
+             */
 
             //FROM case#0 from old switch on HeatRule
             src = CellSrc;

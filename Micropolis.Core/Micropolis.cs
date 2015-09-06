@@ -803,12 +803,6 @@ namespace MicropolisSharp
             // int heatFlow;
             HeatFlow = -7;
 
-            // int heatRule;
-            HeatRule = 0;
-
-            // int heatWrap;
-            HeatWrap = 3;
-
             // std::string cityFileName;
             CityFileName = "";
 
@@ -826,12 +820,6 @@ namespace MicropolisSharp
 
             // bool doNotices;
             DoNotices = true;
-
-            // short *cellSrc;
-            CellSrc = 0;
-
-            // short *cellDst;
-            CellDest = 0;
 
             // Quad cityPopLast;
             CityPopulationLast = 0;
