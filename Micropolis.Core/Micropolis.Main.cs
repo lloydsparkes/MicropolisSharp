@@ -370,17 +370,25 @@ namespace MicropolisSharp
 
             /**
              * What does this code do? 
-             * Reads a Cube Cube out of the Map - Applies a mutuation to it - Cube Application Order Matters!
+             * Reads a Square Square out of the Map - Applies a mutuation to it - Square Application Order Matters!
              *
-             * Step 1 -> Read Cube with Center Index @ 0 -> MutationFunction -> Set Result to Center Index @ 0
-             * Step 1 -> Read Cube with Center Index @ 1 -> MutationFunction -> Set Result to Center Index @ 1
+             * Step 1 -> Read Square with Center Index @ 0 -> MutationFunction -> Set Result to Center Index @ 0
+             * Step 1 -> Read Square with Center Index @ 1 -> MutationFunction -> Set Result to Center Index @ 1
              * 
              * Center Index @ 0 = if the map was represented a 1D array, then 0,0 = 0, 0,1 = 1 etc.
              * 
              * From a 2D persective, it snakes through the map for e.g
              *
-             *  A B         -> A C D B is the order the cubes are processed in
+             *  A B         -> A C D B is the order the Squares are processed in
              *  C D
+             *
+             *  The Mutation Function = 
+             *  
+             *  res = (lastRes & 7) + (sum(Square) + 7) >> 3
+             *
+             *  The 7 = the heat flow
+             *  >> 3 is the same as divided by 8
+             *  This seems to operate on the whole map value -> how does it not change the terrain?
              *
              */
 
