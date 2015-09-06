@@ -1083,7 +1083,6 @@ namespace MicropolisSharp
                 }
 
             }
-            Console.WriteLine("Ship Sprite: " + sprite.ToString());
         }
 
         /// <summary>
@@ -1447,8 +1446,10 @@ namespace MicropolisSharp
             sprite.Frame = z;
 
             {
-                foreach(SimSprite s in SpriteList)
+                for(int i = 0; i < SpriteList.Count; i++)
                 {
+                    SimSprite s = SpriteList[i];
+
                     if (s.Frame != 0 &&
                         (s.Type == SpriteType.Airplane || s.Type == SpriteType.Helicopter
                          || s.Type == SpriteType.Ship || s.Type == SpriteType.Train) &&
