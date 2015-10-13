@@ -113,7 +113,7 @@ namespace Micropolis.Windows.Layers
                 }
             }
 
-            _spriteLayer.Draw(spriteBatch);
+            //_spriteLayer.Draw(spriteBatch);
         }
 
         public void Update()

@@ -206,7 +206,7 @@ namespace MicropolisSharp.Types
 
         public static bool TestBounds(int x, int y)
         {
-            return (x >= 0 && y < Constants.WorldWidth) && (y >= 0 && y < Constants.WorldHeight);
+            return (x >= 0 && x < Constants.WorldWidth) && (y >= 0 && y < Constants.WorldHeight);
         }
     }
 }

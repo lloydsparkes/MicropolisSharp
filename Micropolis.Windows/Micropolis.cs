@@ -20,11 +20,14 @@ namespace Micropolis.Basic
 
         private MapLayer _mapLayer;
         private Boolean hasChanged = false;
+        private string cityName;
 
         MicropolisSharp.Micropolis simulator;
 
-        public Micropolis() : base()
+        public Micropolis(string cityName) : base()
         {
+            this.cityName = cityName;
+
             this.Window.AllowUserResizing = true;
             graphics = new GraphicsDeviceManager(this);
             graphics.PreferredBackBufferWidth = 1280;
@@ -56,7 +59,7 @@ namespace Micropolis.Basic
         /// </summary>
         protected override void Initialize()
         {
-            string filePath = "cities" + Path.DirectorySeparatorChar + "wetcity.cty";
+            string filePath = "cities" + Path.DirectorySeparatorChar + cityName + ".cty";
 
             simulator = new MicropolisSharp.Micropolis();
             simulator.InitGame();
@@ -64,6 +67,7 @@ namespace Micropolis.Basic
             simulator.LoadFile(filePath);
             simulator.SetSpeed(2);
             simulator.DoSimInit();
+            simulator.SetEnableDisasters(false);
 
             _mapLayer = new MapLayer(simulator);
             _mapLayer.Resize(Window.ClientBounds.Width, Window.ClientBounds.Height);
