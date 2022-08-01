@@ -7,15 +7,14 @@ A port of the Micropolis code to C# (Original: https://github.com/SimHacker/micr
 SimCity 1989 was an amazing game, one that I loved. My goal with this project is to bring it to modern platforms, so future generations can enjoy it.
 
 ### Target Platforms (In Priority Order)
-* Windows/Windows Phone/Xbox - Universal App
 * Android (Xamarin)
 * iOS (Xamarin)
-* Web? (Asp.Net Backend with the Engine, Web UI for rendering)
+* Web? (Blazor/WebAsm?)
 
 ### How to get there
 
-* Port Micropolis C/C++ Code (partially done)
-* Write a Monogame (or SharpCocos?) Engine
+* Fix porting bugs
+  * Improve Diagnostics as well as state management
 * Write Apps for each Platform utilising the above
 
 ## Want to Help? 
