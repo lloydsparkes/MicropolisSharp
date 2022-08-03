@@ -6,10 +6,10 @@ namespace Micropolis.Windows.Utilities;
 
 public class TileDrawer
 {
-    private const int TILE_SIZE = 16;
+    private const int TileSize = 16;
 
-    private const int GRID_WIDTH = 256 / TILE_SIZE;
-    private const int GRID_HEIGHT = 960 / TILE_SIZE;
+    private const int GridWidth = 256 / TileSize;
+    private const int GridHeight = 960 / TileSize;
 
     private readonly Texture2D _tileSheet;
 
@@ -21,13 +21,13 @@ public class TileDrawer
     public void DrawTile(int tileId, SpriteBatch batch, Vector2 drawPosition, Color overrideColor)
     {
         //Translate Tile Id to grid position
-        var y = tileId / GRID_WIDTH;
-        var x = tileId % GRID_WIDTH;
+        var y = tileId / GridWidth;
+        var x = tileId % GridWidth;
 
-        if (y < 0 || y > GRID_HEIGHT || x < 0 || x > GRID_WIDTH) throw new Exception("Invalid Grid Tile");
+        if (y < 0 || y > GridHeight || x < 0 || x > GridWidth) throw new Exception("Invalid Grid Tile");
 
         batch.Draw(_tileSheet, Normalise(drawPosition),
-            ClippedRectange(drawPosition, new Rectangle(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE)),
+            ClippedRectange(drawPosition, new Rectangle(x * TileSize, y * TileSize, TileSize, TileSize)),
             overrideColor);
     }
 

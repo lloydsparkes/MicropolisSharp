@@ -347,14 +347,14 @@ public partial class Micropolis
     /// </summary>
     private void DoTrees()
     {
-        int Amount, x, xloc, yloc;
+        int amount, x, xloc, yloc;
 
         if (TerrainTreeLevel < 0)
-            Amount = GetRandom(100) + 50;
+            amount = GetRandom(100) + 50;
         else
-            Amount = TerrainTreeLevel + 3;
+            amount = TerrainTreeLevel + 3;
 
-        for (x = 0; x < Amount; x++)
+        for (x = 0; x < amount; x++)
         {
             xloc = GetRandom(Constants.WorldWidth - 1);
             yloc = GetRandom(Constants.WorldHeight - 1);
@@ -369,7 +369,7 @@ public partial class Micropolis
     {
         short[] dx = { -1, 0, 1, 0 };
         short[] dy = { 0, 1, 0, -1 };
-        short[] REdTab =
+        short[] rEdTab =
         {
             13 | (ushort)MapTileBits.Bulldozable, 13 | (ushort)MapTileBits.Bulldozable,
             17 | (ushort)MapTileBits.Bulldozable, 15 | (ushort)MapTileBits.Bulldozable,
@@ -402,7 +402,7 @@ public partial class Micropolis
                         bitIndex++;
                 }
 
-                temp = REdTab[bitIndex & 15];
+                temp = rEdTab[bitIndex & 15];
 
                 if (temp != (ushort)MapTileCharacters.RIVER &&
                     GetRandom(1).IsTrue())
@@ -630,7 +630,7 @@ public partial class Micropolis
     public void PlopBRiver(Position pos)
     {
         int x, y;
-        ushort[,] BRMatrix =
+        ushort[,] brMatrix =
         {
             {
                 0, 0, 0, (ushort)MapTileCharacters.REDGE, (ushort)MapTileCharacters.REDGE,
@@ -677,7 +677,7 @@ public partial class Micropolis
 
         for (x = 0; x < 9; x++)
         for (y = 0; y < 9; y++)
-            PutOnMap(BRMatrix[y, x], pos.X + x, pos.Y + y);
+            PutOnMap(brMatrix[y, x], pos.X + x, pos.Y + y);
     }
 
     /// <summary>
@@ -687,7 +687,7 @@ public partial class Micropolis
     public void PlopSRiver(Position pos)
     {
         int x, y;
-        ushort[,] SRMatrix =
+        ushort[,] srMatrix =
         {
             { 0, 0, (ushort)MapTileCharacters.REDGE, (ushort)MapTileCharacters.REDGE, 0, 0 },
             {
@@ -711,7 +711,7 @@ public partial class Micropolis
 
         for (x = 0; x < 6; x++)
         for (y = 0; y < 6; y++)
-            PutOnMap(SRMatrix[y, x], pos.X + x, pos.Y + y);
+            PutOnMap(srMatrix[y, x], pos.X + x, pos.Y + y);
     }
 
     private void SmoothWater()

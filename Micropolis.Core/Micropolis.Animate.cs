@@ -80,7 +80,7 @@ public partial class Micropolis
         ///     TODO: Generate Table below from doc/AnimationSequences.txt and doc/genAnimationTable.py
         ///     TODO: Translate genAnimationTable.py -> C#
         /// </summary>
-        private static readonly ushort[] animatedTiles =
+        private static readonly ushort[] AnimatedTiles =
     {
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
         16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
@@ -210,7 +210,7 @@ public partial class Micropolis
             {
                 tileflags = (ushort)(tilevalue & (ushort)MapTileBits.AllBits);
                 tilevalue &= (ushort)MapTileBits.LowMask;
-                tilevalue = animatedTiles[tilevalue];
+                tilevalue = AnimatedTiles[tilevalue];
                 tilevalue |= tileflags;
                 Map[x, y] = tilevalue;
             }
@@ -221,6 +221,6 @@ public partial class Micropolis
     {
         if (index < 0 || index >= (int)MapTileCharacters.TILE_COUNT) return -1;
 
-        return animatedTiles[index];
+        return AnimatedTiles[index];
     }
 }

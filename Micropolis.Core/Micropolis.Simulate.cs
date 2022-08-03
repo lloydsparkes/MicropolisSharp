@@ -116,7 +116,7 @@ public partial class Micropolis
     /// <summary>
     ///     The time to wait before computing the score
     /// </summary>
-    public short scoreWait { get; private set; }
+    public short ScoreWait { get; private set; }
 
     /// <summary>
     ///     Number of powered tiles in all zones
@@ -178,7 +178,7 @@ public partial class Micropolis
     public void Simulate()
     {
         short[] speedPowerScan = { 2, 4, 5 };
-        short[] SpeedPollutionTerrainLandValueScan = { 2, 7, 17 };
+        short[] speedPollutionTerrainLandValueScan = { 2, 7, 17 };
         short[] speedCrimeScan = { 1, 8, 18 };
         short[] speedPopulationDensityScan = { 1, 9, 19 };
         short[] speedFireAnalysis = { 1, 10, 20 };
@@ -225,7 +225,7 @@ public partial class Micropolis
             case 8:
 
                 // Scan 1/8 of the map for each of the 8 phases 1..8:
-                mapScan((PhaseCycle - 1) * Constants.WorldWidth / 8, PhaseCycle * Constants.WorldWidth / 8);
+                MapScan((PhaseCycle - 1) * Constants.WorldWidth / 8, PhaseCycle * Constants.WorldWidth / 8);
 
                 break;
 
@@ -273,7 +273,7 @@ public partial class Micropolis
 
             case 12:
 
-                if (SimCycle % SpeedPollutionTerrainLandValueScan[speedIndex] == 0) PollutionTerrainLandValueScan();
+                if (SimCycle % speedPollutionTerrainLandValueScan[speedIndex] == 0) PollutionTerrainLandValueScan();
 
                 break;
 
@@ -321,7 +321,7 @@ public partial class Micropolis
 
         SetValves();
         ClearCensus();
-        mapScan(0, Constants.WorldWidth);
+        MapScan(0, Constants.WorldWidth);
         DoPowerScan();
         NewPower = true; /* post rel */
         PollutionTerrainLandValueScan();
@@ -440,7 +440,7 @@ public partial class Micropolis
         ScoreType = Scenario.None;
 
         /* This clears powermem */
-        powerStackPointer = 0;
+        _powerStackPointer = 0;
         DoPowerScan();
         NewPower = true; /* post rel */
 
@@ -534,14 +534,14 @@ public partial class Micropolis
             DisasterEvent = Scenario;
             DisasterWait = disasterWaitTable[(int)DisasterEvent];
             ScoreType = DisasterEvent;
-            scoreWait = scoreWaitTable[(int)DisasterEvent];
+            ScoreWait = scoreWaitTable[(int)DisasterEvent];
         }
         else
         {
             DisasterEvent = Scenario.None;
             DisasterWait = 0;
             ScoreType = Scenario.None;
-            scoreWait = 0;
+            ScoreWait = 0;
         }
 
         RoadEffect = Constants.MaxRoadEffect;
@@ -712,7 +712,7 @@ public partial class Micropolis
         NuclearPowerPop = 0;
         SeaportPop = 0;
         AirportPop = 0;
-        powerStackPointer = 0; /* Reset before Mapscan */
+        _powerStackPointer = 0; /* Reset before Mapscan */
 
         FireStationMap.Clear();
         //fireStationEffectMap.clear(); // Added in rev293
@@ -846,11 +846,11 @@ public partial class Micropolis
         /**
          * @todo Break out so the user interface can configure this.
          */
-        float[] RLevels = { 0.7f, 0.9f, 1.2f };
-        float[] FLevels = { 1.4f, 1.2f, 0.8f };
+        float[] rLevels = { 0.7f, 0.9f, 1.2f };
+        float[] fLevels = { 1.4f, 1.2f, 0.8f };
 
-        Debug.Assert((int)Levels.Count == RLevels.Length);
-        Debug.Assert((int)Levels.Count == FLevels.Length);
+        Debug.Assert((int)Levels.Count == rLevels.Length);
+        Debug.Assert((int)Levels.Count == fLevels.Length);
 
         CashFlow = 0;
 
@@ -871,8 +871,8 @@ public partial class Micropolis
 
             PoliceFund = (long)PoliceStationPop * 100;
             FireFund = (long)FireStationPop * 100;
-            RoadFund = (long)((RoadTotal + RailTotal * 2) * RLevels[(int)GameLevel]);
-            TaxFund = (long)((long)TotalPop * LandValueAverage / 120 * CityTax * FLevels[(int)GameLevel]);
+            RoadFund = (long)((RoadTotal + RailTotal * 2) * rLevels[(int)GameLevel]);
+            TaxFund = (long)((long)TotalPop * LandValueAverage / 120 * CityTax * fLevels[(int)GameLevel]);
 
             if (TotalPop > 0)
             {
@@ -926,7 +926,7 @@ public partial class Micropolis
     /// </summary>
     /// <param name="x1"></param>
     /// <param name="x2"></param>
-    public void mapScan(int x1, int x2)
+    public void MapScan(int x1, int x2)
     {
         int x, y;
 
@@ -1113,9 +1113,9 @@ public partial class Micropolis
     /// <returns>????</returns>
     public bool DoBridge(Position pos, ushort tile)
     {
-        short[] HDx = { -2, 2, -2, -1, 0, 1, 2 };
-        short[] HDy = { -1, -1, 0, 0, 0, 0, 0 };
-        short[] HBRTAB =
+        short[] hDx = { -2, 2, -2, -1, 0, 1, 2 };
+        short[] hDy = { -1, -1, 0, 0, 0, 0, 0 };
+        short[] hbrtab =
         {
             (short)MapTileCharacters.HBRDG1 | (short)MapTileBits.Bulldozable,
             (short)MapTileCharacters.HBRDG3 | (short)MapTileBits.Bulldozable,
@@ -1123,7 +1123,7 @@ public partial class Micropolis
             (short)MapTileCharacters.RIVER, (short)MapTileCharacters.BRWH | (short)MapTileBits.Bulldozable,
             (short)MapTileCharacters.RIVER, (short)MapTileCharacters.HBRDG2 | (short)MapTileBits.Bulldozable
         };
-        short[] HBRTAB2 =
+        short[] hbrtab2 =
         {
             (short)MapTileCharacters.RIVER, (short)MapTileCharacters.RIVER,
             (short)MapTileCharacters.HBRIDGE | (short)MapTileBits.Bulldozable,
@@ -1132,9 +1132,9 @@ public partial class Micropolis
             (short)MapTileCharacters.HBRIDGE | (short)MapTileBits.Bulldozable,
             (short)MapTileCharacters.HBRIDGE | (short)MapTileBits.Bulldozable
         };
-        short[] VDx = { 0, 1, 0, 0, 0, 0, 1 };
-        short[] VDy = { -2, -2, -1, 0, 1, 2, 2 };
-        short[] VBRTAB =
+        short[] vDx = { 0, 1, 0, 0, 0, 0, 1 };
+        short[] vDy = { -2, -2, -1, 0, 1, 2, 2 };
+        short[] vbrtab =
         {
             (short)MapTileCharacters.VBRDG0 | (short)MapTileBits.Bulldozable,
             (short)MapTileCharacters.VBRDG1 | (short)MapTileBits.Bulldozable, (short)MapTileCharacters.RIVER,
@@ -1142,7 +1142,7 @@ public partial class Micropolis
             (short)MapTileCharacters.RIVER, (short)MapTileCharacters.VBRDG2 | (short)MapTileBits.Bulldozable,
             (short)MapTileCharacters.VBRDG3 | (short)MapTileBits.Bulldozable
         };
-        short[] VBRTAB2 =
+        short[] vbrtab2 =
         {
             (short)MapTileCharacters.VBRIDGE | (short)MapTileBits.Bulldozable, (short)MapTileCharacters.RIVER,
             (short)MapTileCharacters.VBRIDGE | (short)MapTileBits.Bulldozable,
@@ -1150,7 +1150,7 @@ public partial class Micropolis
             (short)MapTileCharacters.VBRIDGE | (short)MapTileBits.Bulldozable,
             (short)MapTileCharacters.VBRIDGE | (short)MapTileBits.Bulldozable, (short)MapTileCharacters.RIVER
         };
-        int z, x, y, MPtem;
+        int z, x, y, mPtem;
 
         if (tile == (short)MapTileCharacters.BRWV)
         {
@@ -1161,12 +1161,12 @@ public partial class Micropolis
                 {
                     /* Close */
 
-                    x = pos.X + VDx[z];
-                    y = pos.Y + VDy[z];
+                    x = pos.X + vDx[z];
+                    y = pos.Y + vDy[z];
 
                     if (Position.TestBounds(x, y))
-                        if ((Map[x, y] & (short)MapTileBits.LowMask) == (VBRTAB[z] & (short)MapTileBits.LowMask))
-                            Map[x, y] = (ushort)VBRTAB2[z];
+                        if ((Map[x, y] & (short)MapTileBits.LowMask) == (vbrtab[z] & (short)MapTileBits.LowMask))
+                            Map[x, y] = (ushort)vbrtab2[z];
                 }
 
             return true;
@@ -1181,12 +1181,12 @@ public partial class Micropolis
                 {
                     /* Close */
 
-                    x = pos.X + HDx[z];
-                    y = pos.Y + HDy[z];
+                    x = pos.X + hDx[z];
+                    y = pos.Y + hDy[z];
 
                     if (Position.TestBounds(x, y))
-                        if ((Map[x, y] & (short)MapTileBits.LowMask) == (HBRTAB[z] & (short)MapTileBits.LowMask))
-                            Map[x, y] = (ushort)HBRTAB2[z];
+                        if ((Map[x, y] & (short)MapTileBits.LowMask) == (hbrtab[z] & (short)MapTileBits.LowMask))
+                            Map[x, y] = (ushort)hbrtab2[z];
                 }
 
             return true;
@@ -1203,14 +1203,14 @@ public partial class Micropolis
 
                         for (z = 0; z < 7; z++)
                         {
-                            x = pos.X + VDx[z];
-                            y = pos.Y + VDy[z];
+                            x = pos.X + vDx[z];
+                            y = pos.Y + vDy[z];
 
                             if (Position.TestBounds(x, y))
                             {
-                                MPtem = Map[x, y];
-                                if (MPtem == (short)MapTileCharacters.CHANNEL || (MPtem & 15) == (VBRTAB2[z] & 15))
-                                    Map[x, y] = (ushort)VBRTAB[z];
+                                mPtem = Map[x, y];
+                                if (mPtem == (short)MapTileCharacters.CHANNEL || (mPtem & 15) == (vbrtab2[z] & 15))
+                                    Map[x, y] = (ushort)vbrtab[z];
                             }
                         }
 
@@ -1226,14 +1226,14 @@ public partial class Micropolis
                     /* Horizontal open  */
                     for (z = 0; z < 7; z++)
                     {
-                        x = pos.X + HDx[z];
-                        y = pos.Y + HDy[z];
+                        x = pos.X + hDx[z];
+                        y = pos.Y + hDy[z];
 
                         if (Position.TestBounds(x, y))
                         {
-                            MPtem = Map[x, y];
-                            if ((MPtem & 15) == (HBRTAB2[z] & 15) || MPtem == (short)MapTileCharacters.CHANNEL)
-                                Map[x, y] = (ushort)HBRTAB[z];
+                            mPtem = Map[x, y];
+                            if ((mPtem & 15) == (hbrtab2[z] & 15) || mPtem == (short)MapTileCharacters.CHANNEL)
+                                Map[x, y] = (ushort)hbrtab[z];
                         }
                     }
 
@@ -1333,7 +1333,7 @@ public partial class Micropolis
     /// <param name="ch">Character of the zone.</param>
     public void FireZone(Position pos, ushort ch)
     {
-        int XYmax;
+        int xYmax;
 
         int value = RateOfGrowthMap.WorldGet(pos.X, pos.Y);
         value = Utilities.Restrict(value - 20, -200, 200);
@@ -1343,19 +1343,19 @@ public partial class Micropolis
 
         if (ch < (ushort)MapTileCharacters.PORTBASE)
         {
-            XYmax = 2;
+            xYmax = 2;
         }
         else
         {
             if (ch == (ushort)MapTileCharacters.AIRPORT)
-                XYmax = 5;
+                xYmax = 5;
             else
-                XYmax = 4;
+                xYmax = 4;
         }
 
         // Make remaining tiles of the zone bulldozable
-        for (short x = -1; x < XYmax; x++)
-        for (short y = -1; y < XYmax; y++)
+        for (short x = -1; x < xYmax; x++)
+        for (short y = -1; y < xYmax; y++)
         {
             var xTem = pos.X + x;
             var yTem = pos.Y + y;
@@ -1606,7 +1606,7 @@ public partial class Micropolis
     /// <param name="pos">Center tile of the coal power plant</param>
     public void CoalSmoke(Position pos)
     {
-        short[] SmTb =
+        short[] smTb =
         {
             (short)MapTileCharacters.COALSMOKE1, (short)MapTileCharacters.COALSMOKE2,
             (short)MapTileCharacters.COALSMOKE3, (short)MapTileCharacters.COALSMOKE4
@@ -1616,7 +1616,7 @@ public partial class Micropolis
 
         for (short x = 0; x < 4; x++)
             Map[pos.X + dx[x], pos.Y + dy[x]] = (ushort)
-                (SmTb[x] | (ushort)MapTileBits.Animated | (ushort)MapTileBits.Conductivity | (ushort)MapTileBits.Power |
+                (smTb[x] | (ushort)MapTileBits.Animated | (ushort)MapTileBits.Conductivity | (ushort)MapTileBits.Power |
                  (ushort)MapTileBits.Burnable);
     }
 

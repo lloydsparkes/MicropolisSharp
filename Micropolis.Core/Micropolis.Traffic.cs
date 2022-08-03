@@ -75,10 +75,10 @@ namespace MicropolisSharp;
 /// </summary>
 public partial class Micropolis
 {
-    private short curMapStackPointer;
-    private readonly Position[] curMapStackXY = new Position[Constants.MaxTrafficDistance + 1];
-    private int trafMaxX;
-    private int trafMaxY;
+    private short _curMapStackPointer;
+    private readonly Position[] _curMapStackXy = new Position[Constants.MaxTrafficDistance + 1];
+    private int _trafMaxX;
+    private int _trafMaxY;
 
     /// <summary>
     ///     Makes traffic starting from the road tile at \x, \y.
@@ -94,7 +94,7 @@ public partial class Micropolis
         if (TryDrive(pos, dest))
         {
             /* attempt to drive somewhere */
-            addToTrafficDensityMap(); /* if sucessful, inc trafdensity */
+            AddToTrafficDensityMap(); /* if sucessful, inc trafdensity */
             return 1; /* traffic passed */
         }
 
@@ -122,7 +122,7 @@ public partial class Micropolis
     /// <returns>1 if connection found, 0 if not, -1 if no road connection</returns>
     public short MakeTraffic(Position startPos, ZoneType dest)
     {
-        curMapStackPointer = 0; // Clear position stack
+        _curMapStackPointer = 0; // Clear position stack
 
         var pos = new Position(startPos);
 
@@ -135,7 +135,7 @@ public partial class Micropolis
             if (TryDrive(pos, dest))
             {
                 /* attempt to drive somewhere */
-                addToTrafficDensityMap(); /* if sucessful, inc trafdensity */
+                AddToTrafficDensityMap(); /* if sucessful, inc trafdensity */
                 return 1; /* traffic passed */
             }
 
@@ -148,10 +148,10 @@ public partial class Micropolis
     /// <summary>
     ///     Update the #trafficDensityMap from the positions at the #curMapStackXY stack.
     /// </summary>
-    public void addToTrafficDensityMap()
+    public void AddToTrafficDensityMap()
     {
         /* For each saved position of the drive */
-        while (curMapStackPointer > 0)
+        while (_curMapStackPointer > 0)
         {
             var pos = PullPos();
             if (pos.TestBounds())
@@ -171,15 +171,15 @@ public partial class Micropolis
                     // Check for heavy traffic.
                     if (traffic >= 240 && GetRandom(5) == 0)
                     {
-                        trafMaxX = pos.X;
-                        trafMaxY = pos.Y;
+                        _trafMaxX = pos.X;
+                        _trafMaxY = pos.Y;
 
                         /* Direct helicopter towards heavy traffic */
                         sprite = GetSprite(SpriteType.Helicopter);
                         if (sprite != null && sprite.Control == -1)
                         {
-                            sprite.DestX = trafMaxX * 16;
-                            sprite.DestY = trafMaxY * 16;
+                            sprite.DestX = _trafMaxX * 16;
+                            sprite.DestY = _trafMaxY * 16;
                         }
                     }
                 }
@@ -195,10 +195,10 @@ public partial class Micropolis
     {
         //TODO: Fix & Enable Assert
         //assert(curMapStackPointer < MAX_TRAFFIC_DISTANCE + 1);
-        curMapStackPointer++;
-        if (curMapStackPointer > Constants.MaxTrafficDistance)
+        _curMapStackPointer++;
+        if (_curMapStackPointer > Constants.MaxTrafficDistance)
             return;
-        curMapStackXY[curMapStackPointer] = new Position(pos);
+        _curMapStackXy[_curMapStackPointer] = new Position(pos);
     }
 
     /// <summary>
@@ -209,10 +209,10 @@ public partial class Micropolis
     {
         //TODO: Fix & Enable Assert
         //assert(curMapStackPointer > 0);
-        if (curMapStackPointer > 0)
+        if (_curMapStackPointer > 0)
         {
-            curMapStackPointer--;
-            return curMapStackXY[curMapStackPointer + 1];
+            _curMapStackPointer--;
+            return _curMapStackXy[_curMapStackPointer + 1];
         }
 
         return null;
@@ -227,14 +227,14 @@ public partial class Micropolis
     public bool FindPerimeterRoad(Position pos)
     {
         /* look for road on edges of zone */
-        short[] PerimX = { -1, 0, 1, 2, 2, 2, 1, 0, -1, -2, -2, -2 };
-        short[] PerimY = { -2, -2, -2, -1, 0, 1, 2, 2, 2, 1, 0, -1 };
+        short[] perimX = { -1, 0, 1, 2, 2, 2, 1, 0, -1, -2, -2, -2 };
+        short[] perimY = { -2, -2, -2, -1, 0, 1, 2, 2, 2, 1, 0, -1 };
         int tx, ty;
 
         for (short z = 0; z < 12; z++)
         {
-            tx = pos.X + PerimX[z];
-            ty = pos.Y + PerimY[z];
+            tx = pos.X + perimX[z];
+            ty = pos.Y + perimY[z];
 
             if (Position.TestBounds(tx, ty))
                 if (RoadTest(Map[tx, ty]))
@@ -258,15 +258,15 @@ public partial class Micropolis
     public bool FindPerimeterTelecom(Position pos)
     {
         /* look for telecom on edges of zone */
-        short[] PerimX = { -1, 0, 1, 2, 2, 2, 1, 0, -1, -2, -2, -2 };
-        short[] PerimY = { -2, -2, -2, -1, 0, 1, 2, 2, 2, 1, 0, -1 };
+        short[] perimX = { -1, 0, 1, 2, 2, 2, 1, 0, -1, -2, -2, -2 };
+        short[] perimY = { -2, -2, -2, -1, 0, 1, 2, 2, 2, 1, 0, -1 };
         int tx, ty;
         ushort tile;
 
         for (short z = 0; z < 12; z++)
         {
-            tx = pos.X + PerimX[z];
-            ty = pos.Y + PerimY[z];
+            tx = pos.X + perimX[z];
+            ty = pos.Y + perimY[z];
 
             if (Position.TestBounds(tx, ty))
             {
@@ -313,10 +313,10 @@ public partial class Micropolis
             }
             else
             {
-                if (curMapStackPointer > 0)
+                if (_curMapStackPointer > 0)
                 {
                     /* dead end, backup */
-                    curMapStackPointer--;
+                    _curMapStackPointer--;
                     dist += 3;
                 }
                 else

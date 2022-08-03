@@ -81,7 +81,7 @@ public partial class Micropolis
     /// </summary>
     /// <param name="bytes">Array with shorts.</param>
     /// <returns></returns>
-    private short swapShort(byte[] bytes)
+    private short SwapShort(byte[] bytes)
     {
         if (BitConverter.IsLittleEndian)
         {
@@ -100,18 +100,18 @@ public partial class Micropolis
     /// <param name="buf">Buffer to put the loaded short values in.</param>
     /// <param name="stream">The stream to read from</param>
     /// <returns>Load was succesful</returns>
-    private bool loadShort(ref short buf, BinaryReader stream)
+    private bool LoadShort(ref short buf, BinaryReader stream)
     {
         var bytes = stream.ReadBytes(sizeof(short));
         if (bytes.Length != sizeof(short)) return false;
-        buf = swapShort(bytes);
+        buf = SwapShort(bytes);
         return true;
     }
 
-    private bool loadShorts(ref short[] output, int len, BinaryReader stream)
+    private bool LoadShorts(ref short[] output, int len, BinaryReader stream)
     {
         var result = true;
-        for (var i = 0; i < len; ++i) result = result && loadShort(ref output[i], stream);
+        for (var i = 0; i < len; ++i) result = result && LoadShort(ref output[i], stream);
         return result;
     }
 
@@ -122,16 +122,16 @@ public partial class Micropolis
     /// <param name="buf">containing the short values to save.</param>
     /// <param name="stream">The stream to save to</param>
     /// <returns>Save was succesful</returns>
-    private bool saveShort(short buf, BinaryWriter stream)
+    private bool SaveShort(short buf, BinaryWriter stream)
     {
-        var toWrite = swapShort(BitConverter.GetBytes(buf));
+        var toWrite = SwapShort(BitConverter.GetBytes(buf));
         stream.Write(buf);
         return true;
     }
 
-    private bool saveShorts(short[] buf, BinaryWriter stream)
+    private bool SaveShorts(short[] buf, BinaryWriter stream)
     {
-        foreach (var s in buf) saveShort(s, stream);
+        foreach (var s in buf) SaveShort(s, stream);
         return true;
     }
 
@@ -141,7 +141,7 @@ public partial class Micropolis
     /// <param name="shorts">Array with longs.</param>
     /// <param name="indexOfFirst"></param>
     /// <returns></returns>
-    private int halfSwapLong(short[] shorts, int indexOfFirst)
+    private int HalfSwapLong(short[] shorts, int indexOfFirst)
     {
         var bytes = new byte[4];
         bytes[0] = BitConverter.GetBytes(shorts[indexOfFirst])[0];
@@ -162,7 +162,7 @@ public partial class Micropolis
         return BitConverter.ToInt32(bytes, 0);
     }
 
-    private void saveIntToShort(short[] output, int outputIndex, int valueToSave)
+    private void SaveIntToShort(short[] output, int outputIndex, int valueToSave)
     {
         var data = BitConverter.GetBytes(valueToSave);
 
@@ -200,19 +200,19 @@ public partial class Micropolis
         using (var reader = new BinaryReader(File.OpenRead(filename)))
         {
             result = result &&
-                     loadShorts(ref ResHist, Constants.HistoryLength, reader) &&
-                     loadShorts(ref ComHist, Constants.HistoryLength, reader) &&
-                     loadShorts(ref IndHist, Constants.HistoryLength, reader) &&
-                     loadShorts(ref CrimeHist, Constants.HistoryLength, reader) &&
-                     loadShorts(ref PollutionHist, Constants.HistoryLength, reader) &&
-                     loadShorts(ref MoneyHist, Constants.HistoryLength, reader) &&
-                     loadShorts(ref MiscHist, Constants.MiscHistoryLength, reader);
+                     LoadShorts(ref ResHist, Constants.HistoryLength, reader) &&
+                     LoadShorts(ref ComHist, Constants.HistoryLength, reader) &&
+                     LoadShorts(ref IndHist, Constants.HistoryLength, reader) &&
+                     LoadShorts(ref CrimeHist, Constants.HistoryLength, reader) &&
+                     LoadShorts(ref PollutionHist, Constants.HistoryLength, reader) &&
+                     LoadShorts(ref MoneyHist, Constants.HistoryLength, reader) &&
+                     LoadShorts(ref MiscHist, Constants.MiscHistoryLength, reader);
 
             for (var x = 0; x < Map.GetLength(0); x++)
             for (var y = 0; y < Map.GetLength(1); y++)
             {
                 var temp = (short)Map[x, y];
-                result = result && loadShort(ref temp, reader);
+                result = result && LoadShort(ref temp, reader);
                 Map[x, y] = (ushort)temp;
             }
         }
@@ -235,10 +235,10 @@ public partial class Micropolis
         /* total funds is being put in the 50th & 51th word of miscHist */
         /* find the address, cast the ptr to a longPtr, take contents */
 
-        n = halfSwapLong(MiscHist, 50);
+        n = HalfSwapLong(MiscHist, 50);
         SetFunds(n);
 
-        n = halfSwapLong(MiscHist, 8);
+        n = HalfSwapLong(MiscHist, 8);
         CityTime = n;
 
         SetAutoBulldoze(MiscHist[52] != 0); // flag for autoBulldoze
@@ -251,9 +251,9 @@ public partial class Micropolis
         MustUpdateOptions = true;
 
         /* yayaya */
-        PolicePercentage = halfSwapLong(MiscHist, 58) / (float)65536;
-        FirePercentage = halfSwapLong(MiscHist, 60) / (float)65536.0;
-        RoadPercentage = halfSwapLong(MiscHist, 62) / (float)65536.0;
+        PolicePercentage = HalfSwapLong(MiscHist, 58) / (float)65536;
+        FirePercentage = HalfSwapLong(MiscHist, 60) / (float)65536.0;
+        RoadPercentage = HalfSwapLong(MiscHist, 62) / (float)65536.0;
 
         CityTime = Math.Max(0, CityTime);
 
@@ -292,8 +292,8 @@ public partial class Micropolis
         /* total funds is a long.....    miscHist is array of ints */
         /* total funds is bien put in the 50th & 51th word of miscHist */
         /* find the address, cast the ptr to a longPtr, take contents */
-        saveIntToShort(MiscHist, 50, (int)TotalFunds);
-        saveIntToShort(MiscHist, 50, (int)CityTime);
+        SaveIntToShort(MiscHist, 50, (int)TotalFunds);
+        SaveIntToShort(MiscHist, 50, (int)CityTime);
 
         MiscHist[52] = AutoBulldoze.ToShort(); // flag for autoBulldoze
         MiscHist[53] = AutoBudget.ToShort(); // flag for autoBudget
@@ -303,25 +303,25 @@ public partial class Micropolis
         MiscHist[56] = (short)CityTax; /* post release */
 
         /* yayaya */
-        saveIntToShort(MiscHist, 58, (int)PolicePercentage);
-        saveIntToShort(MiscHist, 60, (int)FirePercentage);
-        saveIntToShort(MiscHist, 62, (int)RoadPercentage);
+        SaveIntToShort(MiscHist, 58, (int)PolicePercentage);
+        SaveIntToShort(MiscHist, 60, (int)FirePercentage);
+        SaveIntToShort(MiscHist, 62, (int)RoadPercentage);
 
         var result = true;
         using (var f = new BinaryWriter(File.OpenWrite(filename)))
         {
             result = result &&
-                     saveShorts(ResHist, f) &&
-                     saveShorts(ComHist, f) &&
-                     saveShorts(IndHist, f) &&
-                     saveShorts(CrimeHist, f) &&
-                     saveShorts(PollutionHist, f) &&
-                     saveShorts(MoneyHist, f) &&
-                     saveShorts(MiscHist, f);
+                     SaveShorts(ResHist, f) &&
+                     SaveShorts(ComHist, f) &&
+                     SaveShorts(IndHist, f) &&
+                     SaveShorts(CrimeHist, f) &&
+                     SaveShorts(PollutionHist, f) &&
+                     SaveShorts(MoneyHist, f) &&
+                     SaveShorts(MiscHist, f);
 
             for (var x = 0; x < Constants.WorldWidth; ++x)
             for (var y = 0; y < Constants.WorldHeight; ++y)
-                result = result && saveShort((short)Map[x, y], f);
+                result = result && SaveShort((short)Map[x, y], f);
         }
 
         return result;
@@ -408,7 +408,7 @@ public partial class Micropolis
 
         LoadFileDir(
             fname,
-            resourceDir);
+            ResourceDir);
 
         InitWillStuff();
         InitFundingLevel();

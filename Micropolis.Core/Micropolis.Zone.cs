@@ -220,8 +220,8 @@ public partial class Micropolis
 
     public void SetSmoke(Position pos, bool zonePower)
     {
-        ushort ASCBIT = (ushort)MapTileBits.Animated | (ushort)MapTileBits.Conductivity | (ushort)MapTileBits.Burnable;
-        ushort REGBIT = (ushort)MapTileBits.Conductivity | (ushort)MapTileBits.Burnable;
+        ushort ascbit = (ushort)MapTileBits.Animated | (ushort)MapTileBits.Conductivity | (ushort)MapTileBits.Burnable;
+        ushort regbit = (ushort)MapTileBits.Conductivity | (ushort)MapTileBits.Burnable;
 
         bool[] aniThis = { true, false, true, true, false, false, true, true };
         short[] dx1 = { -1, 0, 1, 0, 0, 0, 0, 1 };
@@ -259,8 +259,8 @@ public partial class Micropolis
                     /// @todo Add #SMOKEBASE into aniTabA and aniTabB tables?
                     if ((ushort)(Map[pos.X, pos.Y] & (ushort)MapTileBits.LowMask) == aniTabC[z])
                     {
-                        Map[xx, yy] = (ushort)(ASCBIT | ((short)MapTileCharacters.SMOKEBASE + aniTabA[z]));
-                        Map[xx, yy] = (ushort)(ASCBIT | ((short)MapTileCharacters.SMOKEBASE + aniTabB[z]));
+                        Map[xx, yy] = (ushort)(ascbit | ((short)MapTileCharacters.SMOKEBASE + aniTabA[z]));
+                        Map[xx, yy] = (ushort)(ascbit | ((short)MapTileCharacters.SMOKEBASE + aniTabB[z]));
                     }
                 }
                 else
@@ -268,8 +268,8 @@ public partial class Micropolis
                     /// @todo Why do we assign the same map position twice?
                     if ((ushort)(Map[pos.X, pos.Y] & (ushort)MapTileBits.LowMask) == aniTabC[z])
                     {
-                        Map[xx, yy] = (ushort)(REGBIT | aniTabC[z]);
-                        Map[xx, yy] = (ushort)(REGBIT | aniTabD[z]);
+                        Map[xx, yy] = (ushort)(regbit | aniTabC[z]);
+                        Map[xx, yy] = (ushort)(regbit | aniTabD[z]);
                     }
                 }
             }
@@ -350,14 +350,14 @@ public partial class Micropolis
     {
         short z;
         ushort x;
-        short[] Zx = { -1, 0, 1, -1, 0, 1, -1, 0, 1 };
-        short[] Zy = { -1, -1, -1, 0, 0, 0, 1, 1, 1 };
+        short[] zx = { -1, 0, 1, -1, 0, 1, -1, 0, 1 };
+        short[] zy = { -1, -1, -1, 0, 0, 0, 1, 1, 1 };
 
         for (z = 0; z < 9; z++)
         {
             /* check for fire  */
-            var xx = pos.X + Zx[z];
-            var yy = pos.Y + Zy[z];
+            var xx = pos.X + zx[z];
+            var yy = pos.Y + zy[z];
 
             if (Position.TestBounds(xx, yy))
             {
@@ -369,8 +369,8 @@ public partial class Micropolis
 
         for (z = 0; z < 9; z++)
         {
-            var xx = pos.X + Zx[z];
-            var yy = pos.Y + Zy[z];
+            var xx = pos.X + zx[z];
+            var yy = pos.Y + zy[z];
 
             if (Position.TestBounds(xx, yy))
                 Map[xx, yy] = (ushort)(baseTile + (ushort)MapTileBits.BurnableOrConductive);
@@ -438,17 +438,17 @@ public partial class Micropolis
     /// <param name="value">Value to build (land value?)</param>
     public void BuildHouse(Position pos, int value)
     {
-        short z, score, hscore, BestLoc;
-        short[] ZeX = { 0, -1, 0, 1, -1, 1, -1, 0, 1 };
-        short[] ZeY = { 0, -1, -1, -1, 0, 0, 1, 1, 1 };
+        short z, score, hscore, bestLoc;
+        short[] zeX = { 0, -1, 0, 1, -1, 1, -1, 0, 1 };
+        short[] zeY = { 0, -1, -1, -1, 0, 0, 1, 1, 1 };
 
-        BestLoc = 0;
+        bestLoc = 0;
         hscore = 0;
 
         for (z = 1; z < 9; z++)
         {
-            var xx = pos.X + ZeX[z];
-            var yy = pos.Y + ZeY[z];
+            var xx = pos.X + zeX[z];
+            var yy = pos.Y + zeY[z];
 
             if (Position.TestBounds(xx, yy))
             {
@@ -460,21 +460,21 @@ public partial class Micropolis
                     if (score > hscore)
                     {
                         hscore = score;
-                        BestLoc = z;
+                        bestLoc = z;
                     }
 
                     /// @todo Move the code below to a better place.
                     ///       If we just updated hscore above, we could
                     //        trigger this code too.
-                    if (score == hscore && (GetRandom16() & 7).IsFalse()) BestLoc = z;
+                    if (score == hscore && (GetRandom16() & 7).IsFalse()) bestLoc = z;
                 }
             }
         }
 
-        if (BestLoc > 0)
+        if (bestLoc > 0)
         {
-            var xx = pos.X + ZeX[BestLoc];
-            var yy = pos.Y + ZeY[BestLoc];
+            var xx = pos.X + zeX[bestLoc];
+            var yy = pos.Y + zeY[bestLoc];
 
             if (Position.TestBounds(xx, yy))
                 /// @todo Is HOUSE the proper constant here?
@@ -525,7 +525,7 @@ public partial class Micropolis
     /// <param name="zonePower">Does the zone have power?</param>
     public void DoResidential(Position pos, bool zonePower)
     {
-        short tpop, zscore, locvalve, value, TrfGood;
+        short tpop, zscore, locvalve, value, trfGood;
 
         ResZonePop++;
 
@@ -537,14 +537,14 @@ public partial class Micropolis
             tpop = GetResZonePop(tile);
 
         ResPop += tpop;
-
+        
         if (tpop > GetRandom(35))
             /* Try driving from residential to commercial */
-            TrfGood = MakeTraffic(pos, ZoneType.Commercial);
+            trfGood = MakeTraffic(pos, ZoneType.Commercial);
         else
-            TrfGood = 1;
+            trfGood = 1;
 
-        if (TrfGood == -1)
+        if (trfGood == -1)
         {
             value = GetLandPollutionValue(pos);
             DoResOut(pos, tpop, value);
@@ -553,7 +553,7 @@ public partial class Micropolis
 
         if (tile == (ushort)MapTileCharacters.FREEZ || (GetRandom16() & 7).IsFalse())
         {
-            locvalve = EvalRes(pos, TrfGood);
+            locvalve = EvalRes(pos, trfGood);
             zscore = (short)(ResValve + locvalve);
 
             if (!zonePower) zscore = -500;
@@ -630,7 +630,7 @@ public partial class Micropolis
     /// <param name="value">Land value corrected for pollution.</param>
     public void DoResOut(Position pos, int pop, int value)
     {
-        short[] Brdr = { 0, 3, 6, 1, 4, 7, 2, 5, 8 };
+        short[] brdr = { 0, 3, 6, 1, 4, 7, 2, 5, 8 };
         int x, y, loc, z;
 
         if (pop.IsFalse()) return;
@@ -668,7 +668,7 @@ public partial class Micropolis
                     loc = Map[x, y] & (ushort)MapTileBits.LowMask;
                     if (loc >= (ushort)MapTileCharacters.LHTHR && loc <= (ushort)MapTileCharacters.HHTHR)
                     {
-                        Map[x, y] = (ushort)(Brdr[z] + (ushort)MapTileBits.BurnableOrBulldozableOrConductive +
+                        Map[x, y] = (ushort)(brdr[z] + (ushort)MapTileBits.BurnableOrBulldozableOrConductive +
                             (ushort)MapTileCharacters.FREEZ - 4);
                         return;
                     }
@@ -686,8 +686,8 @@ public partial class Micropolis
     /// <returns>Population of the residential zone.</returns>
     public short GetResZonePop(ushort mapTile)
     {
-        var CzDen = (short)((mapTile - (short)MapTileCharacters.RZB) / 9 % 4);
-        return (short)(CzDen * 8 + 16);
+        var czDen = (short)((mapTile - (short)MapTileCharacters.RZB) / 9 % 4);
+        return (short)(czDen * 8 + 16);
     }
 
     /// <summary>
@@ -750,7 +750,7 @@ public partial class Micropolis
     /// <param name="zonePower"></param>
     public void DoCommercial(Position pos, bool zonePower)
     {
-        int tpop, TrfGood;
+        int tpop, trfGood;
         int zscore, locvalve, value;
 
         var tile = (ushort)(Map[pos.X, pos.Y] & (ushort)MapTileBits.LowMask);
@@ -761,11 +761,11 @@ public partial class Micropolis
 
         if (tpop > GetRandom(5))
             /* Try driving from commercial to industrial */
-            TrfGood = MakeTraffic(pos, ZoneType.Industrial);
+            trfGood = MakeTraffic(pos, ZoneType.Industrial);
         else
-            TrfGood = 1;
+            trfGood = 1;
 
-        if (TrfGood == -1)
+        if (trfGood == -1)
         {
             value = GetLandPollutionValue(pos);
             DoComOut(pos, tpop, value);
@@ -774,12 +774,12 @@ public partial class Micropolis
 
         if ((GetRandom16() & 7).IsFalse())
         {
-            locvalve = EvalCom(pos, TrfGood);
+            locvalve = EvalCom(pos, trfGood);
             zscore = ComValve + locvalve;
 
             if (!zonePower) zscore = -500;
 
-            if (TrfGood.IsTrue() &&
+            if (trfGood.IsTrue() &&
                 zscore > -350 &&
                 (short)(zscore - 26380) > (short)GetRandom16Signed())
             {
@@ -850,8 +850,8 @@ public partial class Micropolis
     {
         if (tile == (ushort)MapTileCharacters.COMCLR) return 0;
 
-        var CzDen = (tile - (ushort)MapTileCharacters.CZB) / 9 % 5 + 1;
-        return (short)CzDen;
+        var czDen = (tile - (ushort)MapTileCharacters.CZB) / 9 % 5 + 1;
+        return (short)czDen;
     }
 
     /// <summary>
@@ -876,13 +876,13 @@ public partial class Micropolis
     /// <returns></returns>
     public short EvalCom(Position pos, int traf)
     {
-        short Value;
+        short value;
 
         if (traf < 0) return -3000;
 
-        Value = ComRateMap.WorldGet(pos.X, pos.Y);
+        value = ComRateMap.WorldGet(pos.X, pos.Y);
 
-        return Value;
+        return value;
     }
 
     /// <summary>
@@ -892,7 +892,7 @@ public partial class Micropolis
     /// <param name="zonePower"></param>
     public void DoIndustrial(Position pos, bool zonePower)
     {
-        int tpop, zscore, TrfGood;
+        int tpop, zscore, trfGood;
 
         var tile = (ushort)(Map[pos.X, pos.Y] & (ushort)MapTileBits.LowMask);
 
@@ -903,11 +903,11 @@ public partial class Micropolis
 
         if (tpop > GetRandom(5))
             /* Try driving from industrial to residential */
-            TrfGood = MakeTraffic(pos, ZoneType.Residential);
+            trfGood = MakeTraffic(pos, ZoneType.Residential);
         else
-            TrfGood = 1;
+            trfGood = 1;
 
-        if (TrfGood == -1)
+        if (trfGood == -1)
         {
             DoIndOut(pos, tpop, GetRandom16() & 1);
             return;
@@ -915,7 +915,7 @@ public partial class Micropolis
 
         if ((GetRandom16() & 7).IsFalse())
         {
-            zscore = IndValve + EvalInd(TrfGood);
+            zscore = IndValve + EvalInd(trfGood);
 
             if (!zonePower) zscore = -500;
 
@@ -978,8 +978,8 @@ public partial class Micropolis
     {
         if (tile == (ushort)MapTileCharacters.INDCLR) return 0;
 
-        var CzDen = (tile - (ushort)MapTileCharacters.IZB) / 9 % 4 + 1;
-        return (short)CzDen;
+        var czDen = (tile - (ushort)MapTileCharacters.IZB) / 9 % 4 + 1;
+        return (short)czDen;
     }
 
     /// <summary>

@@ -177,8 +177,8 @@ public partial class Micropolis
 
         if (TestDirectory(simHome))
         {
-            resourceDir = simHome + Path.PathSeparator + "res" + Path.PathSeparator;
-            if (TestDirectory(resourceDir)) return;
+            ResourceDir = simHome + Path.PathSeparator + "res" + Path.PathSeparator;
+            if (TestDirectory(ResourceDir)) return;
         }
 
         //TODO: Exception - cannot find res dir
@@ -282,15 +282,15 @@ public partial class Micropolis
         int src, dst;
         var fl = (short)HeatFlow;
 
-        const int SRCCOL = Constants.WorldHeight + 2;
-        const int DSTCOL = Constants.WorldHeight;
+        const int srccol = Constants.WorldHeight + 2;
+        const int dstcol = Constants.WorldHeight;
 
         //cellSrc, cellDst, src, dst, - are all pointers to arrays;
         //In c# they will just be indexes to positions in said array
-        const int CellSrc = 0;
-        const int CellDest = 0;
+        const int cellSrc = 0;
+        const int cellDest = 0;
 
-        var CellMap = new ushort[Constants.WorldWidth + 2, Constants.WorldHeight * 2];
+        var cellMap = new ushort[Constants.WorldWidth + 2, Constants.WorldHeight * 2];
 
         /** - See above initialization
         if (cellSrc == 0)
@@ -331,24 +331,24 @@ public partial class Micropolis
          *                     B A B A
          */
         //FROM case#3 from old switch on HeatWrap --  3   copy future=>past, wrap edges
-        src = CellSrc + SRCCOL + 1;
-        dst = CellSrc;
+        src = cellSrc + srccol + 1;
+        dst = cellSrc;
 
         for (x = 0; x < Constants.WorldWidth; x++)
         {
             //Copy a column from Map -> to a Offset in CellMap (Cell Map seems to have a boundary around it
-            SimHeat_MemCopy(src, dst, Constants.WorldHeight, CellMap, Map);
+            SimHeat_MemCopy(src, dst, Constants.WorldHeight, cellMap, Map);
             //Wrap the Edges
-            SimHeat_CopyPosition(src - 1, src + (Constants.WorldHeight - 1), CellMap, CellMap);
-            SimHeat_CopyPosition(src + Constants.WorldHeight, src, CellMap, CellMap);
-            src += SRCCOL;
-            dst += DSTCOL;
+            SimHeat_CopyPosition(src - 1, src + (Constants.WorldHeight - 1), cellMap, cellMap);
+            SimHeat_CopyPosition(src + Constants.WorldHeight, src, cellMap, cellMap);
+            src += srccol;
+            dst += dstcol;
         }
 
         //Copy the map from CellMap into CellMap again (so its there twice - wrapped)
-        SimHeat_MemCopy(CellSrc, CellSrc + SRCCOL * Constants.WorldWidth, SRCCOL, CellMap, CellMap);
+        SimHeat_MemCopy(cellSrc, cellSrc + srccol * Constants.WorldWidth, srccol, cellMap, cellMap);
         //Wrap Edges
-        SimHeat_MemCopy(CellSrc + SRCCOL * (Constants.WorldWidth + 1), CellSrc + SRCCOL, SRCCOL, CellMap, CellMap);
+        SimHeat_MemCopy(cellSrc + srccol * (Constants.WorldWidth + 1), cellSrc + srccol, srccol, cellMap, cellMap);
         //END FROM case#3 from old switch on HeatWrap
 
         /**
@@ -376,40 +376,40 @@ public partial class Micropolis
          */
 
         //FROM case#0 from old switch on HeatRule
-        src = CellSrc;
-        dst = CellDest;
+        src = cellSrc;
+        dst = cellDest;
         for (x = 0; x < Constants.WorldWidth;)
         {
             short nw, n, ne, w, c, e, sw, s, se;
-            src = CellSrc + x * SRCCOL;
-            dst = CellDest + x * DSTCOL;
+            src = cellSrc + x * srccol;
+            dst = cellDest + x * dstcol;
 
-            w = (short)SimHeat_GetValue(CellMap, src);
+            w = (short)SimHeat_GetValue(cellMap, src);
             //w = src[0];
-            c = (short)SimHeat_GetValue(CellMap, src + SRCCOL);
+            c = (short)SimHeat_GetValue(cellMap, src + srccol);
             //c = src[SRCCOL];
-            e = (short)SimHeat_GetValue(CellMap, src + 2 * SRCCOL);
+            e = (short)SimHeat_GetValue(cellMap, src + 2 * srccol);
             //e = src[2 * SRCCOL];
-            sw = (short)SimHeat_GetValue(CellMap, src + 1);
+            sw = (short)SimHeat_GetValue(cellMap, src + 1);
             //sw = src[1];
-            s = (short)SimHeat_GetValue(CellMap, src + SRCCOL + 1);
+            s = (short)SimHeat_GetValue(cellMap, src + srccol + 1);
             //s = src[SRCCOL + 1];
-            se = (short)SimHeat_GetValue(CellMap, src + 2 * SRCCOL + 1);
+            se = (short)SimHeat_GetValue(cellMap, src + 2 * srccol + 1);
             //se = src[(2 * SRCCOL) + 1];
 
             for (y = 0; y < Constants.WorldHeight; y++)
             {
                 nw = w;
                 w = sw;
-                sw = (short)SimHeat_GetValue(CellMap, src + 2);
+                sw = (short)SimHeat_GetValue(cellMap, src + 2);
                 //sw = src[2];
                 n = c;
                 c = s;
-                s = (short)SimHeat_GetValue(CellMap, src + SRCCOL + 2);
+                s = (short)SimHeat_GetValue(cellMap, src + srccol + 2);
                 //s = src[SRCCOL + 2];
                 ne = e;
                 e = se;
-                se = (short)SimHeat_GetValue(CellMap, src + 2 * SRCCOL + 2);
+                se = (short)SimHeat_GetValue(cellMap, src + 2 * srccol + 2);
                 //se = src[(2 * SRCCOL) + 2];
                 {
                     a += nw + n + ne + w + e + sw + s + se + fl;
@@ -424,33 +424,33 @@ public partial class Micropolis
             }
 
             x++;
-            src = CellSrc + (x + 1) * SRCCOL - 3;
-            dst = CellDest + (x + 1) * DSTCOL - 1;
-            nw = (short)SimHeat_GetValue(CellMap, src + 1);
+            src = cellSrc + (x + 1) * srccol - 3;
+            dst = cellDest + (x + 1) * dstcol - 1;
+            nw = (short)SimHeat_GetValue(cellMap, src + 1);
             //nw = src[1]; 
-            n = (short)SimHeat_GetValue(CellMap, src + SRCCOL + 1);
+            n = (short)SimHeat_GetValue(cellMap, src + srccol + 1);
             //n = src[SRCCOL + 1];
-            ne = (short)SimHeat_GetValue(CellMap, src + 2 * SRCCOL + 1);
+            ne = (short)SimHeat_GetValue(cellMap, src + 2 * srccol + 1);
             //ne = src[(2 * SRCCOL) + 1];
-            w = (short)SimHeat_GetValue(CellMap, src + 2);
+            w = (short)SimHeat_GetValue(cellMap, src + 2);
             //w = src[2]; 
-            c = (short)SimHeat_GetValue(CellMap, src + SRCCOL + 2);
+            c = (short)SimHeat_GetValue(cellMap, src + srccol + 2);
             //c = src[SRCCOL + 2];
-            e = (short)SimHeat_GetValue(CellMap, src + 2 * SRCCOL + 2);
+            e = (short)SimHeat_GetValue(cellMap, src + 2 * srccol + 2);
             //e = src[(2 * SRCCOL) + 2];
             for (y = Constants.WorldHeight - 1; y >= 0; y--)
             {
                 sw = w;
                 w = nw;
-                nw = (short)SimHeat_GetValue(CellMap, src);
+                nw = (short)SimHeat_GetValue(cellMap, src);
                 //nw = src[0];
                 s = c;
                 c = n;
-                n = (short)SimHeat_GetValue(CellMap, src + SRCCOL);
+                n = (short)SimHeat_GetValue(cellMap, src + srccol);
                 //n = src[SRCCOL];
                 se = e;
                 e = ne;
-                ne = (short)SimHeat_GetValue(CellMap, src + 2 * SRCCOL);
+                ne = (short)SimHeat_GetValue(cellMap, src + 2 * srccol);
                 //ne = src[2 * SRCCOL];
                 {
                     a += nw + n + ne + w + e + sw + s + se + fl;

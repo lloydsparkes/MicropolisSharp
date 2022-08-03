@@ -508,22 +508,22 @@ public partial class Micropolis
 
         if (IndValve < -1000) z = (int)(z * .85);
 
-        var SM = 1.0f;
+        var sm = 1.0f;
         if (CityPopulation == 0 || CityPopDelta == 0)
-            SM = 1.0f; // there is nobody or no migration happened
+            sm = 1.0f; // there is nobody or no migration happened
         else if (CityPopDelta == CityPopulation)
-            SM = 1.0f; // city sprang into existence or doubled in size
+            sm = 1.0f; // city sprang into existence or doubled in size
         else if (CityPopDelta > 0)
-            SM = (float)CityPopDelta / CityPopulation + 1.0f;
-        else if (CityPopDelta < 0) SM = 0.95f + (float)CityPopDelta / (CityPopulation - CityPopDelta);
+            sm = (float)CityPopDelta / CityPopulation + 1.0f;
+        else if (CityPopDelta < 0) sm = 0.95f + (float)CityPopDelta / (CityPopulation - CityPopDelta);
 
-        z = (int)(z * SM);
+        z = (int)(z * sm);
         z = z - GetFireSeverity() - CityTax; // dec score for fires and taxes
 
-        float TM = UnpoweredZoneCount + PoweredZoneCount; // dec score for unpowered zones
-        if (TM > 0.0)
+        float tm = UnpoweredZoneCount + PoweredZoneCount; // dec score for unpowered zones
+        if (tm > 0.0)
         {
-            z = (int)(z * (PoweredZoneCount / TM));
+            z = (int)(z * (PoweredZoneCount / tm));
         }
 
         z = Utilities.Restrict(z, 0, 1000);

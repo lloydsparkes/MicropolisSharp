@@ -175,9 +175,9 @@ public partial class Micropolis
     {
         /*  sets: populationDensityMap, , , comRateMap  */
         TempMap1.Clear();
-        long Xtot = 0;
-        long Ytot = 0;
-        long Ztot = 0;
+        long xtot = 0;
+        long ytot = 0;
+        long ztot = 0;
         for (var x = 0; x < Constants.WorldWidth; x++)
         for (var y = 0; y < Constants.WorldHeight; y++)
         {
@@ -189,9 +189,9 @@ public partial class Micropolis
                 pop = Math.Min(pop, 254);
 
                 TempMap1.WorldSet(x, y, (byte)pop);
-                Xtot += x;
-                Ytot += y;
-                Ztot++;
+                xtot += x;
+                ytot += y;
+                ztot++;
             }
         }
 
@@ -211,11 +211,11 @@ public partial class Micropolis
 
 
         // Compute new city center
-        if (Ztot > 0)
+        if (ztot > 0)
         {
             /* Find Center of Mass for City */
-            CityCenterX = (short)(Xtot / Ztot);
-            CityCenterY = (short)(Ytot / Ztot);
+            CityCenterX = (short)(xtot / ztot);
+            CityCenterY = (short)(ytot / ztot);
         }
         else
         {
@@ -272,15 +272,15 @@ public partial class Micropolis
     public void PollutionTerrainLandValueScan()
     {
         /* Does pollution, terrain, land value */
-        long ptot, LVtot;
+        long ptot, lVtot;
         int x, y, z, dis;
-        int pollutionLevel, loc, worldX, worldY, Mx, My, pnum, LVnum, pmax;
+        int pollutionLevel, loc, worldX, worldY, mx, my, pnum, lVnum, pmax;
 
         // tempMap3 is a map of development density, smoothed into terrainMap.
         TempMap3.Clear();
 
-        LVtot = 0;
-        LVnum = 0;
+        lVtot = 0;
+        lVnum = 0;
 
         for (x = 0; x < LandValueMap.width; x++)
         for (y = 0; y < LandValueMap.height; y++)
@@ -290,10 +290,10 @@ public partial class Micropolis
             worldX = x * 2;
             worldY = y * 2;
 
-            for (Mx = worldX; Mx <= worldX + 1; Mx++)
-            for (My = worldY; My <= worldY + 1; My++)
+            for (mx = worldX; mx <= worldX + 1; mx++)
+            for (my = worldY; my <= worldY + 1; my++)
             {
-                loc = Map[Mx, My] & (ushort)MapTileBits.LowMask;
+                loc = Map[mx, my] & (ushort)MapTileBits.LowMask;
                 if (loc.IsTrue())
                 {
                     if (loc < (ushort)MapTileCharacters.RUBBLE)
@@ -328,8 +328,8 @@ public partial class Micropolis
                 if (CrimeRateMap.Get(x, y) > 190) dis -= 20;
                 dis = Utilities.Restrict(dis, 1, 250);
                 LandValueMap.Set(x, y, (byte)dis);
-                LVtot += dis;
-                LVnum++;
+                lVtot += dis;
+                lVnum++;
             }
             else
             {
@@ -337,8 +337,8 @@ public partial class Micropolis
             }
         }
 
-        if (LVnum > 0)
-            LandValueAverage = (short)(LVtot / LVnum);
+        if (lVnum > 0)
+            LandValueAverage = (short)(lVtot / lVnum);
         else
             LandValueAverage = 0;
 
@@ -547,7 +547,7 @@ public partial class Micropolis
     /// <param name="srcMap">Source map.</param>
     /// <param name="destMap">Destination map.</param>
     /// <param name="dither">Function should apply dithering.</param>
-    private static void smoothDitherMap(ByteMap2 srcMap, ByteMap2 destMap, bool dither)
+    private static void SmoothDitherMap(ByteMap2 srcMap, ByteMap2 destMap, bool dither)
     {
         if (dither)
         {
@@ -596,7 +596,7 @@ public partial class Micropolis
     /// </summary>
     public void DoSmooth1()
     {
-        smoothDitherMap(TempMap1, TempMap2, (DonDither & 2).IsTrue());
+        SmoothDitherMap(TempMap1, TempMap2, (DonDither & 2).IsTrue());
     }
 
     /// <summary>
@@ -604,7 +604,7 @@ public partial class Micropolis
     /// </summary>
     public void DoSmooth2()
     {
-        smoothDitherMap(TempMap2, TempMap1, (DonDither & 4).IsTrue());
+        SmoothDitherMap(TempMap2, TempMap1, (DonDither & 4).IsTrue());
     }
 
     /// <summary>

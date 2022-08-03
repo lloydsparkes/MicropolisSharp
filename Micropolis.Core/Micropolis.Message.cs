@@ -96,20 +96,20 @@ public partial class Micropolis
     /// </summary>
     public void SendMessages()
     {
-        short PowerPop;
-        float TM;
+        short powerPop;
+        float tm;
 
         // Running a scenario, and waiting it to 'end' so we can give a score
-        if (Scenario > Scenario.None && ScoreType > Scenario.None && scoreWait > 0)
+        if (Scenario > Scenario.None && ScoreType > Scenario.None && ScoreWait > 0)
         {
-            scoreWait--;
-            if (scoreWait == 0) DoScenarioScore(ScoreType);
+            ScoreWait--;
+            if (ScoreWait == 0) DoScenarioScore(ScoreType);
         }
 
         CheckGrowth();
 
         TotalZonePop = ResZonePop + ComZonePop + IndZonePop;
-        PowerPop = (short)(NuclearPowerPop + CoalPowerPop);
+        powerPop = (short)(NuclearPowerPop + CoalPowerPop);
 
         switch (CityTime & 63)
         {
@@ -135,7 +135,7 @@ public partial class Micropolis
                 break;
 
             case 22:
-                if (TotalZonePop > 10 && PowerPop == 0) SendMessage(GeneralMessages.MESSAGE_NEED_ELECTRICITY);
+                if (TotalZonePop > 10 && powerPop == 0) SendMessage(GeneralMessages.MESSAGE_NEED_ELECTRICITY);
                 break;
 
             case 26:
@@ -178,9 +178,9 @@ public partial class Micropolis
                 break;
 
             case 32:
-                TM = UnpoweredZoneCount + PoweredZoneCount; /* dec score for unpowered zones */
-                if (TM > 0)
-                    if (PoweredZoneCount / TM < 0.7)
+                tm = UnpoweredZoneCount + PoweredZoneCount; /* dec score for unpowered zones */
+                if (tm > 0)
+                    if (PoweredZoneCount / tm < 0.7)
                         SendMessage(GeneralMessages.MESSAGE_BLACKOUTS_REPORTED);
                 break;
 

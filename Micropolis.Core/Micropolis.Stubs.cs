@@ -384,7 +384,7 @@ public partial class Micropolis
     /// </summary>
     /// <param name="x"></param>
     /// <param name="y"></param>
-    public ByteMap2 getCrimeRateMapBuffer()
+    public ByteMap2 GetCrimeRateMapBuffer()
     {
         return CrimeRateMap;
     }
@@ -444,7 +444,7 @@ public partial class Micropolis
     /// </summary>
     /// <param name="x"></param>
     /// <param name="y"></param>
-    public ShortMap8 getFireCoverageMapBuffer()
+    public ShortMap8 GetFireCoverageMapBuffer()
     {
         return FireStationEffectMap;
     }

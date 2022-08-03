@@ -111,7 +111,7 @@ public partial class Micropolis
         PoliceStationEffectMap = new ShortMap8();
         ComRateMap = new ShortMap8();
 
-        init();
+        Init();
     }
 
     public ushort[,] Map { get; private set; }
@@ -513,7 +513,7 @@ public partial class Micropolis
     /// <summary>
     ///     Initialize simulator variables to a sane default.
     /// </summary>
-    private void init()
+    private void Init()
     {
         // short roadTotal;
         RoadTotal = 0;
@@ -808,19 +808,19 @@ public partial class Micropolis
 
         AutoGoTo = false;
 
-        powerStackPointer = 0;
+        _powerStackPointer = 0;
 
         // Position powerStackXY[POWER_STACK_SIZE];
-        for (var i = 0; i < Constants.PowerStackSize; i++) powerStackXY[i] = new Position();
+        for (var i = 0; i < Constants.PowerStackSize; i++) _powerStackXy[i] = new Position();
 
         // UQuad nextRandom;
-        nextRandom = 1;
+        NextRandom = 1;
 
         // char *HomeDir;
-        homeDir = "";
+        HomeDir = "";
 
         // char *ResourceDir;
-        resourceDir = "";
+        ResourceDir = "";
 
         // Resource *resources;
         Resources = null;
@@ -885,7 +885,7 @@ public partial class Micropolis
         ScoreType = Scenario.None;
 
         // short scoreWait;
-        scoreWait = 0;
+        ScoreWait = 0;
 
         // short poweredZoneCount;
         PoweredZoneCount = 0;
@@ -926,16 +926,16 @@ public partial class Micropolis
         SpriteList = null;
 
         // SimSprite *freeSprites;
-        freeSprites = null;
+        _freeSprites = null;
 
         // SimSprite *globalSprites[SPRITE_COUNT];
-        globalSprites = new SimSprite[(int)SpriteType.Count];
+        _globalSprites = new SimSprite[(int)SpriteType.Count];
 
         // int absDist;
-        absDist = 0;
+        _absDist = 0;
 
         // short spriteCycle;
-        spriteCycle = 0;
+        _spriteCycle = 0;
 
         // Quad totalFunds;
         TotalFunds = 0;
@@ -967,14 +967,14 @@ public partial class Micropolis
         BlinkFlag = 0;
 
         // short curMapStackPointer;
-        curMapStackPointer = 0;
+        _curMapStackPointer = 0;
 
         // Position curMapStackXY[MAX_TRAFFIC_DISTANCE+1];
-        for (var i = 0; i < Constants.MaxTrafficDistance + 1; i++) curMapStackXY[i] = new Position();
+        for (var i = 0; i < Constants.MaxTrafficDistance + 1; i++) _curMapStackXy[i] = new Position();
 
         // short trafMaxX, trafMaxY;
-        trafMaxX = 0;
-        trafMaxY = 0;
+        _trafMaxX = 0;
+        _trafMaxY = 0;
 
         MustUpdateFunds = false;
 
@@ -1004,9 +1004,9 @@ public partial class Micropolis
         SimInit();
     }
 
-    private void destory()
+    private void Destory()
     {
-        destoryMapArrays();
+        DestoryMapArrays();
     }
 
     public void Spend(long amount)

@@ -74,7 +74,7 @@ namespace MicropolisSharp;
 /// </summary>
 public partial class Micropolis
 {
-    protected long nextRandom;
+    protected long NextRandom;
 
     /// <summary>
     ///     Draw a random number (internal function).
@@ -83,8 +83,8 @@ public partial class Micropolis
     /// <returns> Unsigned 16 bit random number.</returns>
     public int SimRandom()
     {
-        nextRandom = nextRandom * 1103515245 + 12345;
-        return (int)(nextRandom & 0xffff00) >> 8;
+        NextRandom = NextRandom * 1103515245 + 12345;
+        return (int)(NextRandom & 0xffff00) >> 8;
     }
 
     /// <summary>
@@ -149,7 +149,7 @@ public partial class Micropolis
     /// <param name="seed">New seed.</param>
     public void SeedRandom(int seed)
     {
-        nextRandom = seed;
+        NextRandom = seed;
     }
 
     /// <summary>
@@ -157,6 +157,6 @@ public partial class Micropolis
     /// </summary>
     public void RandomlySeedRandom()
     {
-        nextRandom = new Random().Next();
+        NextRandom = new Random().Next();
     }
 }

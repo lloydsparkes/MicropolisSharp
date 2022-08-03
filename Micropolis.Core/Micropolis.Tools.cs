@@ -75,7 +75,7 @@ namespace MicropolisSharp;
 /// </summary>
 public partial class Micropolis
 {
-    private static readonly ushort[] idArray =
+    private static readonly ushort[] IdArray =
     {
         (ushort)MapTileCharacters.DIRT, (ushort)MapTileCharacters.RIVER, (ushort)MapTileCharacters.TREEBASE,
         (ushort)MapTileCharacters.RUBBLE,
@@ -617,7 +617,7 @@ public partial class Micropolis
         // Note: If 'tileNum < idArray[i]', it belongs to category i-1
         short i;
         for (i = 1; i < 29; i++)
-            if (tileNum < idArray[i])
+            if (tileNum < IdArray[i])
                 break;
 
         i--;

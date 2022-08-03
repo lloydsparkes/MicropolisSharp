@@ -74,8 +74,8 @@ namespace MicropolisSharp;
 /// </summary>
 public partial class Micropolis
 {
-    private int powerStackPointer;
-    private readonly Position[] powerStackXY = new Position[Constants.PowerStackSize];
+    private int _powerStackPointer;
+    private readonly Position[] _powerStackXy = new Position[Constants.PowerStackSize];
 
     /// <summary>
     ///     Scan the map for powered tiles, and copy them to the Micropolis::powerGridMap array.
@@ -95,7 +95,7 @@ public partial class Micropolis
 
         long numPower = 0; // Amount of power used.
 
-        while (powerStackPointer > 0)
+        while (_powerStackPointer > 0)
         {
             var pos = PullPowerStack();
             anyDir = Direction.Invalid;
@@ -153,10 +153,10 @@ public partial class Micropolis
     /// <param name="pos">Position to push.</param>
     public void PushPowerStack(Position pos)
     {
-        if (powerStackPointer < Constants.PowerStackSize - 2)
+        if (_powerStackPointer < Constants.PowerStackSize - 2)
         {
-            powerStackPointer++;
-            powerStackXY[powerStackPointer] = new Position(pos);
+            _powerStackPointer++;
+            _powerStackXy[_powerStackPointer] = new Position(pos);
         }
     }
 
@@ -168,10 +168,10 @@ public partial class Micropolis
     public Position PullPowerStack()
     {
         //TODO: Make this an assert
-        if (powerStackPointer > 0)
+        if (_powerStackPointer > 0)
         {
-            powerStackPointer--;
-            return powerStackXY[powerStackPointer + 1];
+            _powerStackPointer--;
+            return _powerStackXy[_powerStackPointer + 1];
         }
 
         //TODO: Change this to an Assert really

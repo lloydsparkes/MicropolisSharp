@@ -86,13 +86,13 @@ public partial class Micropolis
     private void DoDisasters()
     {
         /* Chance of disasters at lev 0 1 2 */
-        short[] DisChance =
+        short[] disChance =
         {
             10 * 48, // Game level 0
             5 * 48, // Game level 1
             60 // Game level 2
         };
-        Debug.Assert((int)Levels.Count == DisChance.Length);
+        Debug.Assert((int)Levels.Count == disChance.Length);
 
         if (FloodCount.IsTrue()) FloodCount--;
 
@@ -105,7 +105,7 @@ public partial class Micropolis
         var x = GameLevel;
         if (x > Levels.Last) x = Levels.Easy;
 
-        if (GetRandom(DisChance[(int)x]).IsFalse())
+        if (GetRandom(disChance[(int)x]).IsFalse())
             switch (GetRandom(8))
             {
                 case 0:

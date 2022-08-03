@@ -79,12 +79,12 @@ public partial class Micropolis
     /// <summary>
     ///     Name of the Micropolis Top Level Directory
     /// </summary>
-    protected string homeDir;
+    protected string HomeDir;
 
     /// <summary>
     ///     Name of the sub directory where resources are
     /// </summary>
-    protected string resourceDir;
+    protected string ResourceDir;
 
     /// <summary>
     ///     TODO: Turn into a List
@@ -119,7 +119,7 @@ public partial class Micropolis
         r.Name = name;
         r.Id = id;
 
-        var filename = string.Format("{0}{1}{2}{3}", resourceDir, Path.DirectorySeparatorChar, r.Name, r.Id);
+        var filename = string.Format("{0}{1}{2}{3}", ResourceDir, Path.DirectorySeparatorChar, r.Name, r.Id);
 
         if (!File.Exists(filename)) return null;
 

@@ -107,7 +107,7 @@ public partial class Micropolis
     /// <summary>
     ///     Free / Clear all Map Arrays
     /// </summary>
-    private void destoryMapArrays()
+    private void DestoryMapArrays()
     {
         InitMapArrays();
 

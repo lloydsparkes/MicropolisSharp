@@ -13,23 +13,23 @@ namespace Micropolis.Windows;
 public class Micropolis : Game
 {
     private MapLayer _mapLayer;
-    private readonly string cityName;
-    private SpriteFont font;
-    private readonly GraphicsDeviceManager graphics;
-    private bool hasChanged;
-    private Texture2D rect2x2;
+    private readonly string _cityName;
+    private SpriteFont _font;
+    private readonly GraphicsDeviceManager _graphics;
+    private bool _hasChanged;
+    private Texture2D _rect2X2;
 
-    private MicropolisSharp.Micropolis simulator;
-    private SpriteBatch spriteBatch;
+    private MicropolisSharp.Micropolis _simulator;
+    private SpriteBatch _spriteBatch;
 
     public Micropolis(string cityName)
     {
-        this.cityName = cityName;
+        this._cityName = cityName;
 
         Window.AllowUserResizing = true;
-        graphics = new GraphicsDeviceManager(this);
-        graphics.PreferredBackBufferWidth = 1280;
-        graphics.PreferredBackBufferHeight = 768;
+        _graphics = new GraphicsDeviceManager(this);
+        _graphics.PreferredBackBufferWidth = 1280;
+        _graphics.PreferredBackBufferHeight = 768;
 
         Content.RootDirectory = "Content";
 
@@ -39,11 +39,11 @@ public class Micropolis : Game
 
     private void Window_ClientSizeChanged(object sender, EventArgs e)
     {
-        graphics.PreferredBackBufferWidth = Window.ClientBounds.Width;
-        graphics.PreferredBackBufferHeight = Window.ClientBounds.Height;
+        _graphics.PreferredBackBufferWidth = Window.ClientBounds.Width;
+        _graphics.PreferredBackBufferHeight = Window.ClientBounds.Height;
 
         if (_mapLayer != null) _mapLayer.Resize(Window.ClientBounds.Width, Window.ClientBounds.Height);
-        hasChanged = true;
+        _hasChanged = true;
     }
 
     /// <summary>
@@ -54,17 +54,17 @@ public class Micropolis : Game
     /// </summary>
     protected override void Initialize()
     {
-        var filePath = "cities" + Path.DirectorySeparatorChar + cityName + ".cty";
+        var filePath = "cities" + Path.DirectorySeparatorChar + _cityName + ".cty";
 
-        simulator = new MicropolisSharp.Micropolis();
-        simulator.InitGame();
-        simulator.SimInit();
-        simulator.LoadFile(filePath);
-        simulator.SetSpeed(2);
-        simulator.DoSimInit();
-        simulator.SetEnableDisasters(false);
+        _simulator = new MicropolisSharp.Micropolis();
+        _simulator.InitGame();
+        _simulator.SimInit();
+        _simulator.LoadFile(filePath);
+        _simulator.SetSpeed(2);
+        _simulator.DoSimInit();
+        _simulator.SetEnableDisasters(false);
 
-        _mapLayer = new MapLayer(simulator);
+        _mapLayer = new MapLayer(_simulator);
         _mapLayer.Resize(Window.ClientBounds.Width, Window.ClientBounds.Height);
 
         base.Initialize();
@@ -77,16 +77,16 @@ public class Micropolis : Game
     protected override void LoadContent()
     {
         // Create a new SpriteBatch, which can be used to draw textures.
-        spriteBatch = new SpriteBatch(GraphicsDevice);
-        rect2x2 = new Texture2D(GraphicsDevice, 2, 2);
+        _spriteBatch = new SpriteBatch(GraphicsDevice);
+        _rect2X2 = new Texture2D(GraphicsDevice, 2, 2);
 
         var data = new Color[2 * 2];
         for (var i = 0; i < data.Length; ++i) data[i] = Color.White;
-        rect2x2.SetData(data);
+        _rect2X2.SetData(data);
 
         _mapLayer.LoadContent(Content);
 
-        font = Content.Load<SpriteFont>("font");
+        _font = Content.Load<SpriteFont>("font");
     }
 
     /// <summary>
@@ -105,10 +105,10 @@ public class Micropolis : Game
     /// <param name="gameTime">Provides a snapshot of timing values.</param>
     protected override void Update(GameTime gameTime)
     {
-        if (hasChanged)
+        if (_hasChanged)
         {
-            hasChanged = false;
-            graphics.ApplyChanges();
+            _hasChanged = false;
+            _graphics.ApplyChanges();
         }
 
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
@@ -124,8 +124,8 @@ public class Micropolis : Game
 
         if (gameTime.ElapsedGameTime.Milliseconds % 16 == 0)
         {
-            simulator.SimTick();
-            simulator.AnimateTiles();
+            _simulator.SimTick();
+            _simulator.AnimateTiles();
 
             _mapLayer.Update();
         }
@@ -141,9 +141,9 @@ public class Micropolis : Game
     {
         GraphicsDevice.Clear(Color.CornflowerBlue);
 
-        spriteBatch.Begin();
+        _spriteBatch.Begin();
 
-        _mapLayer.Draw(spriteBatch);
+        _mapLayer.Draw(_spriteBatch);
 
         /*   
         if (simulator.GetPowerGridMapBuffer() != null)
@@ -168,7 +168,7 @@ public class Micropolis : Game
         }
         */
 
-        spriteBatch.End();
+        _spriteBatch.End();
 
         base.Draw(gameTime);
     }

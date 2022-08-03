@@ -76,11 +76,11 @@ namespace MicropolisSharp;
 /// </summary>
 public partial class Micropolis
 {
-    private int absDist;
+    private int _absDist;
 
-    private Stack<SimSprite> freeSprites;
-    private SimSprite[] globalSprites;
-    private short spriteCycle;
+    private Stack<SimSprite> _freeSprites;
+    private SimSprite[] _globalSprites;
+    private short _spriteCycle;
     public List<SimSprite> SpriteList { get; private set; }
 
     /// <summary>
@@ -97,8 +97,8 @@ public partial class Micropolis
 
         // If a sprite is available at the pool, use one.
         // else, allocate a new one.
-        if (freeSprites != null && freeSprites.Count > 0)
-            sprite = freeSprites.Pop();
+        if (_freeSprites != null && _freeSprites.Count > 0)
+            sprite = _freeSprites.Pop();
         else
             sprite = new SimSprite();
 
@@ -140,7 +140,7 @@ public partial class Micropolis
         sprite.Accel = 0;
         sprite.Speed = 100;
 
-        if (globalSprites[(int)sprite.Type] == null) globalSprites[(int)sprite.Type] = sprite;
+        if (_globalSprites[(int)sprite.Type] == null) _globalSprites[(int)sprite.Type] = sprite;
 
         switch (sprite.Type)
         {
@@ -297,7 +297,7 @@ public partial class Micropolis
     /// <param name="sprite">sprite Sprite to destroy.</param>
     public void DestorySprite(SimSprite sprite)
     {
-        if (globalSprites[(int)sprite.Type] == sprite) globalSprites[(int)sprite.Type] = null;
+        if (_globalSprites[(int)sprite.Type] == sprite) _globalSprites[(int)sprite.Type] = null;
 
         if (sprite.Name != null) sprite.Name = null;
     }
@@ -309,7 +309,7 @@ public partial class Micropolis
     /// <returns>Pointer to the active sprite if avaiable, else \c NULL.</returns>
     public SimSprite GetSprite(SpriteType type)
     {
-        var sprite = globalSprites[(int)type];
+        var sprite = _globalSprites[(int)type];
         if (sprite == null || sprite.Frame == 0)
             return null;
         return sprite;
@@ -326,7 +326,7 @@ public partial class Micropolis
     {
         SimSprite sprite;
 
-        sprite = globalSprites[(int)type];
+        sprite = _globalSprites[(int)type];
         if (sprite == null)
             sprite = NewSprite("", type, x, y);
         else
@@ -390,23 +390,23 @@ public partial class Micropolis
     ///     TODO: Figure out what this function is doing
     ///     TODO: Remove local magic constants and document the code
     /// </summary>
-    /// <param name="Tpoo"></param>
-    /// <param name="Told"></param>
-    /// <param name="Tnew"></param>
+    /// <param name="tpoo"></param>
+    /// <param name="told"></param>
+    /// <param name="tnew"></param>
     /// <returns></returns>
-    public bool TryOther(int Tpoo, int Told, int Tnew)
+    public bool TryOther(int tpoo, int told, int tnew)
     {
         int z;
 
-        z = Told + 4;
+        z = told + 4;
 
         if (z > 8) z -= 8;
 
-        if (Tnew != z) return false;
+        if (tnew != z) return false;
 
-        if (Tpoo == (int)MapTileCharacters.POWERBASE || Tpoo == (int)MapTileCharacters.POWERBASE + 1
-                                                     || Tpoo == (int)MapTileCharacters.RAILBASE ||
-                                                     Tpoo == (int)MapTileCharacters.RAILBASE + 1)
+        if (tpoo == (int)MapTileCharacters.POWERBASE || tpoo == (int)MapTileCharacters.POWERBASE + 1
+                                                     || tpoo == (int)MapTileCharacters.RAILBASE ||
+                                                     tpoo == (int)MapTileCharacters.RAILBASE + 1)
             return true;
 
         return false;
@@ -437,7 +437,7 @@ public partial class Micropolis
     /// <returns>Direction to go in.</returns>
     public short GetDir(int orgX, int orgY, int desX, int desY)
     {
-        short[] Gdtab = { 0, 3, 2, 1, 3, 4, 5, 7, 6, 5, 7, 8, 1 };
+        short[] gdtab = { 0, 3, 2, 1, 3, 4, 5, 7, 6, 5, 7, 8, 1 };
         int dispX, dispY, z;
 
         dispX = desX - orgX;
@@ -460,7 +460,7 @@ public partial class Micropolis
 
         dispX = Math.Abs(dispX);
         dispY = Math.Abs(dispY);
-        absDist = dispX + dispY;
+        _absDist = dispX + dispY;
 
         if (dispX * 2 < dispY)
             z++;
@@ -470,7 +470,7 @@ public partial class Micropolis
 
         if (z < 0 || z > 12) z = 0;
 
-        return Gdtab[z];
+        return gdtab[z];
     }
 
     /// <summary>
@@ -510,7 +510,7 @@ public partial class Micropolis
     {
         if (!SimSpeed.IsTrue()) return;
 
-        spriteCycle++;
+        _spriteCycle++;
 
         for (var i = 0; i < SpriteList.Count; i++)
         {
@@ -572,22 +572,22 @@ public partial class Micropolis
     public void DoTrainSprite(SimSprite sprite)
     {
         /* Offset in pixels of sprite x and y to map tile */
-        short[] Cx = { 0, 16, 0, -16 };
-        short[] Cy = { -16, 0, 16, 0 };
+        short[] cx = { 0, 16, 0, -16 };
+        short[] cy = { -16, 0, 16, 0 };
         /* X and Y movement of the sprite in pixels */
-        short[] Dx = { 0, 4, 0, -4, 0 };
-        short[] Dy = { -4, 0, 4, 0, 0 };
+        short[] dx = { 0, 4, 0, -4, 0 };
+        short[] dy = { -4, 0, 4, 0, 0 };
 
-        short[] TrainPic2 = { 1, 2, 1, 2, 5 };
+        short[] trainPic2 = { 1, 2, 1, 2, 5 };
         int z, dir, dir2;
         int c;
 
-        if (sprite.Frame == 3 || sprite.Frame == 4) sprite.Frame = TrainPic2[sprite.Dir];
+        if (sprite.Frame == 3 || sprite.Frame == 4) sprite.Frame = trainPic2[sprite.Dir];
 
-        sprite.X += Dx[sprite.Dir];
-        sprite.Y += Dy[sprite.Dir];
+        sprite.X += dx[sprite.Dir];
+        sprite.Y += dy[sprite.Dir];
 
-        if ((spriteCycle & 3) == 0)
+        if ((_spriteCycle & 3) == 0)
         {
             dir = GetRandom16() & 3;
             for (z = dir; z < dir + 4; z++)
@@ -598,7 +598,7 @@ public partial class Micropolis
                     if (dir2 == ((sprite.Dir + 2) & 3))
                         continue;
 
-                c = GetChar(sprite.X + Cx[dir2] + 48, sprite.Y + Cy[dir2]);
+                c = GetChar(sprite.X + cx[dir2] + 48, sprite.Y + cy[dir2]);
 
                 if ((c >= (ushort)MapTileCharacters.RAILBASE && c <= (ushort)MapTileCharacters.LASTRAIL) /* track? */
                     || c == (ushort)MapTileCharacters.RAILVPOWERH || c == (ushort)MapTileCharacters.RAILHPOWERV)
@@ -612,7 +612,7 @@ public partial class Micropolis
                     }
                     else
                     {
-                        sprite.Frame = TrainPic2[dir2];
+                        sprite.Frame = trainPic2[dir2];
                     }
 
                     if (c == (ushort)MapTileCharacters.HRAIL || c == (ushort)MapTileCharacters.VRAIL) sprite.Frame = 5;
@@ -639,8 +639,8 @@ public partial class Micropolis
     /// <param name="sprite">Helicopter sprite.</param>
     public void DoCopterSprite(SimSprite sprite)
     {
-        short[] CDx = { 0, 0, 3, 5, 3, 0, -3, -5, -3 };
-        short[] CDy = { 0, -5, -3, 0, 3, 5, 3, 0, -3 };
+        short[] cDx = { 0, 0, 3, 5, 3, 0, -3, -5, -3 };
+        short[] cDy = { 0, -5, -3, 0, 3, 5, 3, 0, -3 };
 
         if (sprite.SoundCount > 0) sprite.SoundCount--;
 
@@ -681,7 +681,7 @@ public partial class Micropolis
                 /* land */
                 GetDir(sprite.X, sprite.Y, sprite.OrigX, sprite.OrigY);
 
-                if (absDist < 30)
+                if (_absDist < 30)
                 {
                     sprite.Frame = 0;
                     return;
@@ -692,7 +692,7 @@ public partial class Micropolis
         {
             GetDir(sprite.X, sprite.Y, sprite.DestX, sprite.DestY);
 
-            if (absDist < 16)
+            if (_absDist < 16)
             {
                 sprite.DestX = sprite.OrigX;
                 sprite.DestY = sprite.OrigY;
@@ -725,15 +725,15 @@ public partial class Micropolis
 
         var z = sprite.Frame;
 
-        if ((spriteCycle & 3) == 0)
+        if ((_spriteCycle & 3) == 0)
         {
             var d = GetDir(sprite.X, sprite.Y, sprite.DestX, sprite.DestY);
             z = TurnTo(z, d);
             sprite.Frame = z;
         }
 
-        sprite.X += CDx[z];
-        sprite.Y += CDy[z];
+        sprite.X += cDx[z];
+        sprite.Y += cDy[z];
     }
 
     /// <summary>
@@ -746,12 +746,12 @@ public partial class Micropolis
     /// <param name="sprite">Airplane sprite.</param>
     public void DoAirplaneSprite(SimSprite sprite)
     {
-        short[] CDx = { 0, 0, 6, 8, 6, 0, -6, -8, -6, 8, 8, 8 };
-        short[] CDy = { 0, -8, -6, 0, 6, 8, 6, 0, -6, 0, 0, 0 };
+        short[] cDx = { 0, 0, 6, 8, 6, 0, -6, -8, -6, 8, 8, 8 };
+        short[] cDy = { 0, -8, -6, 0, 6, 8, 6, 0, -6, 0, 0, 0 };
 
         var z = sprite.Frame;
 
-        if (spriteCycle % 5 == 0)
+        if (_spriteCycle % 5 == 0)
         {
             if (z > 8)
             {
@@ -769,7 +769,7 @@ public partial class Micropolis
             }
         }
 
-        if (absDist < 50)
+        if (_absDist < 50)
         {
             /* at destination  */
             sprite.DestX = GetRandom(Constants.WorldWidth * 16 + 100) - 50;
@@ -801,8 +801,8 @@ public partial class Micropolis
             if (explode) ExplodeSprite(sprite);
         }
 
-        sprite.X += CDx[z];
-        sprite.Y += CDy[z];
+        sprite.X += cDx[z];
+        sprite.Y += cDy[z];
 
         if (SpriteNotInBounds(sprite)) sprite.Frame = 0;
     }
@@ -814,11 +814,11 @@ public partial class Micropolis
     /// <param name="sprite">Ship sprite.</param>
     public void DoShipSprite(SimSprite sprite)
     {
-        short[] BDx = { 0, 0, 1, 1, 1, 0, -1, -1, -1 };
-        short[] BDy = { 0, -1, -1, 0, 1, 1, 1, 0, -1 };
-        short[] BPx = { 0, 0, 2, 2, 2, 0, -2, -2, -2 };
-        short[] BPy = { 0, -2, -2, 0, 2, 2, 2, 0, -2 };
-        short[] BtClrTab =
+        short[] bDx = { 0, 0, 1, 1, 1, 0, -1, -1, -1 };
+        short[] bDy = { 0, -1, -1, 0, 1, 1, 1, 0, -1 };
+        short[] bPx = { 0, 0, 2, 2, 2, 0, -2, -2, -2 };
+        short[] bPy = { 0, -2, -2, 0, 2, 2, 2, 0, -2 };
+        short[] btClrTab =
         {
             (short)MapTileCharacters.RIVER, (short)MapTileCharacters.CHANNEL, (short)MapTileCharacters.POWERBASE,
             (short)MapTileCharacters.POWERBASE + 1,
@@ -867,8 +867,8 @@ public partial class Micropolis
 
                 if (z == sprite.Dir) continue;
 
-                x = ((sprite.X + (48 - 1)) >> 4) + BDx[z];
-                y = (sprite.Y >> 4) + BDy[z];
+                x = ((sprite.X + (48 - 1)) >> 4) + bDx[z];
+                y = (sprite.Y >> 4) + bDy[z];
 
                 if (Position.TestBounds(x, y))
                 {
@@ -901,8 +901,8 @@ public partial class Micropolis
 
             if (z == sprite.NewDir)
             {
-                sprite.X += BPx[z];
-                sprite.Y += BPy[z];
+                sprite.X += bPx[z];
+                sprite.Y += bPy[z];
             }
         }
 
@@ -914,7 +914,7 @@ public partial class Micropolis
 
         for (z = 0; z < 8; z++)
         {
-            if (t == BtClrTab[z]) break;
+            if (t == btClrTab[z]) break;
 
             if (z == 7)
             {
@@ -948,10 +948,10 @@ public partial class Micropolis
     /// <param name="sprite">Monster sprite.</param>
     public void DoMonsterSprite(SimSprite sprite)
     {
-        short[] Gx = { 2, 2, -2, -2, 0 };
-        short[] Gy = { -2, 2, 2, -2, 0 };
-        short[] ND1 = { 0, 1, 2, 3 };
-        short[] ND2 = { 1, 2, 3, 0 };
+        short[] gx = { 2, 2, -2, -2, 0 };
+        short[] gy = { -2, 2, 2, -2, 0 };
+        short[] nd1 = { 0, 1, 2, 3 };
+        short[] nd2 = { 1, 2, 3, 0 };
         short[] nn1 = { 2, 5, 8, 11 };
         short[] nn2 = { 11, 2, 5, 8 };
         int d, z, c;
@@ -978,7 +978,7 @@ public partial class Micropolis
 
                 c = GetDir(sprite.X, sprite.Y, sprite.DestX, sprite.DestY);
 
-                if (absDist < 18)
+                if (_absDist < 18)
                 {
                     sprite.Control = -1;
                     sprite.Count = 1000;
@@ -1043,7 +1043,7 @@ public partial class Micropolis
 
                     GetDir(sprite.X, sprite.Y, sprite.DestX, sprite.DestY);
 
-                    if (absDist < 60)
+                    if (_absDist < 60)
                     {
                         if (sprite.Flag == 0)
                         {
@@ -1064,9 +1064,9 @@ public partial class Micropolis
                     if (c != d && !GetRandom(10).IsTrue())
                     {
                         if ((GetRandom16() & 1).IsTrue())
-                            z = ND1[d];
+                            z = nd1[d];
                         else
-                            z = ND2[d];
+                            z = nd2[d];
 
                         d = 4;
 
@@ -1122,8 +1122,8 @@ public partial class Micropolis
 
         sprite.Frame = z;
 
-        sprite.X += Gx[d];
-        sprite.Y += Gy[d];
+        sprite.X += gx[d];
+        sprite.Y += gy[d];
 
         if (sprite.Count > 0) sprite.Count--;
 
@@ -1152,8 +1152,8 @@ public partial class Micropolis
     /// <param name="sprite">Tornado sprite to move.</param>
     public void DoTornadoSprite(SimSprite sprite)
     {
-        short[] CDx = { 2, 3, 2, 0, -2, -3 };
-        short[] CDy = { -2, 0, 2, 3, 2, 0 };
+        short[] cDx = { 2, 3, 2, 0, -2, -3 };
+        short[] cDy = { -2, 0, 2, 3, 2, 0 };
         int z;
 
         z = sprite.Frame;
@@ -1195,8 +1195,8 @@ public partial class Micropolis
         }
 
         z = GetRandom(5);
-        sprite.X += CDx[z];
-        sprite.Y += CDy[z];
+        sprite.X += cDx[z];
+        sprite.Y += cDy[z];
 
         if (SpriteNotInBounds(sprite)) sprite.Frame = 0;
 
@@ -1213,7 +1213,7 @@ public partial class Micropolis
     {
         int x, y;
 
-        if ((spriteCycle & 1) == 0)
+        if ((_spriteCycle & 1) == 0)
         {
             if (sprite.Frame == 1)
             {
@@ -1248,9 +1248,9 @@ public partial class Micropolis
     /// <param name="sprite">Bus sprite.</param>
     public void DoBusSprite(SimSprite sprite)
     {
-        short[] Dx = { 0, 1, 0, -1, 0 };
-        short[] Dy = { -1, 0, 1, 0, 0 };
-        short[] Dir2Frame = { 1, 2, 1, 2 };
+        short[] dx = { 0, 1, 0, -1, 0 };
+        short[] dy = { -1, 0, 1, 0, 0 };
+        short[] dir2Frame = { 1, 2, 1, 2 };
 
         int dx, dy, tx, ty, otx, oty;
         var turned = 0;
@@ -1297,7 +1297,7 @@ public partial class Micropolis
                 sprite.Frame == 4)
             {
                 turned = 1;
-                sprite.Frame = Dir2Frame[sprite.Dir];
+                sprite.Frame = dir2Frame[sprite.Dir];
             }
         }
 
@@ -1400,16 +1400,16 @@ public partial class Micropolis
             }
         }
 
-        const int AHEAD = 8;
+        const int ahead = 8;
 
-        otx = (sprite.X + sprite.XHot + Dx[sprite.Dir] * AHEAD) >> 4;
-        oty = (sprite.Y + sprite.YHot + Dy[sprite.Dir] * AHEAD) >> 4;
+        otx = (sprite.X + sprite.XHot + Dx[sprite.Dir] * ahead) >> 4;
+        oty = (sprite.Y + sprite.YHot + Dy[sprite.Dir] * ahead) >> 4;
 
         otx = Utilities.Restrict(otx, 0, Constants.WorldWidth - 1);
         oty = Utilities.Restrict(oty, 0, Constants.WorldHeight - 1);
 
-        tx = (sprite.X + sprite.XHot + dx + Dx[sprite.Dir] * AHEAD) >> 4;
-        ty = (sprite.Y + sprite.YHot + dy + Dy[sprite.Dir] * AHEAD) >> 4;
+        tx = (sprite.X + sprite.XHot + dx + Dx[sprite.Dir] * ahead) >> 4;
+        ty = (sprite.Y + sprite.YHot + dy + Dy[sprite.Dir] * ahead) >> 4;
 
         tx = Utilities.Restrict(tx, 0, Constants.WorldWidth - 1);
         ty = Utilities.Restrict(ty, 0, Constants.WorldHeight - 1);
@@ -1604,41 +1604,41 @@ public partial class Micropolis
     /// <summary>
     ///     Start a fire in a zone.
     /// </summary>
-    /// <param name="Xloc">X coordinate in map coordinate.</param>
-    /// <param name="Yloc">Y coordinate in map coordinate.</param>
+    /// <param name="xloc">X coordinate in map coordinate.</param>
+    /// <param name="yloc">Y coordinate in map coordinate.</param>
     /// <param name="ch">Map character at (\a Xloc, \a Yloc).</param>
-    public void StartFireInZone(int Xloc, int Yloc, int ch)
+    public void StartFireInZone(int xloc, int yloc, int ch)
     {
-        int Xtem, Ytem;
-        short x, y, XYmax;
+        int xtem, ytem;
+        short x, y, xYmax;
 
-        int value = RateOfGrowthMap.WorldGet(Xloc, Yloc);
+        int value = RateOfGrowthMap.WorldGet(xloc, yloc);
         value = Utilities.Restrict(value - 20, -200, 200);
-        RateOfGrowthMap.WorldSet(Xloc, Yloc, (short)value);
+        RateOfGrowthMap.WorldSet(xloc, yloc, (short)value);
 
         ch &= (short)MapTileBits.LowMask;
 
         if (ch < (short)MapTileCharacters.PORTBASE)
         {
-            XYmax = 2;
+            xYmax = 2;
         }
         else
         {
             if (ch == (short)MapTileCharacters.AIRPORT)
-                XYmax = 5;
+                xYmax = 5;
             else
-                XYmax = 4;
+                xYmax = 4;
         }
 
-        for (x = -1; x < XYmax; x++)
-        for (y = -1; y < XYmax; y++)
+        for (x = -1; x < xYmax; x++)
+        for (y = -1; y < xYmax; y++)
         {
-            Xtem = Xloc + x;
-            Ytem = Yloc + y;
+            xtem = xloc + x;
+            ytem = yloc + y;
 
-            if (Position.TestBounds(Xtem, Ytem) &&
-                (Map[Xtem, Ytem] & (ushort)MapTileBits.LowMask) >= (short)MapTileCharacters.ROADBASE)
-                Map[Xtem, Ytem] |= (ushort)MapTileBits.Bulldozable;
+            if (Position.TestBounds(xtem, ytem) &&
+                (Map[xtem, ytem] & (ushort)MapTileBits.LowMask) >= (short)MapTileCharacters.ROADBASE)
+                Map[xtem, ytem] |= (ushort)MapTileBits.Bulldozable;
         }
     }
 
