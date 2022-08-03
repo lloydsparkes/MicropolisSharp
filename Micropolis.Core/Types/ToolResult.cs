@@ -64,16 +64,22 @@
  * CONSUMER, SO SOME OR ALL OF THE ABOVE EXCLUSIONS AND LIMITATIONS MAY
  * NOT APPLY TO YOU.
  */
-namespace MicropolisSharp.Types
+
+namespace MicropolisSharp.Types;
+
+/// <summary>
+///     Tool result - The result from the action requested - from micropolis.h
+/// </summary>
+public enum ToolResult
 {
-    /// <summary>
-    /// Tool result - The result from the action requested - from micropolis.h
-    /// </summary>
-    public enum ToolResult
-    {
-        NoMoney = -2,  ///< User has not enough money for tool.
-        NeedBulldoze = -1, ///< Clear the area first.
-        Failed = 0, ///< Cannot build here.
-        Ok = 1, ///< Build succeeded.
-    }
+    NoMoney = -2,
+
+    ///< User has not enough money for tool.
+    NeedBulldoze = -1,
+
+    ///< Clear the area first.
+    Failed = 0,
+
+    ///< Cannot build here.
+    Ok = 1 ///< Build succeeded.
 }

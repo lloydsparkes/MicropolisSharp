@@ -1,73 +1,66 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Micropolis.Utilities
+namespace Micropolis.Windows.Utilities;
+
+public class TileDrawer
 {
-    public class TileDrawer
+    private const int TILE_SIZE = 16;
+
+    private const int GRID_WIDTH = 256 / TILE_SIZE;
+    private const int GRID_HEIGHT = 960 / TILE_SIZE;
+
+    private readonly Texture2D _tileSheet;
+
+    public TileDrawer(Texture2D tileSheet)
     {
-        private const int TILE_SIZE = 16;
+        _tileSheet = tileSheet;
+    }
 
-        private const int GRID_WIDTH = 256 / TILE_SIZE;
-        private const int GRID_HEIGHT = 960 / TILE_SIZE;
+    public void DrawTile(int tileId, SpriteBatch batch, Vector2 drawPosition, Color overrideColor)
+    {
+        //Translate Tile Id to grid position
+        var y = tileId / GRID_WIDTH;
+        var x = tileId % GRID_WIDTH;
 
-        private Texture2D _tileSheet;
+        if (y < 0 || y > GRID_HEIGHT || x < 0 || x > GRID_WIDTH) throw new Exception("Invalid Grid Tile");
 
-        public TileDrawer(Texture2D tileSheet)
+        batch.Draw(_tileSheet, Normalise(drawPosition),
+            ClippedRectange(drawPosition, new Rectangle(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE)),
+            overrideColor);
+    }
+
+    private Rectangle ClippedRectange(Vector2 drawPosition, Rectangle original)
+    {
+        var x = original.X;
+        var y = original.Y;
+        var w = original.Width;
+        var h = original.Height;
+
+        if (drawPosition.X < 0)
         {
-            _tileSheet = tileSheet;
+            x = (int)(x - drawPosition.X); // x - dp.X == x + Abs(dp.X) because dp.X < 0
+            w = (int)(w + drawPosition.X);
         }
 
-        public void DrawTile(int tileId, SpriteBatch batch, Vector2 drawPosition, Color overrideColor)
+        if (drawPosition.Y < 0)
         {
-            //Translate Tile Id to grid position
-            int y = tileId / GRID_WIDTH;
-            int x = tileId % GRID_WIDTH;
-
-            if ((y < 0 || y > GRID_HEIGHT) || (x < 0 || x > GRID_WIDTH))
-            {
-                throw new Exception("Invalid Grid Tile");
-            }
-
-            batch.Draw(_tileSheet, Normalise(drawPosition), ClippedRectange(drawPosition, new Rectangle(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE)), overrideColor);
+            y = (int)(y - drawPosition.Y); // x - dp.X == x + Abs(dp.X) because dp.X < 0
+            h = (int)(h + drawPosition.Y);
         }
 
-        private Rectangle ClippedRectange(Vector2 drawPosition, Rectangle original)
-        {
-            int x = original.X;
-            int y = original.Y;
-            int w = original.Width;
-            int h = original.Height;
+        return new Rectangle(x, y, w, h);
+    }
 
-            if(drawPosition.X < 0)
-            {
-                x = (int)(x -drawPosition.X); // x - dp.X == x + Abs(dp.X) because dp.X < 0
-                w = (int)(w + drawPosition.X);
-            }
-            if (drawPosition.Y < 0)
-            {
-                y = (int)(y - drawPosition.Y); // x - dp.X == x + Abs(dp.X) because dp.X < 0
-                h = (int)(h + drawPosition.Y);
-            }
+    private Vector2 Normalise(Vector2 drawPosition)
+    {
+        return new Vector2(Math.Max(drawPosition.X, 0), Math.Max(drawPosition.Y, 0));
+    }
 
-            return new Rectangle(x, y, w, h);
-        }
-
-        private Vector2 Normalise(Vector2 drawPosition)
-        {
-            return new Vector2(Math.Max(drawPosition.X, 0), Math.Max(drawPosition.Y, 0));
-        }
-
-        internal void DrawAnimatedTile(int tileId, int cycle, SpriteBatch spriteBatch, Vector2 vector2)
-        {
-            if ((tileId >= 128 && tileId < 143) || (tileId >= 192 && tileId <= 207))
-            {
-                DrawTile(tileId - (16 * cycle), spriteBatch, vector2, Color.White);
-            }
-        }
+    internal void DrawAnimatedTile(int tileId, int cycle, SpriteBatch spriteBatch, Vector2 vector2)
+    {
+        if ((tileId >= 128 && tileId < 143) || (tileId >= 192 && tileId <= 207))
+            DrawTile(tileId - 16 * cycle, spriteBatch, vector2, Color.White);
     }
 }

@@ -64,24 +64,39 @@
  * CONSUMER, SO SOME OR ALL OF THE ABOVE EXCLUSIONS AND LIMITATIONS MAY
  * NOT APPLY TO YOU.
  */
-namespace MicropolisSharp.Types
+
+namespace MicropolisSharp.Types;
+
+/// <summary>
+///     The types of sprites which can be overlayed onto the map - from micropolis.h
+/// </summary>
+public enum SpriteType
 {
-    /// <summary>
-    /// The types of sprites which can be overlayed onto the map - from micropolis.h
-    /// </summary>
-    public enum SpriteType
-    {
-        NotUsed = 0,
+    NotUsed = 0,
 
-        Train, ///< Train sprite
-        Helicopter, ///< Helicopter sprite
-        Airplane, ///< Airplane sprite
-        Ship, ///< Ship
-        Monster, ///< Scary monster
-        Tornado, ///< Tornado sprite
-        Explosion, ///< Explosion sprite
-        Bus, ///< Bus sprite
+    Train,
 
-        Count, ///< Number of sprite objects
-    }
+    ///< Train sprite
+    Helicopter,
+
+    ///< Helicopter sprite
+    Airplane,
+
+    ///< Airplane sprite
+    Ship,
+
+    ///< Ship
+    Monster,
+
+    ///< Scary monster
+    Tornado,
+
+    ///< Tornado sprite
+    Explosion,
+
+    ///< Explosion sprite
+    Bus,
+
+    ///< Bus sprite
+    Count ///< Number of sprite objects
 }

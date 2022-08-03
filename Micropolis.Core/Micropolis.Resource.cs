@@ -64,154 +64,131 @@
  * CONSUMER, SO SOME OR ALL OF THE ABOVE EXCLUSIONS AND LIMITATIONS MAY
  * NOT APPLY TO YOU.
  */
-using MicropolisSharp.Types;
-using System;
+
 using System.Collections.Generic;
 using System.IO;
+using MicropolisSharp.Types;
 
-namespace MicropolisSharp
+namespace MicropolisSharp;
+
+/// <summary>
+///     Partial Class Containing the content of resource.cpp
+/// </summary>
+public partial class Micropolis
 {
     /// <summary>
-    /// Partial Class Containing the content of resource.cpp
+    ///     Name of the Micropolis Top Level Directory
     /// </summary>
-    public partial class Micropolis
+    protected string homeDir;
+
+    /// <summary>
+    ///     Name of the sub directory where resources are
+    /// </summary>
+    protected string resourceDir;
+
+    /// <summary>
+    ///     TODO: Turn into a List
+    /// </summary>
+    public Resource Resources { get; private set; }
+
+    /// <summary>
+    ///     TODO: Turn into a List
+    /// </summary>
+    public StringTable StringTables { get; private set; }
+
+    /// <summary>
+    ///     Find the resource with the given name and identification.
+    ///     TODO: Function is not safely handling strings
+    ///     TODO: File handling is not safe across platforms
+    ///     TODO: What is point of long id, when we cast it to int?
+    ///     TODO: Remove the GOTO
+    /// </summary>
+    /// <param name="name">Name of the resource (a 4 character string)</param>
+    /// <param name="id">Identification of the resource.</param>
+    /// <returns>Pointer to the resource.</returns>
+    public Resource GetResource(string name, long id)
     {
-        /// <summary>
-        /// Name of the Micropolis Top Level Directory
-        /// </summary>
-        protected string homeDir;
-
-        /// <summary>
-        /// Name of the sub directory where resources are
-        /// </summary>
-        protected string resourceDir;
-
-        /// <summary>
-        /// TODO: Turn into a List
-        /// </summary>
-        public Resource Resources { get; private set; }
-
-        /// <summary>
-        /// TODO: Turn into a List
-        /// </summary>
-        public StringTable StringTables { get; private set; }
-
-        /// <summary>
-        /// Find the resource with the given name and identification.
-        /// 
-        /// TODO: Function is not safely handling strings
-        /// TODO: File handling is not safe across platforms
-        /// TODO: What is point of long id, when we cast it to int?
-        /// TODO: Remove the GOTO
-        /// </summary>
-        /// <param name="name">Name of the resource (a 4 character string)</param>
-        /// <param name="id">Identification of the resource.</param>
-        /// <returns>Pointer to the resource.</returns>
-        public Resource GetResource(string name, long id)
+        var r = Resources;
+        while (r != null)
         {
-            Resource r = Resources;
-            while(r != null)
-            {
-                if(r.Id == id && r.Name == name)
-                {
-                    return r;
-                }
-                r = r.Next;
-            }
-
-            r = new Resource();
-            r.Name = name;
-            r.Id = id;
-
-            String filename = String.Format("{0}{1}{2}{3}", resourceDir, Path.DirectorySeparatorChar, r.Name, r.Id);
-
-            if (!File.Exists(filename))
-            {
-                return null;
-            }
-
-            using(BinaryReader reader = new BinaryReader(File.OpenRead(filename)))
-            {
-                FileInfo fileInfo = new FileInfo(filename);
-
-                r.Data = reader.ReadBytes((int)fileInfo.Length);
-                r.Size = (int)fileInfo.Length;
-            }
-
-            Resource n = Resources;
-            while (n != null)
-            {
-                if(n.Next == null)
-                {
-                    n.Next = r;
-                    return r;
-                }
-            }
-            return r;
+            if (r.Id == id && r.Name == name) return r;
+            r = r.Next;
         }
 
-        /// <summary>
-        /// Get the text of a message.
-        /// 
-        /// TODO: Make the function safe
-        /// TODO: Out of range is not handled correctly
-        /// TODO: Why do we copy the text, why not return its address?
-        /// </summary>
-        /// <param name="id">Identification of the resource.</param>
-        /// <param name="num">Number of the string in the resource.</param>
-        /// <returns>Destination of the text (usually 256 characters long).</returns>
-        public String GetIndString(long id, short num)
-        {
-            StringTable tp = StringTables;
-            StringTable st = null;
+        r = new Resource();
+        r.Name = name;
+        r.Id = id;
 
+        var filename = string.Format("{0}{1}{2}{3}", resourceDir, Path.DirectorySeparatorChar, r.Name, r.Id);
+
+        if (!File.Exists(filename)) return null;
+
+        using (var reader = new BinaryReader(File.OpenRead(filename)))
+        {
+            var fileInfo = new FileInfo(filename);
+
+            r.Data = reader.ReadBytes((int)fileInfo.Length);
+            r.Size = (int)fileInfo.Length;
+        }
+
+        var n = Resources;
+        while (n != null)
+            if (n.Next == null)
+            {
+                n.Next = r;
+                return r;
+            }
+
+        return r;
+    }
+
+    /// <summary>
+    ///     Get the text of a message.
+    ///     TODO: Make the function safe
+    ///     TODO: Out of range is not handled correctly
+    ///     TODO: Why do we copy the text, why not return its address?
+    /// </summary>
+    /// <param name="id">Identification of the resource.</param>
+    /// <param name="num">Number of the string in the resource.</param>
+    /// <returns>Destination of the text (usually 256 characters long).</returns>
+    public string GetIndString(long id, short num)
+    {
+        var tp = StringTables;
+        StringTable st = null;
+
+        while (tp != null)
+        {
+            if (tp.Id == id) st = tp;
+            tp = tp.Next;
+        }
+
+        if (st == null)
+        {
+            st = new StringTable();
+            st.Id = id;
+
+            var r = GetResource("stri", id);
+            var size = r.Size;
+            var buf = r.Data;
+
+            var strings = new List<string>();
+
+            var tempLine = "";
+            for (long i = 0; i < size; i++)
+                if ((char)buf[i] == '\n')
+                    strings.Add(tempLine);
+                else
+                    tempLine += (char)buf[i];
+
+            st.Lines = strings.Count;
+            st.Strings = strings.ToArray();
+
+            tp = StringTables;
             while (tp != null)
-            {
-                if(tp.Id == id)
-                {
-                    st = tp;
-                }
-                tp = tp.Next;
-            }
-
-            if(st == null)
-            {
-                st = new StringTable();
-                st.Id = id;
-
-                Resource r = GetResource("stri", id);
-                long size = r.Size;
-                byte[] buf = r.Data;
-
-                List<String> strings = new List<string>();
-
-                string tempLine = "";
-                for(long i = 0; i < size; i++)
-                {                    
-                    if((char)buf[i] == '\n')
-                    {
-                        strings.Add(tempLine);
-                    }
-                    else
-                    {
-                        tempLine += (char)buf[i];
-                    }
-                }
-
-                st.Lines = strings.Count;
-                st.Strings = strings.ToArray();
-
-                tp = StringTables;
-                while (tp != null)
-                {
-                    if(tp.Next == null)
-                    {
-                        tp.Next = st;
-                    }
-                }
-            }
-
-            return st.Strings[num - 1];
+                if (tp.Next == null)
+                    tp.Next = st;
         }
+
+        return st.Strings[num - 1];
     }
 }

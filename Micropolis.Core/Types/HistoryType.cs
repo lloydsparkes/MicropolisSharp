@@ -64,20 +64,31 @@
  * CONSUMER, SO SOME OR ALL OF THE ABOVE EXCLUSIONS AND LIMITATIONS MAY
  * NOT APPLY TO YOU.
  */
-namespace MicropolisSharp.Types
-{
-    /// <summary>
-    /// Available types of historic data - from micropolis.h
-    /// </summary>
-    public enum HistoryType
-    {
-        Res,   ///< Residiential history type
-        Com,   ///< Commercial history type
-        Ind,   ///< Industry history type
-        Money, ///< Money history type
-        Crime, ///< Crime history type
-        Pollution, ///< Pollution history type
 
-        Count,  ///< Number of history types
-    }
+namespace MicropolisSharp.Types;
+
+/// <summary>
+///     Available types of historic data - from micropolis.h
+/// </summary>
+public enum HistoryType
+{
+    Res,
+
+    ///< Residiential history type
+    Com,
+
+    ///< Commercial history type
+    Ind,
+
+    ///< Industry history type
+    Money,
+
+    ///< Money history type
+    Crime,
+
+    ///< Crime history type
+    Pollution,
+
+    ///< Pollution history type
+    Count ///< Number of history types
 }

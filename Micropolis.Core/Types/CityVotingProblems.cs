@@ -64,26 +64,42 @@
  * CONSUMER, SO SOME OR ALL OF THE ABOVE EXCLUSIONS AND LIMITATIONS MAY
  * NOT APPLY TO YOU.
  */
-namespace MicropolisSharp.Types
+
+namespace MicropolisSharp.Types;
+
+/// <summary>
+///     Problems in the city where citizens vote on - from micropolis.h
+/// </summary>
+public enum CityVotingProblems
 {
-    /// <summary>
-    /// Problems in the city where citizens vote on - from micropolis.h
-    /// </summary>
-    public enum CityVotingProblems
-    {
-        Crime,                    ///< Crime
-        Pollution,                ///< Pollution
-        Housing,                  ///< Housing
-        Taxes,                    ///< Taxes
-        Traffic,                  ///< Traffic
-        Unemployment,             ///< Unemployment
-        Fire,                     ///< Fire
+    Crime,
 
-        //TODO: Remove the below items
-        Count,              ///< Number of problems
+    ///< Crime
+    Pollution,
 
-        CountOfProblemsToComplainAbout = 4,   ///< Number of problems to complain about.
+    ///< Pollution
+    Housing,
 
-        NumberOfProblems = 10,
-    }
+    ///< Housing
+    Taxes,
+
+    ///< Taxes
+    Traffic,
+
+    ///< Traffic
+    Unemployment,
+
+    ///< Unemployment
+    Fire,
+
+    ///< Fire
+
+    //TODO: Remove the below items
+    Count,
+
+    ///< Number of problems
+    CountOfProblemsToComplainAbout = 4,
+
+    ///< Number of problems to complain about.
+    NumberOfProblems = 10
 }

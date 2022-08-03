@@ -1,88 +1,88 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <OutputType>Library</OutputType>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <LangVersion>latestmajor</LangVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <UseVSHostingProcess>true</UseVSHostingProcess>
-  </PropertyGroup>
-  <ItemGroup>
-    <Compile Update="Micropolis.Allocate.cs">
-      <DependentUpon>Micropolis.cs</DependentUpon>
-    </Compile>
-    <Compile Update="Micropolis.Animate.cs">
-      <DependentUpon>Micropolis.cs</DependentUpon>
-    </Compile>
-    <Compile Update="Micropolis.Budget.cs">
-      <DependentUpon>Micropolis.cs</DependentUpon>
-    </Compile>
-    <Compile Update="Micropolis.Connect.cs">
-      <DependentUpon>Micropolis.cs</DependentUpon>
-    </Compile>
-    <Compile Update="Micropolis.Disasters.cs">
-      <DependentUpon>Micropolis.cs</DependentUpon>
-    </Compile>
-    <Compile Update="Micropolis.Evaluate.cs">
-      <DependentUpon>Micropolis.cs</DependentUpon>
-    </Compile>
-    <Compile Update="Micropolis.FileIo.cs">
-      <DependentUpon>Micropolis.cs</DependentUpon>
-    </Compile>
-    <Compile Update="Micropolis.Generate.cs">
-      <DependentUpon>Micropolis.cs</DependentUpon>
-    </Compile>
-    <Compile Update="Micropolis.Graph.cs">
-      <DependentUpon>Micropolis.cs</DependentUpon>
-    </Compile>
-    <Compile Update="Micropolis.Initialize.cs">
-      <DependentUpon>Micropolis.cs</DependentUpon>
-    </Compile>
-    <Compile Update="Micropolis.Main.cs">
-      <DependentUpon>Micropolis.cs</DependentUpon>
-    </Compile>
-    <Compile Update="Micropolis.Message.cs">
-      <DependentUpon>Micropolis.cs</DependentUpon>
-    </Compile>
-    <Compile Update="Micropolis.Power.cs">
-      <DependentUpon>Micropolis.cs</DependentUpon>
-    </Compile>
-    <Compile Update="Micropolis.Random.cs">
-      <DependentUpon>Micropolis.cs</DependentUpon>
-    </Compile>
-    <Compile Update="Micropolis.Resource.cs">
-      <DependentUpon>Micropolis.cs</DependentUpon>
-    </Compile>
-    <Compile Update="Micropolis.Scan.cs">
-      <DependentUpon>Micropolis.cs</DependentUpon>
-    </Compile>
-    <Compile Update="Micropolis.Simulate.cs">
-      <DependentUpon>Micropolis.cs</DependentUpon>
-    </Compile>
-    <Compile Update="Micropolis.Sprite.cs">
-      <DependentUpon>Micropolis.cs</DependentUpon>
-    </Compile>
-    <Compile Update="Micropolis.Stubs.cs">
-      <DependentUpon>Micropolis.cs</DependentUpon>
-    </Compile>
-    <Compile Update="Micropolis.Tools.cs">
-      <DependentUpon>Micropolis.cs</DependentUpon>
-    </Compile>
-    <Compile Update="Micropolis.Traffic.cs">
-      <DependentUpon>Micropolis.cs</DependentUpon>
-    </Compile>
-    <Compile Update="Micropolis.Update.cs">
-      <DependentUpon>Micropolis.cs</DependentUpon>
-    </Compile>
-    <Compile Update="Micropolis.Utilities.cs">
-      <DependentUpon>Micropolis.cs</DependentUpon>
-    </Compile>
-    <Compile Update="Micropolis.Zone.cs">
-      <DependentUpon>Micropolis.cs</DependentUpon>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-  </ItemGroup>
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <OutputType>Library</OutputType>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <LangVersion>latestmajor</LangVersion>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+        <UseVSHostingProcess>true</UseVSHostingProcess>
+    </PropertyGroup>
+    <ItemGroup>
+        <Compile Update="Micropolis.Allocate.cs">
+            <DependentUpon>Micropolis.cs</DependentUpon>
+        </Compile>
+        <Compile Update="Micropolis.Animate.cs">
+            <DependentUpon>Micropolis.cs</DependentUpon>
+        </Compile>
+        <Compile Update="Micropolis.Budget.cs">
+            <DependentUpon>Micropolis.cs</DependentUpon>
+        </Compile>
+        <Compile Update="Micropolis.Connect.cs">
+            <DependentUpon>Micropolis.cs</DependentUpon>
+        </Compile>
+        <Compile Update="Micropolis.Disasters.cs">
+            <DependentUpon>Micropolis.cs</DependentUpon>
+        </Compile>
+        <Compile Update="Micropolis.Evaluate.cs">
+            <DependentUpon>Micropolis.cs</DependentUpon>
+        </Compile>
+        <Compile Update="Micropolis.FileIo.cs">
+            <DependentUpon>Micropolis.cs</DependentUpon>
+        </Compile>
+        <Compile Update="Micropolis.Generate.cs">
+            <DependentUpon>Micropolis.cs</DependentUpon>
+        </Compile>
+        <Compile Update="Micropolis.Graph.cs">
+            <DependentUpon>Micropolis.cs</DependentUpon>
+        </Compile>
+        <Compile Update="Micropolis.Initialize.cs">
+            <DependentUpon>Micropolis.cs</DependentUpon>
+        </Compile>
+        <Compile Update="Micropolis.Main.cs">
+            <DependentUpon>Micropolis.cs</DependentUpon>
+        </Compile>
+        <Compile Update="Micropolis.Message.cs">
+            <DependentUpon>Micropolis.cs</DependentUpon>
+        </Compile>
+        <Compile Update="Micropolis.Power.cs">
+            <DependentUpon>Micropolis.cs</DependentUpon>
+        </Compile>
+        <Compile Update="Micropolis.Random.cs">
+            <DependentUpon>Micropolis.cs</DependentUpon>
+        </Compile>
+        <Compile Update="Micropolis.Resource.cs">
+            <DependentUpon>Micropolis.cs</DependentUpon>
+        </Compile>
+        <Compile Update="Micropolis.Scan.cs">
+            <DependentUpon>Micropolis.cs</DependentUpon>
+        </Compile>
+        <Compile Update="Micropolis.Simulate.cs">
+            <DependentUpon>Micropolis.cs</DependentUpon>
+        </Compile>
+        <Compile Update="Micropolis.Sprite.cs">
+            <DependentUpon>Micropolis.cs</DependentUpon>
+        </Compile>
+        <Compile Update="Micropolis.Stubs.cs">
+            <DependentUpon>Micropolis.cs</DependentUpon>
+        </Compile>
+        <Compile Update="Micropolis.Tools.cs">
+            <DependentUpon>Micropolis.cs</DependentUpon>
+        </Compile>
+        <Compile Update="Micropolis.Traffic.cs">
+            <DependentUpon>Micropolis.cs</DependentUpon>
+        </Compile>
+        <Compile Update="Micropolis.Update.cs">
+            <DependentUpon>Micropolis.cs</DependentUpon>
+        </Compile>
+        <Compile Update="Micropolis.Utilities.cs">
+            <DependentUpon>Micropolis.cs</DependentUpon>
+        </Compile>
+        <Compile Update="Micropolis.Zone.cs">
+            <DependentUpon>Micropolis.cs</DependentUpon>
+        </Compile>
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.CSharp" Version="4.7.0"/>
+    </ItemGroup>
 </Project>

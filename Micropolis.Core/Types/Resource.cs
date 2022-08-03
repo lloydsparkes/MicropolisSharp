@@ -64,24 +64,23 @@
  * CONSUMER, SO SOME OR ALL OF THE ABOVE EXCLUSIONS AND LIMITATIONS MAY
  * NOT APPLY TO YOU.
  */
+
 using System;
 
-namespace MicropolisSharp.Types
-{
-    /// <summary>
-    /// Resource of the game (a file with data loaded in memory). From micropolis.h
-    /// 
-    /// TODO: Remove the next variable - and rework all code to not use Linked Lists
-    /// TODO: Remove - Shouldnt be something for the game engine to utilise
-    /// </summary>
-    public class Resource
-    {
-        public byte[] Data { get; set; }
-        public long Size { get; set; }
-        public string Name { get; set; }
-        public long Id { get; set; }
+namespace MicropolisSharp.Types;
 
-        [Obsolete("No longer a linked list, Use Array Accessor")]
-        public Resource Next { get; set; }
-    }
+/// <summary>
+///     Resource of the game (a file with data loaded in memory). From micropolis.h
+///     TODO: Remove the next variable - and rework all code to not use Linked Lists
+///     TODO: Remove - Shouldnt be something for the game engine to utilise
+/// </summary>
+public class Resource
+{
+    public byte[] Data { get; set; }
+    public long Size { get; set; }
+    public string Name { get; set; }
+    public long Id { get; set; }
+
+    [Obsolete("No longer a linked list, Use Array Accessor")]
+    public Resource Next { get; set; }
 }

@@ -64,57 +64,89 @@
  * CONSUMER, SO SOME OR ALL OF THE ABOVE EXCLUSIONS AND LIMITATIONS MAY
  * NOT APPLY TO YOU.
  */
+
 using System;
 
-namespace MicropolisSharp.Types
+namespace MicropolisSharp.Types;
+
+/// <summary>
+///     Sprite in the simulator - From micropolis.h
+///     TODO: is never set to anything else than \c "", and only used to detect a non-removed non-active sprite(in a
+///     non-robust way).
+///     TODO: Remove next
+///     TODO: Remove Linked List
+///     TODO: Remove Completely as this isnt a game engine thing
+/// </summary>
+public class SimSprite
 {
-    /// <summary>
-    /// Sprite in the simulator - From micropolis.h
-    /// 
-    /// TODO: is never set to anything else than \c "", and only used to detect a non-removed non-active sprite(in a non-robust way).
-    /// TODO: Remove next
-    /// TODO: Remove Linked List
-    /// TODO: Remove Completely as this isnt a game engine thing
-    /// </summary>
-    public class SimSprite
+    public SimSprite()
     {
-        public SimSprite()
-        {
-            Id = Guid.NewGuid().ToString().Substring(0, 8);
-        }
+        Id = Guid.NewGuid().ToString().Substring(0, 8);
+    }
 
-        public String Id { get; private set; }
-        [Obsolete("Removed - No longer access as a linked list, use array accessor")]
-        public SimSprite Next { get; set; } ///< Pointer to next #SimSprite object in the list.
-        public string Name{ get; set; } ///< Name of the sprite.
-        public SpriteType Type{ get; set; } ///< Type of the sprite (TRA -- BUS).
-        public int Frame{ get; set; } ///< Frame (\c 0 means non-active sprite)
-        public int X{ get; set; } ///< X coordinate of the sprite in pixels?
-        public int Y{ get; set; } ///< Y coordinate of the sprite in pixels?
-        public int Width{ get; set; }
-        public int Height{ get; set; }
-        public int XOffset{ get; set; }
-        public int YOffset{ get; set; }
-        public int XHot{ get; set; } ///< Offset of the hot-spot relative to SimSprite::x?
-        public int YHot{ get; set; } ///< Offset of the hot-spot relative to SimSprite::y?
-        public int OrigX{ get; set; }
-        public int OrigY{ get; set; }
-        public int DestX{ get; set; } ///< Destination X coordinate of the sprite.
-        public int DestY{ get; set; } ///< Destination Y coordinate of the sprite.
-        public int Count{ get; set; }
-        public int SoundCount{ get; set; }
-        public int Dir{ get; set; }
-        public int NewDir{ get; set; }
-        public int Step{ get; set; }
-        public int Flag{ get; set; }
-        public int Control{ get; set; }
-        public int Turn{ get; set; }
-        public int Accel{ get; set; }
-        public int Speed{ get; set; }
+    public string Id { get; }
 
-        public override string ToString()
-        {
-            return $"Id: {Id}, Name: {Name}, Type: {Type}, Frame: {Frame}, X: {X}, Y: {Y}, Width: {Width}, Height: {Height}, XOffset: {XOffset}, YOffset: {YOffset}, XHot: {XHot}, YHot: {YHot}, OrigX: {OrigX}, OrigY: {OrigY}, DestX: {DestX}, DestY: {DestY}, Count: {Count}, SoundCount: {SoundCount}, Dir: {Dir}, NewDir: {NewDir}, Step: {Step}, Flag: {Flag}, Control: {Control}, Turn: {Turn}, Accel: {Accel}, Speed: {Speed}";
-        }
+    [Obsolete("Removed - No longer access as a linked list, use array accessor")]
+    public SimSprite Next { get; set; }
+
+    /// < Pointer to next # SimSprite object in the list.
+    public string Name { get; set; }
+
+    ///< Name of the sprite.
+    public SpriteType Type { get; set; }
+
+    /// < Type of the sprite ( TRA -- BUS
+    /// )
+    /// .
+    public int Frame { get; set; }
+
+    /// < Frame (\ c 0 means non-active sprite
+    /// )
+    public int X { get; set; }
+
+    /// < X coordinate of the sprite in pixels
+    /// ?
+    public int Y { get; set; }
+
+    /// < Y coordinate of the sprite in pixels
+    /// ?
+    public int Width { get; set; }
+
+    public int Height { get; set; }
+    public int XOffset { get; set; }
+    public int YOffset { get; set; }
+    public int XHot { get; set; }
+
+    /// < Offset of the hot-spot relative to SimSprite::x
+    /// ?
+    public int YHot { get; set; }
+
+    /// < Offset of the hot-spot relative to SimSprite::y
+    /// ?
+    public int OrigX { get; set; }
+
+    public int OrigY { get; set; }
+    public int DestX { get; set; }
+
+    ///< Destination X coordinate of the sprite.
+    public int DestY { get; set; }
+
+    ///< Destination Y coordinate of the sprite.
+    public int Count { get; set; }
+
+    public int SoundCount { get; set; }
+    public int Dir { get; set; }
+    public int NewDir { get; set; }
+    public int Step { get; set; }
+    public int Flag { get; set; }
+    public int Control { get; set; }
+    public int Turn { get; set; }
+    public int Accel { get; set; }
+    public int Speed { get; set; }
+
+    public override string ToString()
+    {
+        return
+            $"Id: {Id}, Name: {Name}, Type: {Type}, Frame: {Frame}, X: {X}, Y: {Y}, Width: {Width}, Height: {Height}, XOffset: {XOffset}, YOffset: {YOffset}, XHot: {XHot}, YHot: {YHot}, OrigX: {OrigX}, OrigY: {OrigY}, DestX: {DestX}, DestY: {DestY}, Count: {Count}, SoundCount: {SoundCount}, Dir: {Dir}, NewDir: {NewDir}, Step: {Step}, Flag: {Flag}, Control: {Control}, Turn: {Turn}, Accel: {Accel}, Speed: {Speed}";
     }
 }

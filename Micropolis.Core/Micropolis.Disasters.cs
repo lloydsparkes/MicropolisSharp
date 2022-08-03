@@ -64,394 +64,344 @@
  * CONSUMER, SO SOME OR ALL OF THE ABOVE EXCLUSIONS AND LIMITATIONS MAY
  * NOT APPLY TO YOU.
  */
-using MicropolisSharp.Types;
+
 using System.Diagnostics;
+using MicropolisSharp.Types;
 
-namespace MicropolisSharp
+namespace MicropolisSharp;
+
+/// <summary>
+///     Partial Class Containing the content of disasters.cpp
+/// </summary>
+public partial class Micropolis
 {
+    public short FloodCount { get; private set; }
+
     /// <summary>
-    /// Partial Class Containing the content of disasters.cpp
+    ///     Let disasters happen.
+    ///     TODO: Decide what to do with the 'nothing happens' disaster (since the
+    ///     chance that a disaster happens is expressed in the \c DisChance
+    ///     table).
     /// </summary>
-    public partial class Micropolis
+    private void DoDisasters()
     {
-        public short FloodCount { get; private set; }
+        /* Chance of disasters at lev 0 1 2 */
+        short[] DisChance =
+        {
+            10 * 48, // Game level 0
+            5 * 48, // Game level 1
+            60 // Game level 2
+        };
+        Debug.Assert((int)Levels.Count == DisChance.Length);
 
-        /// <summary>
-        /// Let disasters happen.
-        /// 
-        /// TODO: Decide what to do with the 'nothing happens' disaster (since the
-        ///       chance that a disaster happens is expressed in the \c DisChance
-        ///       table).
-        /// </summary>
-        private void DoDisasters()
-        { 
-            /* Chance of disasters at lev 0 1 2 */
-            short[] DisChance = {
-                10 * 48, // Game level 0
-                5 * 48,  // Game level 1
-                60 // Game level 2
-            };
-            Debug.Assert((int)Levels.Count == DisChance.Length);
+        if (FloodCount.IsTrue()) FloodCount--;
 
-            if (FloodCount.IsTrue())
+        if (DisasterEvent != Scenario.None) ScenarioDisaster();
+
+        if (!EnableDisasters)
+            // Disasters have been disabled
+            return;
+
+        var x = GameLevel;
+        if (x > Levels.Last) x = Levels.Easy;
+
+        if (GetRandom(DisChance[(int)x]).IsFalse())
+            switch (GetRandom(8))
             {
-                FloodCount--;
-            }
+                case 0:
+                case 1:
+                    SetFire(); // 2/9 chance a fire breaks out
+                    break;
 
-            if (DisasterEvent != Scenario.None)
+                case 2:
+                case 3:
+                    MakeFlood(); // 2/9 chance for a flood
+                    break;
+
+                case 4:
+                    // 1/9 chance nothing happens (was airplane crash,
+                    // which EA removed after 9/11, and requested it be
+                    // removed from this code)
+                    break;
+
+                case 5:
+                    MakeTornado(); // 1/9 chance tornado
+                    break;
+
+                case 6:
+                    MakeEarthquake(); // 1/9 chance earthquake
+                    break;
+
+                case 7:
+                case 8:
+                    // 2/9 chance a scary monster arrives in a dirty town
+                    if (PollutionAverage > /* 80 */ 60) MakeMonster();
+                    break;
+            }
+    }
+
+    /// <summary>
+    ///     Let disasters of the scenario happen
+    /// </summary>
+    private void ScenarioDisaster()
+    {
+        switch (DisasterEvent)
+        {
+            case Scenario.Dullsville:
+                break;
+
+            case Scenario.SanFrancisco:
+                if (DisasterWait == 1) MakeEarthquake();
+                break;
+
+            case Scenario.Hamburg:
+                if (DisasterWait % 10 == 0) MakeFireBombs();
+                break;
+
+            case Scenario.Bern:
+                break;
+
+            case Scenario.Tokyo:
+                if (DisasterWait == 1) MakeMonster();
+                break;
+
+            case Scenario.Detroit:
+                break;
+
+            case Scenario.Boston:
+                if (DisasterWait == 1) MakeMeltdown();
+                break;
+
+            case Scenario.Rio:
+                if (DisasterWait % 24 == 0) MakeFlood();
+                break;
+        }
+
+        if (DisasterWait > 0)
+            DisasterWait--;
+        else
+            DisasterEvent = Scenario.None;
+    }
+
+    /// <summary>
+    ///     Make a nuclear power plant melt
+    ///     TODO: Randomize which Nuclear Power Plant melts down
+    /// </summary>
+    public void MakeMeltdown()
+    {
+        short x, y;
+
+        for (x = 0; x < Constants.WorldWidth - 1; x++)
+        for (y = 0; y < Constants.WorldHeight - 1; y++)
+            if ((Map[x, y] & (ushort)MapTileBits.LowMask) == (ushort)MapTileCharacters.NUCLEAR)
             {
-                ScenarioDisaster();
-            }
-
-            if (!EnableDisasters)
-            { // Disasters have been disabled
+                DoMeltdown(new Position(x, y));
                 return;
             }
+    }
 
-            Levels x = GameLevel;
-            if (x > Levels.Last)
-            {
-                x = Levels.Easy;
-            }
+    /// <summary>
+    ///     Let a fire bomb explode at a random location
+    /// </summary>
+    public void FireBomb()
+    {
+        int crashX = GetRandom(Constants.WorldWidth - 1);
+        int crashY = GetRandom(Constants.WorldHeight - 1);
+        MakeExplosion(crashX, crashY);
+        SendMessage(GeneralMessages.MESSAGE_FIREBOMBING, (short)crashX, (short)crashY, true, true);
+    }
 
-            if (GetRandom(DisChance[(int)x]).IsFalse())
-            {
-                switch (GetRandom(8))
-                {
-                    case 0:
-                    case 1:
-                        SetFire();  // 2/9 chance a fire breaks out
-                        break;
+    /// <summary>
+    ///     Throw several bombs onto the city.
+    /// </summary>
+    public void MakeFireBombs()
+    {
+        var count = 2 + (GetRandom16() & 1);
 
-                    case 2:
-                    case 3:
-                        MakeFlood(); // 2/9 chance for a flood
-                        break;
-
-                    case 4:
-                        // 1/9 chance nothing happens (was airplane crash,
-                        // which EA removed after 9/11, and requested it be
-                        // removed from this code)
-                        break;
-
-                    case 5:
-                        MakeTornado(); // 1/9 chance tornado
-                        break;
-
-                    case 6:
-                        MakeEarthquake(); // 1/9 chance earthquake
-                        break;
-
-                    case 7:
-                    case 8:
-                        // 2/9 chance a scary monster arrives in a dirty town
-                        if (PollutionAverage > /* 80 */ 60)
-                        {
-                            MakeMonster();
-                        }
-                        break;
-                }
-            }
+        while (count > 0)
+        {
+            FireBomb();
+            count--;
         }
 
-        /// <summary>
-        /// Let disasters of the scenario happen
-        /// </summary>
-        private void ScenarioDisaster()
+        // TODO: Schedule periodic fire bombs over time, every few ticks.
+    }
+
+    /// <summary>
+    ///     Change random tiles to fire or dirt as result of the earthquake
+    /// </summary>
+    public void MakeEarthquake()
+    {
+        short x, y, z;
+
+        var strength = GetRandom(700) + 300; // strength/duration of the earthquake
+
+        DoEarthquake(strength);
+
+        SendMessage(GeneralMessages.MESSAGE_EARTHQUAKE, CityCenterX, CityCenterY, true);
+
+        for (z = 0; z < strength; z++)
         {
-            switch (DisasterEvent)
-            {
-                case Scenario.Dullsville:
-                    break;
-
-                case Scenario.SanFrancisco:
-                    if (DisasterWait == 1)
-                    {
-                        MakeEarthquake();
-                    }
-                    break;
-
-                case Scenario.Hamburg:
-                    if (DisasterWait % 10 == 0)
-                    {
-                        MakeFireBombs();
-                    }
-                    break;
-
-                case Scenario.Bern:
-                    break;
-
-                case Scenario.Tokyo:
-                    if (DisasterWait == 1)
-                    {
-                        MakeMonster();
-                    }
-                    break;
-
-                case Scenario.Detroit:
-                    break;
-
-                case Scenario.Boston:
-                    if (DisasterWait == 1)
-                    {
-                        MakeMeltdown();
-                    }
-                    break;
-
-                case Scenario.Rio:
-                    if ((DisasterWait % 24) == 0)
-                    {
-                        MakeFlood();
-                    }
-                    break;
-            }
-
-            if (DisasterWait > 0)
-            {
-                DisasterWait--;
-            }
-            else
-            {
-                DisasterEvent = Scenario.None;
-            }
-        }
-
-        /// <summary>
-        /// Make a nuclear power plant melt
-        /// 
-        /// TODO: Randomize which Nuclear Power Plant melts down
-        /// </summary>
-        public void MakeMeltdown()
-        {
-            short x, y;
-
-            for (x = 0; x < (Constants.WorldWidth - 1); x++)
-            {
-                for (y = 0; y < (Constants.WorldHeight - 1); y++)
-                {
-                    if ((Map[x,y] & (ushort)MapTileBits.LowMask) == (ushort)MapTileCharacters.NUCLEAR)
-                    {
-                        DoMeltdown(new Position(x, y));
-                        return;
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Let a fire bomb explode at a random location
-        /// </summary>
-        public void FireBomb()
-        {
-            int crashX = GetRandom(Constants.WorldWidth - 1);
-            int crashY = GetRandom(Constants.WorldHeight - 1);
-            MakeExplosion(crashX, crashY);
-            SendMessage(GeneralMessages.MESSAGE_FIREBOMBING, (short)crashX, (short)crashY, true, true);
-        }
-
-        /// <summary>
-        /// Throw several bombs onto the city.
-        /// </summary>
-        public void MakeFireBombs()
-        {
-            int count = 2 + (GetRandom16() & 1);
-
-            while (count > 0)
-            {
-                FireBomb();
-                count--;
-            }
-
-            // TODO: Schedule periodic fire bombs over time, every few ticks.
-        }
-
-        /// <summary>
-        /// Change random tiles to fire or dirt as result of the earthquake
-        /// </summary>
-        public void MakeEarthquake()
-        {
-            short x, y, z;
-
-            int strength = GetRandom(700) + 300; // strength/duration of the earthquake
-
-            DoEarthquake(strength);
-
-            SendMessage(GeneralMessages.MESSAGE_EARTHQUAKE, CityCenterX, CityCenterY, true, false);
-
-            for (z = 0; z < strength; z++)
-            {
-                x = GetRandom(Constants.WorldWidth - 1);
-                y = GetRandom(Constants.WorldHeight - 1);
-
-                if (Vulnerable(Map[x,y]))
-                {
-
-                    if ((z & 0x3) != 0)
-                    { // 3 of 4 times reduce to rubble
-                        Map[x,y] = RandomRubble();
-                    }
-                    else
-                    {
-                        // 1 of 4 times start fire
-                        Map[x,y] = RandomFire();
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Start a fire at a random place, random disaster or scenario 
-        /// </summary>
-        public void SetFire()
-        {
-            short x, y, z;
-
             x = GetRandom(Constants.WorldWidth - 1);
             y = GetRandom(Constants.WorldHeight - 1);
-            z = (short)Map[x,y];
 
-            if ((z & (short)MapTileBits.CenterOfZone) == 0)
+            if (Vulnerable(Map[x, y]))
+            {
+                if ((z & 0x3) != 0)
+                    // 3 of 4 times reduce to rubble
+                    Map[x, y] = RandomRubble();
+                else
+                    // 1 of 4 times start fire
+                    Map[x, y] = RandomFire();
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Start a fire at a random place, random disaster or scenario
+    /// </summary>
+    public void SetFire()
+    {
+        short x, y, z;
+
+        x = GetRandom(Constants.WorldWidth - 1);
+        y = GetRandom(Constants.WorldHeight - 1);
+        z = (short)Map[x, y];
+
+        if ((z & (short)MapTileBits.CenterOfZone) == 0)
+        {
+            z = (short)(z & (short)MapTileBits.LowMask);
+            if (z > (short)MapTileCharacters.LHTHR && z < (short)MapTileCharacters.LASTZONE)
+            {
+                Map[x, y] = RandomFire();
+                SendMessage(GeneralMessages.MESSAGE_FIRE_REPORTED, x, y, true);
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Start a fire at a random place, requested by user
+    /// </summary>
+    public void MakeFire()
+    {
+        short t, x, y, z;
+
+        for (t = 0; t < 40; t++)
+        {
+            x = GetRandom(Constants.WorldWidth - 1);
+            y = GetRandom(Constants.WorldHeight - 1);
+            z = (short)Map[x, y];
+
+            if ((z & (short)MapTileBits.CenterOfZone).IsFalse() && (z & (short)MapTileBits.Burnable).IsTrue())
             {
                 z = (short)(z & (short)MapTileBits.LowMask);
-                if (z > (short)MapTileCharacters.LHTHR && z < (short)MapTileCharacters.LASTZONE)
+                if (z > 21 && z < (short)MapTileCharacters.LASTZONE)
                 {
-                    Map[x,y] = RandomFire();
-                    SendMessage(GeneralMessages.MESSAGE_FIRE_REPORTED, x, y, true, false);
+                    Map[x, y] = RandomFire();
+                    SendMessage(GeneralMessages.MESSAGE_FIRE_REPORTED, x, y);
+                    return;
                 }
             }
         }
+    }
 
-        /// <summary>
-        /// Start a fire at a random place, requested by user 
-        /// </summary>
-        public void MakeFire()
+    /// <summary>
+    ///     Flood many tiles
+    ///     TODO: Use Direction and some form of XYPosition class here
+    /// </summary>
+    public void MakeFlood()
+    {
+        short[] Dx = { 0, 1, 0, -1 };
+        short[] Dy = { -1, 0, 1, 0 };
+        short xx, yy, c;
+        short z, t, x, y;
+
+        for (z = 0; z < 300; z++)
         {
-            short t, x, y, z;
+            x = GetRandom(Constants.WorldWidth - 1);
+            y = GetRandom(Constants.WorldHeight - 1);
+            c = (short)(Map[x, y] & (short)MapTileBits.LowMask);
 
-            for (t = 0; t < 40; t++)
-            {
-                x = GetRandom(Constants.WorldWidth - 1);
-                y = GetRandom(Constants.WorldHeight - 1);
-                z = (short)Map[x,y];
-
-                if (((z & (short)MapTileBits.CenterOfZone).IsFalse()) && (z & (short)MapTileBits.Burnable).IsTrue())
+            if (c > (short)MapTileCharacters.CHANNEL && c <= (short)MapTileCharacters.WATER_HIGH)
+                /* if riveredge  */
+                for (t = 0; t < 4; t++)
                 {
-                    z = (short)(z & (short)MapTileBits.LowMask);
-                    if ((z > 21) && (z < (short)MapTileCharacters.LASTZONE))
+                    xx = (short)(x + Dx[t]);
+                    yy = (short)(y + Dy[t]);
+                    if (Position.TestBounds(xx, yy))
                     {
-                        Map[x,y] = RandomFire();
-                        SendMessage(GeneralMessages.MESSAGE_FIRE_REPORTED, x, y, false, false);
-                        return;
-                    }
-                }
-            }
-        }
+                        c = (short)Map[xx, yy];
 
-        /// <summary>
-        /// Flood many tiles
-        /// 
-        /// TODO: Use Direction and some form of XYPosition class here
-        /// </summary>
-        public void MakeFlood()
-        {
-            short[] Dx = { 0, 1, 0, -1 };
-            short[] Dy = { -1, 0, 1, 0 };
-            short xx, yy, c;
-            short z, t, x, y;
-
-            for (z = 0; z < 300; z++)
-            {
-                x = GetRandom(Constants.WorldWidth - 1);
-                y = GetRandom(Constants.WorldHeight - 1);
-                c = (short)(Map[x,y] & (short)MapTileBits.LowMask);
-
-                if (c > (short)MapTileCharacters.CHANNEL && c <= (short)MapTileCharacters.WATER_HIGH)
-                { /* if riveredge  */
-                    for (t = 0; t < 4; t++)
-                    {
-                        xx = (short)(x + Dx[t]);
-                        yy = (short)(y + Dy[t]);
-                        if (Position.TestBounds(xx, yy))
+                        /* tile is floodable */
+                        if (c == (short)MapTileCharacters.DIRT
+                            || (c & ((short)MapTileBits.Bulldozable | (short)MapTileBits.Burnable)) ==
+                            ((short)MapTileBits.Bulldozable | (short)MapTileBits.Burnable))
                         {
-                            c = (short)Map[xx,yy];
-
-                            /* tile is floodable */
-                            if (c == (short)MapTileCharacters.DIRT
-                                  || (c & ((short)MapTileBits.Bulldozable | (short)MapTileBits.Burnable)) == ((short)MapTileBits.Bulldozable | (short)MapTileBits.Burnable))
-                            {
-                                Map[xx,yy] = (ushort)MapTileCharacters.FLOOD;
-                                FloodCount = 30;
-                                SendMessage(GeneralMessages.MESSAGE_FLOODING_REPORTED, xx, yy, true, false);
-                                return;
-                            }
+                            Map[xx, yy] = (ushort)MapTileCharacters.FLOOD;
+                            FloodCount = 30;
+                            SendMessage(GeneralMessages.MESSAGE_FLOODING_REPORTED, xx, yy, true);
+                            return;
                         }
                     }
                 }
-            }
         }
+    }
 
-        /// <summary>
-        /// Is tile vulnerable for an earthquake?
-        /// </summary>
-        /// <param name="tem">Tile data</param>
-        /// <returns>Function returns true if tile is vulnerable, and false if not</returns>
-        private bool Vulnerable(int tem)
+    /// <summary>
+    ///     Is tile vulnerable for an earthquake?
+    /// </summary>
+    /// <param name="tem">Tile data</param>
+    /// <returns>Function returns true if tile is vulnerable, and false if not</returns>
+    private bool Vulnerable(int tem)
+    {
+        var tem2 = tem & (short)MapTileBits.LowMask;
+
+        if (tem2 < (short)MapTileCharacters.RESBASE || tem2 > (short)MapTileCharacters.LASTZONE ||
+            (tem & (short)MapTileBits.CenterOfZone).IsTrue()) return false;
+
+        return true;
+    }
+
+    /// <summary>
+    ///     Flood around the given position.
+    ///     TODO: Use some form of rotating around a position.
+    /// </summary>
+    /// <param name="pos">Position around which to flood further.</param>
+    private void DoFlood(Position pos)
+    {
+        short[] Dx = { 0, 1, 0, -1 };
+        short[] Dy = { -1, 0, 1, 0 };
+
+        if (FloodCount > 0)
         {
-            int tem2 = tem & (short)MapTileBits.LowMask;
-
-            if (tem2 < (short)MapTileCharacters.RESBASE || tem2 > (short)MapTileCharacters.LASTZONE || (tem & (short)MapTileBits.CenterOfZone).IsTrue())
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        /// <summary>
-        /// Flood around the given position.
-        /// 
-        /// TODO: Use some form of rotating around a position.
-        /// </summary>
-        /// <param name="pos">Position around which to flood further.</param>
-        private void DoFlood(Position pos)
-        {
-            short[] Dx = { 0, 1, 0, -1 };
-            short[] Dy = { -1, 0, 1, 0 };
-
-            if (FloodCount > 0)
-            {
-                // Flood is not over yet
-                for (int z = 0; z < 4; z++)
+            // Flood is not over yet
+            for (var z = 0; z < 4; z++)
+                if ((GetRandom16() & 7) == 0)
                 {
-                    if ((GetRandom16() & 7) == 0)
-                    { // 12.5% chance
-                        int xx = pos.X + Dx[z];
-                        int yy = pos.Y + Dy[z];
-                        if (Position.TestBounds(xx, yy))
-                        {
-                            ushort c = Map[xx,yy];
-                            ushort t = (ushort)(c & (ushort)MapTileBits.LowMask);
+                    // 12.5% chance
+                    var xx = pos.X + Dx[z];
+                    var yy = pos.Y + Dy[z];
+                    if (Position.TestBounds(xx, yy))
+                    {
+                        var c = Map[xx, yy];
+                        var t = (ushort)(c & (ushort)MapTileBits.LowMask);
 
-                            if ((c & (ushort)MapTileBits.Burnable) == (ushort)MapTileBits.Burnable || c == (ushort)MapTileCharacters.DIRT
-                                                    || (t >= (ushort)MapTileCharacters.WOODS5 && t < (ushort)MapTileCharacters.FLOOD))
-                            {
-                                if ((c & (ushort)MapTileBits.CenterOfZone) == (ushort)MapTileBits.CenterOfZone)
-                                {
-                                    FireZone(new Position(xx, yy), c);
-                                }
-                                Map[xx,yy] = (ushort)(MapTileCharacters.FLOOD + GetRandom(2));
-                            }
+                        if ((c & (ushort)MapTileBits.Burnable) == (ushort)MapTileBits.Burnable ||
+                            c == (ushort)MapTileCharacters.DIRT
+                            || (t >= (ushort)MapTileCharacters.WOODS5 && t < (ushort)MapTileCharacters.FLOOD))
+                        {
+                            if ((c & (ushort)MapTileBits.CenterOfZone) == (ushort)MapTileBits.CenterOfZone)
+                                FireZone(new Position(xx, yy), c);
+                            Map[xx, yy] = (ushort)(MapTileCharacters.FLOOD + GetRandom(2));
                         }
                     }
                 }
-            }
-            else
-            {
-                if ((GetRandom16() & 15) == 0)
-                { // 1/16 chance
-                    Map[pos.X,pos.Y] = (ushort)MapTileCharacters.DIRT;
-                }
-            }
+        }
+        else
+        {
+            if ((GetRandom16() & 15) == 0)
+                // 1/16 chance
+                Map[pos.X, pos.Y] = (ushort)MapTileCharacters.DIRT;
         }
     }
 }

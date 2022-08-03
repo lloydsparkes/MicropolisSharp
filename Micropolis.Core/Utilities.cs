@@ -67,83 +67,65 @@
 
 using System;
 
-namespace MicropolisSharp
+namespace MicropolisSharp;
+
+/// <summary>
+///     Some utility methods, and Extension Methods, that are useful when dealing with the code
+/// </summary>
+public static class Utilities
 {
     /// <summary>
-    /// Some utility methods, and Extension Methods, that are useful when dealing with the code
+    ///     Replacement for clamp from micropolis.h
+    ///     Returns a value which is between lower and upper.
     /// </summary>
-    public static class Utilities
+    /// <typeparam name="T">Type of the Value being "Restricted"</typeparam>
+    /// <param name="value">The value to be restricted</param>
+    /// <param name="lower">The lower bound (Inclusive)</param>
+    /// <param name="upper">The upper bound (Inclusive)</param>
+    /// <returns></returns>
+    public static T Restrict<T>(T value, T lower, T upper)
+        where T : IComparable
     {
-        /// <summary>
-        /// Replacement for clamp from micropolis.h
-        /// 
-        /// Returns a value which is between lower and upper.
-        /// </summary>
-        /// <typeparam name="T">Type of the Value being "Restricted"</typeparam>
-        /// <param name="value">The value to be restricted</param>
-        /// <param name="lower">The lower bound (Inclusive)</param>
-        /// <param name="upper">The upper bound (Inclusive)</param>
-        /// <returns></returns>
-        public static T Restrict<T>(T value, T lower, T upper)
-            where T : IComparable
-        {
-            if(value.CompareTo(lower) < 0)
-            {
-                return lower;
-            }
-            if(value.CompareTo(upper) > 0)
-            {
-                return upper;
-            }
-            return value;
-        }
+        if (value.CompareTo(lower) < 0) return lower;
+        if (value.CompareTo(upper) > 0) return upper;
+        return value;
+    }
 
-        /// <summary>
-        /// IsTrue - If a Value != 0 return true, else false.
-        /// 
-        /// Used to replace C type functionality if(65) {} which doesnt work in C
-        /// 
-        /// </summary>
-        /// <typeparam name="T">Type of the value to be tested for true</typeparam>
-        /// <param name="value">The value to test</param>
-        /// <returns>bool, true if value != 0</returns>
-        public static bool IsTrue<T>(this T value)
-            where T : IComparable
-        {
-            if(value.CompareTo(default(T)) != 0)
-            {
-                return true;
-            }
-            return false;
-        }
+    /// <summary>
+    ///     IsTrue - If a Value != 0 return true, else false.
+    ///     Used to replace C type functionality if(65) {} which doesnt work in C
+    /// </summary>
+    /// <typeparam name="T">Type of the value to be tested for true</typeparam>
+    /// <param name="value">The value to test</param>
+    /// <returns>bool, true if value != 0</returns>
+    public static bool IsTrue<T>(this T value)
+        where T : IComparable
+    {
+        if (value.CompareTo(default(T)) != 0) return true;
+        return false;
+    }
 
-        /// <summary>
-        /// IsFalse - If a Value == 0 return true, else false.
-        /// 
-        /// Used to replace C type functionality if(!65) {} which doesnt work in C
-        /// 
-        /// </summary>
-        /// <typeparam name="T">Type of the value to be tested for false</typeparam>
-        /// <param name="value">The value to test</param>
-        /// <returns>bool, true if value == 0</returns>
-        public static bool IsFalse<T>(this T value)
-            where T : IComparable
-        {
-            if (value.CompareTo(default(T)) == 0)
-            {
-                return true;
-            }
-            return false;
-        }
+    /// <summary>
+    ///     IsFalse - If a Value == 0 return true, else false.
+    ///     Used to replace C type functionality if(!65) {} which doesnt work in C
+    /// </summary>
+    /// <typeparam name="T">Type of the value to be tested for false</typeparam>
+    /// <param name="value">The value to test</param>
+    /// <returns>bool, true if value == 0</returns>
+    public static bool IsFalse<T>(this T value)
+        where T : IComparable
+    {
+        if (value.CompareTo(default(T)) == 0) return true;
+        return false;
+    }
 
-        /// <summary>
-        /// Turn's a bool back into a number.
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public static short ToShort(this bool value)
-        {
-            return value ? (short)1 : (short)0;
-        }
+    /// <summary>
+    ///     Turn's a bool back into a number.
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static short ToShort(this bool value)
+    {
+        return value ? (short)1 : (short)0;
     }
 }

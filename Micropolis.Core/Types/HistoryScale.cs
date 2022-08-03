@@ -64,16 +64,21 @@
  * CONSUMER, SO SOME OR ALL OF THE ABOVE EXCLUSIONS AND LIMITATIONS MAY
  * NOT APPLY TO YOU.
  */
-namespace MicropolisSharp.Types
-{
-    /// <summary>
-    /// Available historic scales - from micropolis.h
-    /// </summary>
-    public enum HistoryScale
-    {
-        Short, ///< Short scale data (10 years)
-        Long,  ///< Long scale data (120 years)
 
-        Count, ///< Number of history scales available
-    }
+namespace MicropolisSharp.Types;
+
+/// <summary>
+///     Available historic scales - from micropolis.h
+/// </summary>
+public enum HistoryScale
+{
+    Short,
+
+    /// < Short scale data (10 years
+    /// )
+    Long,
+
+    /// < Long scale data (120 years
+    /// )
+    Count ///< Number of history scales available
 }

@@ -64,58 +64,58 @@
  * CONSUMER, SO SOME OR ALL OF THE ABOVE EXCLUSIONS AND LIMITATIONS MAY
  * NOT APPLY TO YOU.
  */
+
 using System;
 
-namespace MicropolisSharp.Types
+namespace MicropolisSharp.Types;
+
+/// <summary>
+///     From micropolis.h
+/// </summary>
+public class FrontendMessage
 {
-    /// <summary>
-    /// From micropolis.h
-    /// </summary>
-    public class FrontendMessage
+    public virtual void SendMessage(Micropolis sim)
     {
-        public virtual void SendMessage(Micropolis sim)
-        {
-            throw new NotImplementedException();
-        }
+        throw new NotImplementedException();
+    }
+}
+
+public class FrontendMessageMakeSound : FrontendMessage
+{
+    private readonly string channel;
+    private readonly int dozeX;
+    private readonly int dozeY;
+    private readonly string sound;
+
+    public FrontendMessageMakeSound(string v1, string v2, int dozeX, int dozeY)
+    {
+        channel = v1;
+        sound = v2;
+        this.dozeX = dozeX;
+        this.dozeY = dozeY;
     }
 
-    public class FrontendMessageMakeSound : FrontendMessage
+    public override void SendMessage(Micropolis sim)
     {
-        private int dozeX;
-        private int dozeY;
-        private string channel;
-        private string sound;
+        sim.MakeSound(channel, sound, dozeX, dozeY);
+    }
+}
 
-        public FrontendMessageMakeSound(string v1, string v2, int dozeX, int dozeY)
-        {
-            this.channel = v1;
-            this.sound = v2;
-            this.dozeX = dozeX;
-            this.dozeY = dozeY;
-        }
+public class FrontendMessageDidTool : FrontendMessage
+{
+    private readonly string name;
+    private readonly short x;
+    private readonly short y;
 
-        public override void SendMessage(Micropolis sim)
-        {
-            sim.MakeSound(channel, sound, dozeX, dozeY);
-        }
+    public FrontendMessageDidTool(string v, short x, short y)
+    {
+        name = v;
+        this.x = x;
+        this.y = y;
     }
 
-    public class FrontendMessageDidTool : FrontendMessage
+    public override void SendMessage(Micropolis sim)
     {
-        private string name;
-        private short x;
-        private short y;
-
-        public FrontendMessageDidTool(string v, short x, short y)
-        {
-            this.name = v;
-            this.x = x;
-            this.y = y;
-        }
-
-        public override void SendMessage(Micropolis sim)
-        {
-            sim.DidTool(name, x, y);
-        }
+        sim.DidTool(name, x, y);
     }
 }

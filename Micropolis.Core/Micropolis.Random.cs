@@ -64,103 +64,99 @@
  * CONSUMER, SO SOME OR ALL OF THE ABOVE EXCLUSIONS AND LIMITATIONS MAY
  * NOT APPLY TO YOU.
  */
+
 using System;
 
-namespace MicropolisSharp
+namespace MicropolisSharp;
+
+/// <summary>
+///     Partial Class Containing the content of random.cpp
+/// </summary>
+public partial class Micropolis
 {
+    protected long nextRandom;
+
     /// <summary>
-    /// Partial Class Containing the content of random.cpp
+    ///     Draw a random number (internal function).
+    ///     TODO: Use Wolfram's fast cellular automata pseudo random number generator.
     /// </summary>
-    public partial class Micropolis
+    /// <returns> Unsigned 16 bit random number.</returns>
+    public int SimRandom()
     {
-        protected long nextRandom;
+        nextRandom = nextRandom * 1103515245 + 12345;
+        return (int)(nextRandom & 0xffff00) >> 8;
+    }
 
-        /// <summary>
-        /// Draw a random number (internal function).
-        /// 
-        /// TODO: Use Wolfram's fast cellular automata pseudo random number generator.
-        /// </summary>
-        /// <returns> Unsigned 16 bit random number.</returns>
-        public int SimRandom()
+    /// <summary>
+    ///     Draw a random number in a given range.
+    /// </summary>
+    /// <param name="range">range Upper bound of the range (inclusive).</param>
+    /// <returns>Random number between \c 0 and \a range (inclusive).</returns>
+    public short GetRandom(short range)
+    {
+        int maxMultiple, rnum;
+
+        range++; /// @bug Increment may cause range overflow.
+        maxMultiple = 0xffff / range;
+        maxMultiple *= range;
+
+        do
         {
-            nextRandom = nextRandom * 1103515245 + 12345;
-            return (int)(nextRandom & 0xffff00) >> 8;
-        }
+            rnum = GetRandom16();
+        } while (rnum >= maxMultiple);
 
-        /// <summary>
-        /// Draw a random number in a given range.
-        /// </summary>
-        /// <param name="range">range Upper bound of the range (inclusive).</param>
-        /// <returns>Random number between \c 0 and \a range (inclusive).</returns>
-        public short GetRandom(short range)
-        {
-            int maxMultiple, rnum;
+        return (short)(rnum % range);
+    }
 
-            range++; /// @bug Increment may cause range overflow.
-            maxMultiple = 0xffff / range;
-            maxMultiple *= range;
+    /// <summary>
+    ///     Get random 16 bit number.
+    /// </summary>
+    /// <returns>Unsigned 16 bit random number.</returns>
+    public int GetRandom16()
+    {
+        return SimRandom() & 0x0000ffff;
+    }
 
-            do
-            {
-                rnum = GetRandom16();
-            } while (rnum >= maxMultiple);
+    /// <summary>
+    ///     Get signed 16 bit random number.
+    /// </summary>
+    /// <returns></returns>
+    public int GetRandom16Signed()
+    {
+        var i = GetRandom16();
 
-            return (short)(rnum % range);
-        }
+        if (i > 0x7fff) i = 0x7fff - i;
 
-        /// <summary>
-        /// Get random 16 bit number.
-        /// </summary>
-        /// <returns>Unsigned 16 bit random number.</returns>
-        public int GetRandom16()
-        {
-            return SimRandom() & 0x0000ffff;
-        }
+        return i;
+    }
 
-        /// <summary>
-        /// Get signed 16 bit random number.
-        /// </summary>
-        /// <returns></returns>
-        public int GetRandom16Signed()
-        {
-            int i = GetRandom16();
+    /// <summary>
+    ///     Get a random number within a given range, with a preference to smaller values.
+    /// </summary>
+    /// <param name="limit">Upper bound of the range (inclusive).</param>
+    /// <returns>Random number between \c 0 and \a limit (inclusive).</returns>
+    public short GetERandom(short limit)
+    {
+        var z = GetRandom(limit);
+        var x = GetRandom(limit);
 
-            if (i > 0x7fff)
-            {
-                i = 0x7fff - i;
-            }
+        return Math.Min(z, x);
+    }
 
-            return i;
-        }
+    /// <summary>
+    ///     Set seed of the random number generator.
+    /// </summary>
+    /// <param name="seed">New seed.</param>
+    public void SeedRandom(int seed)
+    {
+        nextRandom = seed;
+    }
 
-        /// <summary>
-        /// Get a random number within a given range, with a preference to smaller values.
-        /// </summary>
-        /// <param name="limit">Upper bound of the range (inclusive).</param>
-        /// <returns>Random number between \c 0 and \a limit (inclusive).</returns>
-        public short GetERandom(short limit)
-        {
-            short z = GetRandom(limit);
-            short x = GetRandom(limit);
-
-            return Math.Min(z, x);
-        }
-
-        /// <summary>
-        /// Set seed of the random number generator.
-        /// </summary>
-        /// <param name="seed">New seed.</param>
-        public void SeedRandom(int seed)
-        {
-            nextRandom = seed;
-        }
-
-        /// <summary>
-        /// Initialize the random number generator with a 'random' seed.
-        /// </summary>
-        public void RandomlySeedRandom()
-        {
-            nextRandom = (new Random().Next());
-        }
+    /// <summary>
+    ///     Initialize the random number generator with a 'random' seed.
+    /// </summary>
+    public void RandomlySeedRandom()
+    {
+        nextRandom = new Random().Next();
     }
 }

@@ -64,175 +64,169 @@
  * CONSUMER, SO SOME OR ALL OF THE ABOVE EXCLUSIONS AND LIMITATIONS MAY
  * NOT APPLY TO YOU.
  */
+
 using System;
 
-namespace MicropolisSharp
+namespace MicropolisSharp;
+
+/// <summary>
+///     Various Key Constants & Defines found around the Micropolis Code Base. All here in one place
+///     Only put bits here, if its used in more than one place (or more than one Partial Class)
+///     TODO: Make this configuration? - Where sensible
+///     TODO: Is there anything here which should not be here?
+/// </summary>
+public static class Constants
 {
     /// <summary>
-    /// Various Key Constants & Defines found around the Micropolis Code Base. All here in one place
-    /// 
-    /// Only put bits here, if its used in more than one place (or more than one Partial Class)
-    /// 
-    /// TODO: Make this configuration? - Where sensible
-    /// TODO: Is there anything here which should not be here?
+    ///     Default Radius of an Island used by the Terrain Generator - from generate.h
     /// </summary>
-    public static class Constants
+    public const int IslandRadius = 18;
+
+    /// <summary>
+    ///     Default World Size - from map_type.h
+    /// </summary>
+    public const int WorldWidth = 120;
+
+    public const int WorldHeight = 100;
+
+    /// <summary>
+    ///     TODO: Remove this? Is it even needed?
+    ///     The number of bits per tile
+    /// </summary>
+    [Obsolete] public const int BitsPerTile = 16;
+
+    /// <summary>
+    ///     TODO: Remove this? Is it even needed?
+    ///     The number of bytes per tile
+    /// </summary>
+    [Obsolete] public const int BytesPerTile = 2;
+
+    /// <summary>
+    ///     World Widths / Heights for maps with different block sizes
+    ///     TODO: Can this be removed?
+    /// </summary>
+    [Obsolete] public const int WorldWidth2 = WorldWidth / 2;
+
+    [Obsolete] public const int WorldHeight2 = WorldHeight / 2;
+
+    [Obsolete] public const int WorldWidth4 = WorldWidth / 4;
+
+    [Obsolete] public const int WorldHeight4 = WorldHeight / 4;
+
+    [Obsolete] public const int WorldWidth8 = WorldWidth / 8;
+
+    [Obsolete] public const int WorldHeight8 = (WorldHeight + 7) / 8;
+
+    /// <summary>
+    ///     Size of Editor view Tiles - in pixels
+    ///     TODO: Can this be removed?
+    /// </summary>
+    [Obsolete] public const int EditorTileSize = 16;
+
+    //Time
+
+    /// <summary>
+    ///     The number of simulator passes per CityTime unit
+    /// </summary>
+    public const int PassesPerCityTime = 16;
+
+    /// <summary>
+    ///     The number of CityTime units per month
+    /// </summary>
+    public const int CityTimesPerMonth = 4;
+
+    /// <summary>
+    ///     The number of CityTime units per year
+    /// </summary>
+    public const int CityTimesPerYear = CityTimesPerMonth * 12;
+
+    //File Loading / Saving
+
+    /// <summary>
+    ///     The length of the History Storage Array (Max Number of History Items)
+    /// </summary>
+    public const int HistoryLength = 240;
+
+    /// <summary>
+    ///     The length of the Misc History Storage Array (Max Number of Misc History Items)
+    /// </summary>
+    public const int MiscHistoryLength = 120;
+
+    /// <summary>
+    ///     The length of the history tables
+    ///     TODO: Its not really a count - rename
+    /// </summary>
+    public const int HistoryCount = 120;
+
+    /// <summary>
+    ///     The size of the power stack
+    /// </summary>
+    public const int PowerStackSize = WorldWidth * WorldHeight / 4;
+
+    /// <summary>
+    ///     Use in place of X/Y to indicate "nowhere"
+    /// </summary>
+    public const int NoWhere = -1;
+
+    //Traffic
+
+    /// <summary>
+    ///     The maximum number of tiles to drive looking for a destination
+    /// </summary>
+    public const int MaxTrafficDistance = 30;
+
+    /// <summary>
+    ///     The maximum value of RoadEffect
+    /// </summary>
+    public const int MaxRoadEffect = 32;
+
+    /// <summary>
+    ///     The maximum value of PoliceEffect
+    /// </summary>
+    public const int MaxPoliceStationEffect = 1000;
+
+    /// <summary>
+    ///     The maximum value of FireEffect
+    /// </summary>
+    public const int MaxFireStationEffect = 1000;
+
+    //Valves
+    public const int ResValveRange = 2000;
+    public const int ComValveRange = 1500;
+    public const int IndValveRange = 1500;
+
+    //Strength
+    public const long CoalPowerStrength = 700L;
+    public const long NuclearPowerStrength = 2000L;
+
+    public const int BusGrooveX = -39;
+    public const int BusGrooveY = 6;
+    public const int TraGrooveX = -39;
+    public const int TraGrooveY = 6;
+
+    //From Simulate.cpp
+    public const int CensusFrequency10 = 4;
+    public const int CensusFrequency120 = CensusFrequency10 * 12;
+    public const int TaxFrequency = 48;
+
+    //Tool.cpp
+    public static short[] CostOfBuildings =
     {
-        /// <summary>
-        /// Default Radius of an Island used by the Terrain Generator - from generate.h
-        /// </summary>
-        public const int IslandRadius = 18;
+        100, 100, 100, 500, /* res, com, ind, fire */
+        500, 0, 5, 1, /* police, query, wire, bulldozer */
+        20, 10, 5000, 10, /* rail, road, stadium, park */
+        3000, 3000, 5000, 10000, /* seaport, coal, nuclear, airport */
+        100, 0, 0, 0, /* network, water, land, forest */
+        0
+    };
 
-        /// <summary>
-        /// Default World Size - from map_type.h
-        /// </summary>
-        public const int WorldWidth = 120;
-        public const int WorldHeight = 100;
-
-        /// <summary>
-        /// TODO: Remove this? Is it even needed?
-        /// The number of bits per tile
-        /// </summary>
-        [Obsolete]
-        public const int BitsPerTile = 16;
-
-        /// <summary>
-        /// TODO: Remove this? Is it even needed?
-        /// The number of bytes per tile
-        /// </summary>
-        [Obsolete]
-        public const int BytesPerTile = 2;
-
-        /// <summary>
-        /// World Widths / Heights for maps with different block sizes
-        /// 
-        /// TODO: Can this be removed?
-        /// </summary>
-        [Obsolete]
-        public const int WorldWidth2 = WorldWidth / 2;
-        [Obsolete]
-        public const int WorldHeight2 = WorldHeight / 2;
-        [Obsolete]
-        public const int WorldWidth4 = WorldWidth / 4;
-        [Obsolete]
-        public const int WorldHeight4 = WorldHeight / 4;
-        [Obsolete]
-        public const int WorldWidth8 = WorldWidth / 8;
-        [Obsolete]
-        public const int WorldHeight8 = (WorldHeight + 7) / 8;
-
-        /// <summary>
-        /// Size of Editor view Tiles - in pixels
-        /// 
-        /// TODO: Can this be removed?
-        /// </summary>
-        [Obsolete]
-        public const int EditorTileSize = 16;
-
-        //Time
-
-        /// <summary>
-        /// The number of simulator passes per CityTime unit
-        /// </summary>
-        public const int PassesPerCityTime = 16;
-
-        /// <summary>
-        /// The number of CityTime units per month
-        /// </summary>
-        public const int CityTimesPerMonth = 4;
-
-        /// <summary>
-        /// The number of CityTime units per year
-        /// </summary>
-        public const int CityTimesPerYear = CityTimesPerMonth * 12;
-
-        //File Loading / Saving
-
-        /// <summary>
-        /// The length of the History Storage Array (Max Number of History Items)
-        /// </summary>
-        public const int HistoryLength = 240;
-
-        /// <summary>
-        /// The length of the Misc History Storage Array (Max Number of Misc History Items)
-        /// </summary>
-        public const int MiscHistoryLength = 120;
-
-        /// <summary>
-        /// The length of the history tables
-        /// 
-        /// TODO: Its not really a count - rename
-        /// </summary>
-        public const int HistoryCount = 120;
-
-        /// <summary>
-        /// The size of the power stack
-        /// </summary>
-        public const int PowerStackSize = (WorldWidth * WorldHeight) / 4;
-        
-        /// <summary>
-        /// Use in place of X/Y to indicate "nowhere"
-        /// </summary>
-        public const int NoWhere = -1;
-      
-        //Traffic
-
-        /// <summary>
-        /// The maximum number of tiles to drive looking for a destination
-        /// </summary>
-        public const int MaxTrafficDistance = 30;
-
-        /// <summary>
-        /// The maximum value of RoadEffect
-        /// </summary>
-        public const int MaxRoadEffect = 32;
-
-        /// <summary>
-        /// The maximum value of PoliceEffect
-        /// </summary>
-        public const int MaxPoliceStationEffect = 1000;
-
-        /// <summary>
-        /// The maximum value of FireEffect
-        /// </summary>
-        public const int MaxFireStationEffect = 1000;
-
-        //Valves
-        public const int ResValveRange = 2000;
-        public const int ComValveRange = 1500;
-        public const int IndValveRange = 1500;
-
-        //Strength
-        public const long CoalPowerStrength = 700L;
-        public const long NuclearPowerStrength = 2000L;
-
-        //Tool.cpp
-        public static short[] CostOfBuildings =  new short[] {
-             100,    100,    100,    500, /* res, com, ind, fire */
-             500,      0,      5,      1, /* police, query, wire, bulldozer */
-              20,     10,   5000,     10, /* rail, road, stadium, park */
-            3000,   3000,   5000,  10000, /* seaport, coal, nuclear, airport */
-             100,      0,      0,      0, /* network, water, land, forest */
-               0,
-        };
-
-        public static short[] ToolSizes = new short[] {
-            3, 3, 3, 3,
-            3, 1, 1, 1,
-            1, 1, 4, 1,
-            4, 4, 4, 6,
-            1, 1, 1, 1,
-            0,
-        };
-
-        public const int BusGrooveX = -39;
-        public const int BusGrooveY = 6;
-        public const int TraGrooveX = -39;
-        public const int TraGrooveY = 6;
-
-        //From Simulate.cpp
-        public const int CensusFrequency10 = 4;
-        public const int CensusFrequency120 = CensusFrequency10 * 12;
-        public const int TaxFrequency = 48;
-    }
+    public static short[] ToolSizes =
+    {
+        3, 3, 3, 3,
+        3, 1, 1, 1,
+        1, 1, 4, 1,
+        4, 4, 4, 6,
+        1, 1, 1, 1,
+        0
+    };
 }

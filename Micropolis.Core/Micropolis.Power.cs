@@ -64,128 +64,117 @@
  * CONSUMER, SO SOME OR ALL OF THE ABOVE EXCLUSIONS AND LIMITATIONS MAY
  * NOT APPLY TO YOU.
  */
+
 using MicropolisSharp.Types;
 
-namespace MicropolisSharp
+namespace MicropolisSharp;
+
+/// <summary>
+///     Partial Class Containing the content of power.cpp
+/// </summary>
+public partial class Micropolis
 {
+    private int powerStackPointer;
+    private readonly Position[] powerStackXY = new Position[Constants.PowerStackSize];
+
     /// <summary>
-    /// Partial Class Containing the content of power.cpp
+    ///     Scan the map for powered tiles, and copy them to the Micropolis::powerGridMap array.
+    ///     Also warns the user about using too much power ('buy another power plant').
     /// </summary>
-    public partial class Micropolis
+    public void DoPowerScan()
     {
-        private int powerStackPointer = 0;
-        private Position[] powerStackXY = new Position[Constants.PowerStackSize];
+        Direction anyDir, dir;
+        int conNum;
 
-        /// <summary>
-        /// Scan the map for powered tiles, and copy them to the Micropolis::powerGridMap array.
-        /// 
-        /// Also warns the user about using too much power ('buy another power plant').
-        /// </summary>
-        public void DoPowerScan()
+        // Clear power map.
+        PowerGridMap.Clear();
+
+        // Power that the combined coal and nuclear power plants can deliver.
+        var maxPower = CoalPowerPop * Constants.CoalPowerStrength +
+                       NuclearPowerPop * Constants.NuclearPowerStrength;
+
+        long numPower = 0; // Amount of power used.
+
+        while (powerStackPointer > 0)
         {
-            Direction anyDir, dir;
-            int conNum;
-
-            // Clear power map.
-            PowerGridMap.Clear();
-
-            // Power that the combined coal and nuclear power plants can deliver.
-            long maxPower = CoalPowerPop * Constants.CoalPowerStrength +
-                            NuclearPowerPop * Constants.NuclearPowerStrength;
-
-            long numPower = 0; // Amount of power used.
-
-            while (powerStackPointer > 0)
+            var pos = PullPowerStack();
+            anyDir = Direction.Invalid;
+            do
             {
-                Position pos = PullPowerStack();
-                anyDir = Direction.Invalid;
-                do
+                numPower++;
+                if (numPower > maxPower)
                 {
-                    numPower++;
-                    if (numPower > maxPower)
-                    {
-                        SendMessage(GeneralMessages.MESSAGE_NOT_ENOUGH_POWER, Constants.NoWhere, Constants.NoWhere, false, false);
-                        return;
-                    }
-                    if (anyDir != Direction.Invalid)
-                    {
-                        pos.Move(anyDir);
-                    }
-                    PowerGridMap.WorldSet(pos.X, pos.Y, 1);
-                    conNum = 0;
-                    dir = Direction.Begin;
-                    while (dir < Direction.End && conNum < 2)
-                    {
-                        if (TestForConductive(pos, dir))
-                        {
-                            conNum++;
-                            anyDir = dir;
-                        }
-                        dir = dir.Increment90();
-                    }
-                    if (conNum > 1)
-                    {
-                        PushPowerStack(pos);
-                    }
-                } while (conNum.IsTrue());
-            }
-        }
-
-        /// <summary>
-        /// Check at position \a pos for a power-less conducting tile in the direction \a testDir.
-        /// 
-        /// TODO: Re-use something like Micropolis::getFromMap(), and fold this function into its caller.
-        /// </summary>
-        /// <param name="pos">Position to start from.</param>
-        /// <param name="testDir">Direction to investigate.</param>
-        /// <returns>Unpowered tile has been found in the indicated direction.</returns>
-        public bool TestForConductive(Position pos, Direction testDir)
-        {
-            Position movedPos = new Position(pos);
-
-            if (movedPos.Move(testDir))
-            {
-                if ((Map[movedPos.X,movedPos.Y] & (ushort)MapTileBits.Conductivity) == (ushort)MapTileBits.Conductivity)
-                {
-                    if (PowerGridMap.WorldGet(movedPos.X, movedPos.Y).IsFalse())
-                    {
-                        return true;
-                    }
+                    SendMessage(GeneralMessages.MESSAGE_NOT_ENOUGH_POWER, Constants.NoWhere, Constants.NoWhere);
+                    return;
                 }
-            }
 
-            return false;
+                if (anyDir != Direction.Invalid) pos.Move(anyDir);
+                PowerGridMap.WorldSet(pos.X, pos.Y, 1);
+                conNum = 0;
+                dir = Direction.Begin;
+                while (dir < Direction.End && conNum < 2)
+                {
+                    if (TestForConductive(pos, dir))
+                    {
+                        conNum++;
+                        anyDir = dir;
+                    }
+
+                    dir = dir.Increment90();
+                }
+
+                if (conNum > 1) PushPowerStack(pos);
+            } while (conNum.IsTrue());
         }
+    }
 
-        /// <summary>
-        /// Push position \a pos onto the power stack if there is room.
-        /// </summary>
-        /// <param name="pos">Position to push.</param>
-        public void PushPowerStack(Position pos)
+    /// <summary>
+    ///     Check at position \a pos for a power-less conducting tile in the direction \a testDir.
+    ///     TODO: Re-use something like Micropolis::getFromMap(), and fold this function into its caller.
+    /// </summary>
+    /// <param name="pos">Position to start from.</param>
+    /// <param name="testDir">Direction to investigate.</param>
+    /// <returns>Unpowered tile has been found in the indicated direction.</returns>
+    public bool TestForConductive(Position pos, Direction testDir)
+    {
+        var movedPos = new Position(pos);
+
+        if (movedPos.Move(testDir))
+            if ((Map[movedPos.X, movedPos.Y] & (ushort)MapTileBits.Conductivity) == (ushort)MapTileBits.Conductivity)
+                if (PowerGridMap.WorldGet(movedPos.X, movedPos.Y).IsFalse())
+                    return true;
+
+        return false;
+    }
+
+    /// <summary>
+    ///     Push position \a pos onto the power stack if there is room.
+    /// </summary>
+    /// <param name="pos">Position to push.</param>
+    public void PushPowerStack(Position pos)
+    {
+        if (powerStackPointer < Constants.PowerStackSize - 2)
         {
-            if (powerStackPointer < (Constants.PowerStackSize - 2))
-            {
-                powerStackPointer++;
-                powerStackXY[powerStackPointer] = new Position(pos);
-            }
+            powerStackPointer++;
+            powerStackXY[powerStackPointer] = new Position(pos);
+        }
+    }
+
+    /// <summary>
+    ///     Pull a position from the power stack.
+    ///     Stack must be non-empty (powerStackPointer > 0).
+    /// </summary>
+    /// <returns>Pulled position.</returns>
+    public Position PullPowerStack()
+    {
+        //TODO: Make this an assert
+        if (powerStackPointer > 0)
+        {
+            powerStackPointer--;
+            return powerStackXY[powerStackPointer + 1];
         }
 
-        /// <summary>
-        /// Pull a position from the power stack.
-        /// 
-        /// Stack must be non-empty (powerStackPointer > 0).
-        /// </summary>
-        /// <returns>Pulled position.</returns>
-        public Position PullPowerStack()
-        {
-            //TODO: Make this an assert
-            if(powerStackPointer > 0)
-            {
-                powerStackPointer--;
-                return powerStackXY[powerStackPointer + 1];
-            }
-            //TODO: Change this to an Assert really
-            return null;
-        }
+        //TODO: Change this to an Assert really
+        return null;
     }
 }

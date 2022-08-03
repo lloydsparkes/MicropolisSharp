@@ -64,40 +64,39 @@
  * CONSUMER, SO SOME OR ALL OF THE ABOVE EXCLUSIONS AND LIMITATIONS MAY
  * NOT APPLY TO YOU.
  */
-namespace MicropolisSharp.Types
-{
-    /// <summary>
-    /// Avaiable tools which the front end can try to apply to the backend from micropolis.h
-    /// 
-    /// TODO: Comment
-    /// TODO: Store more data
-    /// TODO: Maybe a specific type, with extra data loaded from configuration?
-    /// </summary>
-    public enum EditingTool
-    {
-        Residential,
-        Commercial,
-        Industrial,
-        FireStation,
-        PoliceStation,
-        Query,
-        Wire,
-        Bulldozer,
-        RailRoad,
-        Road,
-        Stadium,
-        Park,
-        Seaport,
-        CoalPower,
-        NuclearPower,
-        Airport,
-        Network,
-        Water,
-        Land,
-        Forest,
 
-        Count,
-        First = Residential,
-        Last = Forest,
-    }
+namespace MicropolisSharp.Types;
+
+/// <summary>
+///     Avaiable tools which the front end can try to apply to the backend from micropolis.h
+///     TODO: Comment
+///     TODO: Store more data
+///     TODO: Maybe a specific type, with extra data loaded from configuration?
+/// </summary>
+public enum EditingTool
+{
+    Residential,
+    Commercial,
+    Industrial,
+    FireStation,
+    PoliceStation,
+    Query,
+    Wire,
+    Bulldozer,
+    RailRoad,
+    Road,
+    Stadium,
+    Park,
+    Seaport,
+    CoalPower,
+    NuclearPower,
+    Airport,
+    Network,
+    Water,
+    Land,
+    Forest,
+
+    Count,
+    First = Residential,
+    Last = Forest
 }

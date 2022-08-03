@@ -64,29 +64,58 @@
  * CONSUMER, SO SOME OR ALL OF THE ABOVE EXCLUSIONS AND LIMITATIONS MAY
  * NOT APPLY TO YOU.
  */
-namespace MicropolisSharp.Types
-{
-    /// <summary>
-    /// Available Map Types - from micropolis.h
-    /// </summary>
-    public enum MapType
-    {
-        All,                 ///< All zones
-        Res,                   ///< Residential zones
-        Com,                   ///< Commercial zones
-        Ind,                   ///< Industrial zones
-        Power,                 ///< Power connectivity
-        Road,                  ///< Roads
-        PopulationDensity,    ///< Population density
-        RateOfGrowth,        ///< Rate of growth
-        TrafficDensity,       ///< Traffic
-        Pollution,             ///< Pollution
-        Crime,                 ///< Crime rate
-        LandValue,            ///< Land value
-        FireRadius,           ///< Fire station coverage radius
-        PoliceRadius,         ///< Police station coverage radius
-        Dynamic,               ///< Dynamic filter
 
-        Count,                 ///< Number of map types
-    }
+namespace MicropolisSharp.Types;
+
+/// <summary>
+///     Available Map Types - from micropolis.h
+/// </summary>
+public enum MapType
+{
+    All,
+
+    ///< All zones
+    Res,
+
+    ///< Residential zones
+    Com,
+
+    ///< Commercial zones
+    Ind,
+
+    ///< Industrial zones
+    Power,
+
+    ///< Power connectivity
+    Road,
+
+    ///< Roads
+    PopulationDensity,
+
+    ///< Population density
+    RateOfGrowth,
+
+    ///< Rate of growth
+    TrafficDensity,
+
+    ///< Traffic
+    Pollution,
+
+    ///< Pollution
+    Crime,
+
+    ///< Crime rate
+    LandValue,
+
+    ///< Land value
+    FireRadius,
+
+    ///< Fire station coverage radius
+    PoliceRadius,
+
+    ///< Police station coverage radius
+    Dynamic,
+
+    ///< Dynamic filter
+    Count ///< Number of map types
 }

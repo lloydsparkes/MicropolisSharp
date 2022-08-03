@@ -64,23 +64,22 @@
  * CONSUMER, SO SOME OR ALL OF THE ABOVE EXCLUSIONS AND LIMITATIONS MAY
  * NOT APPLY TO YOU.
  */
+
 using System;
 
-namespace MicropolisSharp.Types
-{
-    /// <summary>
-    /// A table of strings loaded from a resource. From micropolis.h
-    /// 
-    /// TODO: Remove Next and make all accesses throug an array, not a linked list
-    /// TODO: Remove this class completely, its no longer needed - this is the wrong place or it
-    /// </summary>
-    public class StringTable
-    {
-        public long Id { get; set; }
-        public int Lines { get; set; }
-        public string[] Strings { get; set; }
+namespace MicropolisSharp.Types;
 
-        [Obsolete("No longer a linked list, use an array accessor instead")]
-        public StringTable Next { get; set; }
-    }
+/// <summary>
+///     A table of strings loaded from a resource. From micropolis.h
+///     TODO: Remove Next and make all accesses throug an array, not a linked list
+///     TODO: Remove this class completely, its no longer needed - this is the wrong place or it
+/// </summary>
+public class StringTable
+{
+    public long Id { get; set; }
+    public int Lines { get; set; }
+    public string[] Strings { get; set; }
+
+    [Obsolete("No longer a linked list, use an array accessor instead")]
+    public StringTable Next { get; set; }
 }

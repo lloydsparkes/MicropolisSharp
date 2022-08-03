@@ -64,76 +64,74 @@
  * CONSUMER, SO SOME OR ALL OF THE ABOVE EXCLUSIONS AND LIMITATIONS MAY
  * NOT APPLY TO YOU.
  */
+
 using MicropolisSharp.Types;
 
-namespace MicropolisSharp
+namespace MicropolisSharp;
+
+/// <summary>
+///     Partial Class Containing the content of initialize.cpp
+/// </summary>
+public partial class Micropolis
 {
     /// <summary>
-    /// Partial Class Containing the content of initialize.cpp
+    ///     Reset many game state variables
     /// </summary>
-    public partial class Micropolis
+    public void InitWillStuff()
     {
-        /// <summary>
-        /// Reset many game state variables
-        /// </summary>
-        public void InitWillStuff()
-        {
-            RandomlySeedRandom();
-            InitGraphMax();
-            DestroyAllSprites();
+        RandomlySeedRandom();
+        InitGraphMax();
+        DestroyAllSprites();
 
-            RoadEffect = Constants.MaxRoadEffect;
-            PoliceEffect = Constants.MaxPoliceStationEffect;
-            FireEffect = Constants.MaxFireStationEffect;
-            CityScore = 500;
-            CityPopulation = -1;
-            CityTimeLast = -1;
-            CityYearLast = -1;
-            CityMonthLast = -1;
-            TotalFundsLast = -1;
-            ResLast = ComLast = IndLast = -999999;
-            RoadFund = 0;
-            PoliceFund = 0;
-            FireFund = 0;
-            ValveFlag = true;
-            DisasterEvent = Scenario.None;
-            TaxFlag = false;
+        RoadEffect = Constants.MaxRoadEffect;
+        PoliceEffect = Constants.MaxPoliceStationEffect;
+        FireEffect = Constants.MaxFireStationEffect;
+        CityScore = 500;
+        CityPopulation = -1;
+        CityTimeLast = -1;
+        CityYearLast = -1;
+        CityMonthLast = -1;
+        TotalFundsLast = -1;
+        ResLast = ComLast = IndLast = -999999;
+        RoadFund = 0;
+        PoliceFund = 0;
+        FireFund = 0;
+        ValveFlag = true;
+        DisasterEvent = Scenario.None;
+        TaxFlag = false;
 
-            PopulationDensityMap.Clear();
-            TrafficDensityMap.Clear();
-            PollutionDensityMap.Clear();
-            LandValueMap.Clear();
-            CrimeRateMap.Clear();
-            TerrainDensityMap.Clear();
-            RateOfGrowthMap.Clear();
-            ComRateMap.Clear();
-            PoliceStationMap.Clear();
-            PoliceStationEffectMap.Clear();
-            FireStationMap.Clear();
-            FireStationEffectMap.Clear();
+        PopulationDensityMap.Clear();
+        TrafficDensityMap.Clear();
+        PollutionDensityMap.Clear();
+        LandValueMap.Clear();
+        CrimeRateMap.Clear();
+        TerrainDensityMap.Clear();
+        RateOfGrowthMap.Clear();
+        ComRateMap.Clear();
+        PoliceStationMap.Clear();
+        PoliceStationEffectMap.Clear();
+        FireStationMap.Clear();
+        FireStationEffectMap.Clear();
 
-            DoNewGame();
-            DoUpdateHeads();
-        }
+        DoNewGame();
+        DoUpdateHeads();
+    }
 
-        /// <summary>
-        /// Reset all maps in the simulator.
-        /// 
-        /// TODO: What do to with an empty function
-        /// </summary>
-        public void ResetMapState()
-        {
-            //NO OP
-        }
+    /// <summary>
+    ///     Reset all maps in the simulator.
+    ///     TODO: What do to with an empty function
+    /// </summary>
+    public void ResetMapState()
+    {
+        //NO OP
+    }
 
-        /// <summary>
-        /// Reset all tools in the simulator editor.
-        /// 
-        /// TODO: What do to with an empty function
-        /// </summary>
-        public void ResetEditorState()
-        {
-            //NO OP
-        }
+    /// <summary>
+    ///     Reset all tools in the simulator editor.
+    ///     TODO: What do to with an empty function
+    /// </summary>
+    public void ResetEditorState()
+    {
+        //NO OP
     }
 }

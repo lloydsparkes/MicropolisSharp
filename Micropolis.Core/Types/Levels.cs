@@ -64,22 +64,29 @@
  * CONSUMER, SO SOME OR ALL OF THE ABOVE EXCLUSIONS AND LIMITATIONS MAY
  * NOT APPLY TO YOU.
  */
-namespace MicropolisSharp.Types
+
+namespace MicropolisSharp.Types;
+
+/// <summary>
+///     Game Levels - from micropolis.h
+///     TODO: Rename from Levels
+/// </summary>
+public enum Levels
 {
-    /// <summary>
-    /// Game Levels - from micropolis.h
-    ///  
-    /// TODO: Rename from Levels
-    /// </summary>
-    public enum Levels
-    {
-        Easy,   ///< Simple game level
-        Medium, ///< Intermediate game level
-        Hard,   ///< Difficult game level
+    Easy,
 
-        Count,  ///< Number of game levels
+    ///< Simple game level
+    Medium,
 
-        First = Easy, ///< First game level value
-        Last = Hard, ///< Last game level value
-    }
+    ///< Intermediate game level
+    Hard,
+
+    ///< Difficult game level
+    Count,
+
+    ///< Number of game levels
+    First = Easy,
+
+    ///< First game level value
+    Last = Hard ///< Last game level value
 }

@@ -64,77 +64,94 @@
  * CONSUMER, SO SOME OR ALL OF THE ABOVE EXCLUSIONS AND LIMITATIONS MAY
  * NOT APPLY TO YOU.
  */
+
 using System.Collections.Generic;
 
-namespace MicropolisSharp.Types
+namespace MicropolisSharp.Types;
+
+/// <summary>
+///     From micropolis.h
+/// </summary>
+public class ToolEffects
 {
-    /// <summary>
-    /// From micropolis.h
-    /// </summary>
-    public class ToolEffects
+    private int cost;
+    private readonly List<FrontendMessage> messages = new();
+    private readonly Dictionary<Position, ushort> modificationMap = new();
+    private readonly Micropolis simulator;
+
+    public ToolEffects(Micropolis sim)
     {
-        private Micropolis simulator;
-        private int cost;
-        private Dictionary<Position, ushort> modificationMap = new Dictionary<Position, ushort>();
-        private List<FrontendMessage> messages = new List<FrontendMessage>();
+        simulator = sim;
+        Clear();
+    }
 
-        public ToolEffects(Micropolis sim)
-        {
-            this.simulator = sim;
-            Clear();
-        }
+    public void Clear()
+    {
+        cost = 0;
+        modificationMap.Clear();
+        messages.Clear();
+    }
 
-        public void Clear()
-        {
-            cost = 0;
-            modificationMap.Clear();
-            messages.Clear();
-        }
+    public void ModifyWorld()
+    {
+        simulator.Spend(cost);
+        simulator.UpdateFunds();
 
-        public void ModifyWorld()
-        {
-            simulator.Spend(cost);
-            simulator.UpdateFunds();
+        foreach (var entry in modificationMap) simulator.Map[entry.Key.X, entry.Key.Y] = entry.Value;
 
-            foreach(KeyValuePair<Position, ushort> entry in modificationMap)
-            {
-                simulator.Map[entry.Key.X, entry.Key.Y] = entry.Value;
-            }
+        foreach (var msg in messages) msg.SendMessage(simulator);
+        Clear();
+    }
 
-            foreach(FrontendMessage msg in messages)
-            {
-                msg.SendMessage(simulator);
-            }
-            Clear();
-        }
+    public bool ModifyIfEnoughFunding()
+    {
+        if (simulator.TotalFunds < cost) return false;
+        ModifyWorld();
+        return true;
+    }
 
-        public bool ModifyIfEnoughFunding()
-        {
-            if(simulator.TotalFunds < cost)
-            {
-                return false;
-            }
-            ModifyWorld();
-            return true;
-        }
+    public ushort GetMapValue(Position pos)
+    {
+        if (modificationMap.ContainsKey(pos)) return modificationMap[pos];
+        return simulator.Map[pos.X, pos.Y];
+    }
 
-        public ushort GetMapValue(Position pos)
-        {
-            if (modificationMap.ContainsKey(pos))
-            {
-                return modificationMap[pos];
-            }
-            return simulator.Map[pos.X, pos.Y];
-        }
+    public ushort GetMapValue(int x, int y)
+    {
+        return GetMapValue(new Position(x, y));
+    }
 
-        public ushort GetMapValue(int x, int y) { return GetMapValue(new Position(x, y)); }
-        public ushort GetMapTile(Position pos) { return (ushort)(GetMapValue(pos) & (ushort)MapTileBits.LowMask); }
-        public ushort GetMapTile(int x, int y) { return (ushort)(GetMapValue(x, y) & (ushort)MapTileBits.LowMask); }
-        public int GetCost() { return cost; }
+    public ushort GetMapTile(Position pos)
+    {
+        return (ushort)(GetMapValue(pos) & (ushort)MapTileBits.LowMask);
+    }
 
-        public void AddCost(int amount) { cost += amount;  }
-        public void SetMapValue(Position pos, ushort mapVal) { }
-        public void SetMapValue(int x, int y, ushort mapVal) { SetMapValue(new Position(x, y), mapVal); }
-        public void AddFrontendMessage(FrontendMessage message) { messages.Add(message); }
+    public ushort GetMapTile(int x, int y)
+    {
+        return (ushort)(GetMapValue(x, y) & (ushort)MapTileBits.LowMask);
+    }
+
+    public int GetCost()
+    {
+        return cost;
+    }
+
+    public void AddCost(int amount)
+    {
+        cost += amount;
+    }
+
+    public void SetMapValue(Position pos, ushort mapVal)
+    {
+    }
+
+    public void SetMapValue(int x, int y, ushort mapVal)
+    {
+        SetMapValue(new Position(x, y), mapVal);
+    }
+
+    public void AddFrontendMessage(FrontendMessage message)
+    {
+        messages.Add(message);
     }
 }

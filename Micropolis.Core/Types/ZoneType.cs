@@ -64,18 +64,24 @@
  * CONSUMER, SO SOME OR ALL OF THE ABOVE EXCLUSIONS AND LIMITATIONS MAY
  * NOT APPLY TO YOU.
  */
-namespace MicropolisSharp.Types
-{
-    /// <summary>
-    /// Available Zone Types - from micropolis.h
-    /// </summary>
-    public enum ZoneType
-    {
-        Commercial,       ///< Commercial zone
-        Industrial,       ///< Industrial zone
-        Residential,      ///< Residential zone
 
-        //TODO: Remove this / move it somewhere else - it doesnt make sense here
-        NumberOfDestinations, ///< Number of available zones
-    }
+namespace MicropolisSharp.Types;
+
+/// <summary>
+///     Available Zone Types - from micropolis.h
+/// </summary>
+public enum ZoneType
+{
+    Commercial,
+
+    ///< Commercial zone
+    Industrial,
+
+    ///< Industrial zone
+    Residential,
+
+    ///< Residential zone
+
+    //TODO: Remove this / move it somewhere else - it doesnt make sense here
+    NumberOfDestinations ///< Number of available zones
 }

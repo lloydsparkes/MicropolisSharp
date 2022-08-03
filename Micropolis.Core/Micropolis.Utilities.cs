@@ -64,363 +64,345 @@
  * CONSUMER, SO SOME OR ALL OF THE ABOVE EXCLUSIONS AND LIMITATIONS MAY
  * NOT APPLY TO YOU.
  */
-using MicropolisSharp.Types;
-using System;
-using System.Diagnostics;
 
-namespace MicropolisSharp
+using System.Diagnostics;
+using MicropolisSharp.Types;
+
+namespace MicropolisSharp;
+
+/// <summary>
+///     Partial Class Containing the content of utilities.cpp
+/// </summary>
+public partial class Micropolis
 {
     /// <summary>
-    /// Partial Class Containing the content of utilities.cpp
+    ///     Pause a simulation
     /// </summary>
-    public partial class Micropolis
+    public void Pause()
     {
-        /// <summary>
-        /// Pause a simulation
-        /// </summary>
-        public void Pause()
+        if (!SimPaused)
         {
-            if (!SimPaused)
+            SimPausedSpeed = SimSpeedMeta;
+            SetSpeed(0);
+            SimPaused = true;
+        }
+
+        // Call back even if the state did not change.
+        Callback("update", "s", "paused");
+    }
+
+    /// <summary>
+    ///     Resume simulation after pausing it
+    /// </summary>
+    public void Resume()
+    {
+        if (SimPaused)
+        {
+            SimPaused = false;
+            SetSpeed((short)SimPausedSpeed);
+        }
+
+        // Call back even if the state did not change.
+        Callback("update", "s", "paused");
+    }
+
+    public void SetSpeed(short speed)
+    {
+        if (speed < 0)
+            speed = 0;
+        else if (speed > 3) speed = 3;
+
+        SimSpeedMeta = speed;
+
+        if (SimPaused)
+        {
+            SimPausedSpeed = SimSpeedMeta;
+            speed = 0;
+        }
+
+        SimSpeed = speed;
+
+        Callback("update", "s", "speed");
+    }
+
+    public void SetPasses(int passes)
+    {
+        SimPasses = passes;
+        SimPass = 0;
+        Callback("update", "s", "passes");
+    }
+
+    /// <summary>
+    ///     Set the game level and initial funds.
+    /// </summary>
+    /// <param name="level"></param>
+    public void SetGameLevelFunds(Levels level)
+    {
+        switch (level)
+        {
+            default:
+            case Levels.Easy:
+                SetFunds(20000);
+                SetGameLevel(Levels.Easy);
+                break;
+
+            case Levels.Medium:
+                SetFunds(10000);
+                SetGameLevel(Levels.Medium);
+                break;
+
+            case Levels.Hard:
+                SetFunds(5000);
+                SetGameLevel(Levels.Hard);
+                break;
+        }
+    }
+
+    /// <summary>
+    ///     Set/change the game level.
+    /// </summary>
+    /// <param name="level"></param>
+    public void SetGameLevel(Levels level)
+    {
+        Debug.Assert(level >= Levels.First && level <= Levels.Last);
+        GameLevel = level;
+        UpdateGameLevel();
+    }
+
+    /// <summary>
+    ///     Report to the front-end that a new game level has been set.
+    /// </summary>
+    public void UpdateGameLevel()
+    {
+        Callback("update", "s", "gameLevel");
+    }
+
+    /// <summary>
+    ///     Set the name of the city.
+    /// </summary>
+    /// <param name="name"></param>
+    public void SetCityName(string name)
+    {
+        var cleanName = "";
+
+        int i;
+        var n = name.Length;
+        for (i = 0; i < n; i++)
+        {
+            var ch = name[i];
+            if (!char.IsDigit(ch)) ch = '_';
+            cleanName += ch;
+        }
+
+        SetCleanCityName(cleanName);
+    }
+
+    /// <summary>
+    ///     Set the name of the city.
+    /// </summary>
+    /// <param name="name"></param>
+    public void SetCleanCityName(string name)
+    {
+        CityName = name;
+
+        Callback("update", "s", "cityName");
+    }
+
+    public void SetYear(int year)
+    {
+        // Must prevent year from going negative, since it screws up the non-floored modulo arithmetic.
+        if (year < StartingYear) year = StartingYear;
+
+        year = (int)(year - StartingYear - CityTime / 48);
+        CityTime += year * 48;
+        DoTimeStuff();
+    }
+
+    public int CurrentYear()
+    {
+        return (int)(CityTime / 48 + StartingYear);
+    }
+
+    /// <summary>
+    ///     Notify the user interface to start a new game.
+    /// </summary>
+    public void DoNewGame()
+    {
+        Callback("newGame", "");
+    }
+
+    /// <summary>
+    ///     set the enableDisasters flag, and set the flag to update the user interface.
+    /// </summary>
+    /// <param name="value"></param>
+    public void SetEnableDisasters(bool value)
+    {
+        EnableDisasters = value;
+        MustUpdateOptions = true;
+    }
+
+    /// <summary>
+    ///     Set the auto-budget to the given value.
+    /// </summary>
+    /// <param name="value"></param>
+    public void SetAutoBudget(bool value)
+    {
+        AutoBudget = value;
+        MustUpdateOptions = true;
+    }
+
+    /// <summary>
+    ///     Set the autoBulldoze flag to the given value,
+    ///     and set the mustUpdateOptions flag to update
+    ///     the user interface.
+    /// </summary>
+    /// <param name="value"></param>
+    public void SetAutoBulldoze(bool value)
+    {
+        AutoBulldoze = value;
+        MustUpdateOptions = true;
+    }
+
+    /// <summary>
+    ///     Set the autoGoto flag to the given value,
+    ///     and set the mustUpdateOptions flag to update
+    ///     the user interface.
+    /// </summary>
+    /// <param name="value"></param>
+    public void SetAutoGoTo(bool value)
+    {
+        AutoGoTo = value;
+        MustUpdateOptions = true;
+    }
+
+    /// <summary>
+    ///     Set the enableSound flag to the given value,
+    ///     and set the mustUpdateOptions flag to update
+    ///     the user interface.
+    /// </summary>
+    /// <param name="value"></param>
+    public void SetEnableSound(bool value)
+    {
+        EnableSound = value;
+        MustUpdateOptions = true;
+    }
+
+    /// <summary>
+    ///     Set the doAnimation flag to the given value,
+    ///     and set the mustUpdateOptions flag to update
+    ///     the user interface.
+    /// </summary>
+    /// <param name="value"></param>
+    public void SetDoAnimation(bool value)
+    {
+        DoAnimation = value;
+        MustUpdateOptions = true;
+    }
+
+    /// <summary>
+    ///     Set the doMessages flag to the given value,
+    ///     and set the mustUpdateOptions flag to update
+    ///     the user interface.
+    /// </summary>
+    /// <param name="value"></param>
+    public void SetDoMessages(bool value)
+    {
+        DoMessages = value;
+        MustUpdateOptions = true;
+    }
+
+    /// <summary>
+    ///     Set the doNotices flag to the given value,
+    ///     and set the mustUpdateOptions flag to update
+    ///     the user interface.
+    /// </summary>
+    /// <param name="value"></param>
+    public void SetDoNotices(bool value)
+    {
+        DoNotices = value;
+        MustUpdateOptions = true;
+    }
+
+    /// <summary>
+    ///     Return the residential, commercial and industrial
+    ///     development demands, as floating point numbers
+    ///     from -1 (lowest demand) to 1 (highest demand).
+    /// </summary>
+    /// <param name="resDemandResult"></param>
+    /// <param name="comDemandResult"></param>
+    /// <param name="indDemandResult"></param>
+    public void GetDemands(ref float resDemandResult, ref float comDemandResult, ref float indDemandResult)
+    {
+        resDemandResult = ResValve / (float)Constants.ResValveRange;
+        comDemandResult = ComValve / (float)Constants.ComValveRange;
+        indDemandResult = IndValve / (float)Constants.IndValveRange;
+    }
+
+    /// <summary>
+    ///     comefrom: drawTaxesCollected incBoxValue decBoxValue drawCurrentFunds drawActualBox updateFunds updateCurrentCost
+    /// </summary>
+    /// <param name="numStr"></param>
+    /// <param name="dollarStr"></param>
+    public void MakeDollarDecimalStr(string numStr, char[] dollarStr)
+    {
+        int leftMostSet;
+        int numOfDigits;
+        int numOfChars;
+        int numOfCommas;
+        var dollarIndex = 0;
+        var numIndex = 0;
+        int x;
+
+        numOfDigits = (short)numStr.Length;
+
+        if (numOfDigits == 1)
+        {
+            dollarStr[0] = '$';
+            dollarStr[1] = numStr[0];
+            dollarStr[2] = (char)0;
+            return;
+        }
+
+        if (numOfDigits == 2)
+        {
+            dollarStr[0] = '$';
+            dollarStr[1] = numStr[0];
+            dollarStr[2] = numStr[1];
+            dollarStr[3] = (char)0;
+            return;
+        }
+
+        if (numOfDigits == 3)
+        {
+            dollarStr[0] = '$';
+            dollarStr[1] = numStr[0];
+            dollarStr[2] = numStr[1];
+            dollarStr[3] = numStr[2];
+            dollarStr[4] = (char)0;
+        }
+        else
+        {
+            leftMostSet = numOfDigits % 3;
+
+            if (leftMostSet == 0) leftMostSet = 3;
+
+            numOfCommas = (numOfDigits - 1) / 3;
+
+            /* add 1 for the dollar sign */
+            numOfChars = numOfDigits + numOfCommas + 1;
+
+            dollarStr[numOfChars] = (char)0;
+
+            dollarStr[dollarIndex++] = '$';
+
+            for (x = 1; x <= leftMostSet; x++) dollarStr[dollarIndex++] = numStr[numIndex++];
+
+            for (x = 1; x <= numOfCommas; x++)
             {
-                SimPausedSpeed = SimSpeedMeta;
-                SetSpeed(0);
-                SimPaused = true;
-            }
-
-            // Call back even if the state did not change.
-            Callback("update", "s", "paused");
-        }
-
-        /// <summary>
-        /// Resume simulation after pausing it
-        /// </summary>
-        public void Resume()
-        {
-            if (SimPaused)
-            {
-                SimPaused = false;
-                SetSpeed((short)SimPausedSpeed);
-            }
-
-            // Call back even if the state did not change.
-            Callback("update", "s", "paused");
-        }
-
-        public void SetSpeed(short speed)
-        {
-            if (speed < 0)
-            {
-                speed = 0;
-            }
-            else if (speed > 3)
-            {
-                speed = 3;
-            }
-
-            SimSpeedMeta = speed;
-
-            if (SimPaused)
-            {
-                SimPausedSpeed = SimSpeedMeta;
-                speed = 0;
-            }
-
-            SimSpeed = speed;
-
-            Callback("update", "s", "speed");
-        }
-
-        public void SetPasses(int passes)
-        {
-            SimPasses = passes;
-            SimPass = 0;
-            Callback("update", "s", "passes");
-        }
-
-        /// <summary>
-        /// Set the game level and initial funds.
-        /// </summary>
-        /// <param name="level"></param>
-        public void SetGameLevelFunds(Levels level)
-        {
-            switch (level)
-            {
-
-                default:
-                case Levels.Easy:
-                    SetFunds(20000);
-                    SetGameLevel(Levels.Easy);
-                    break;
-
-                case Levels.Medium:
-                    SetFunds(10000);
-                    SetGameLevel(Levels.Medium);
-                    break;
-
-                case Levels.Hard:
-                    SetFunds(5000);
-                    SetGameLevel(Levels.Hard);
-                    break;
-
-            }
-        }
-
-        /// <summary>
-        /// Set/change the game level.
-        /// </summary>
-        /// <param name="level"></param>
-        public void SetGameLevel(Levels level)
-        {
-            Debug.Assert(level >= Levels.First && level <= Levels.Last);
-            GameLevel = level;
-            UpdateGameLevel();
-        }
-
-        /// <summary>
-        /// Report to the front-end that a new game level has been set.
-        /// </summary>
-        public void UpdateGameLevel()
-        {
-            Callback("update", "s", "gameLevel");
-        }
-
-        /// <summary>
-        /// Set the name of the city.
-        /// </summary>
-        /// <param name="name"></param>
-        public void SetCityName(string name)
-        {
-            string cleanName = "";
-
-            int i;
-            int n = name.Length;
-            for (i = 0; i < n; i++)
-            {
-                char ch = name[i];
-                if (!Char.IsDigit(ch))
-                {
-                    ch = '_';
-                }
-                cleanName += ch;
-            }
-
-            SetCleanCityName(cleanName);
-        }
-
-        /// <summary>
-        /// Set the name of the city.
-        /// </summary>
-        /// <param name="name"></param>
-        public void SetCleanCityName(string name)
-        {
-            CityName = name;
-
-            Callback("update", "s", "cityName");
-        }
-
-        public void SetYear(int year)
-        {     // Must prevent year from going negative, since it screws up the non-floored modulo arithmetic.
-            if (year < StartingYear)
-            {
-                year = StartingYear;
-            }
-
-            year = (int)((year - StartingYear) - (CityTime / 48));
-            CityTime += year * 48;
-            DoTimeStuff();
-        }
-
-        public int CurrentYear()
-        {
-            return (int)((CityTime / 48) + StartingYear);
-        }
-
-        /// <summary>
-        /// Notify the user interface to start a new game.
-        /// </summary>
-        public void DoNewGame()
-        {
-            Callback("newGame", "");
-        }
-
-        /// <summary>
-        /// set the enableDisasters flag, and set the flag to update the user interface.
-        /// </summary>
-        /// <param name="value"></param>
-        public void SetEnableDisasters(bool value)
-        {
-            EnableDisasters = value;
-            MustUpdateOptions = true;
-        }
-
-        /// <summary>
-        /// Set the auto-budget to the given value.
-        /// </summary>
-        /// <param name="value"></param>
-        public void SetAutoBudget(bool value)
-        {
-            AutoBudget = value;
-            MustUpdateOptions = true;
-        }
-
-        /// <summary>
-        /// Set the autoBulldoze flag to the given value,
-        /// and set the mustUpdateOptions flag to update
-        /// the user interface.
-        /// </summary>
-        /// <param name="value"></param>
-        public void SetAutoBulldoze(bool value)
-        {
-            AutoBulldoze = value;
-            MustUpdateOptions = true;
-        }
-
-        /// <summary>
-        /// Set the autoGoto flag to the given value,
-        /// and set the mustUpdateOptions flag to update
-        /// the user interface.
-        /// </summary>
-        /// <param name="value"></param>
-        public void SetAutoGoTo(bool value)
-        {
-            AutoGoTo = value;
-            MustUpdateOptions = true;
-        }
-
-        /// <summary>
-        /// Set the enableSound flag to the given value,
-        /// and set the mustUpdateOptions flag to update
-        /// the user interface.
-        /// </summary>
-        /// <param name="value"></param>
-        public void SetEnableSound(bool value)
-        {
-            EnableSound = value;
-            MustUpdateOptions = true;
-        }
-
-        /// <summary>
-        /// Set the doAnimation flag to the given value,
-        /// and set the mustUpdateOptions flag to update
-        /// the user interface.
-        /// </summary>
-        /// <param name="value"></param>
-        public void SetDoAnimation(bool value)
-        {
-            DoAnimation = value;
-            MustUpdateOptions = true;
-        }
-
-        /// <summary>
-        /// Set the doMessages flag to the given value,
-        /// and set the mustUpdateOptions flag to update
-        /// the user interface.
-        /// </summary>
-        /// <param name="value"></param>
-        public void SetDoMessages(bool value)
-        {
-            DoMessages = value;
-            MustUpdateOptions = true;
-        }
-
-        /// <summary>
-        /// Set the doNotices flag to the given value,
-        /// and set the mustUpdateOptions flag to update
-        /// the user interface.
-        /// </summary>
-        /// <param name="value"></param>
-        public void SetDoNotices(bool value)
-        {
-            DoNotices = value;
-            MustUpdateOptions = true;
-        }
-
-        /// <summary>
-        /// Return the residential, commercial and industrial
-        /// development demands, as floating point numbers
-        /// from -1 (lowest demand) to 1 (highest demand).
-        /// </summary>
-        /// <param name="resDemandResult"></param>
-        /// <param name="comDemandResult"></param>
-        /// <param name="indDemandResult"></param>
-        public void GetDemands(ref float resDemandResult, ref float comDemandResult, ref float indDemandResult)
-        {
-            resDemandResult = (float)ResValve / (float)Constants.ResValveRange;
-            comDemandResult = (float)ComValve / (float)Constants.ComValveRange;
-            indDemandResult = (float)IndValve / (float)Constants.IndValveRange;
-        }
-
-        /// <summary>
-        /// comefrom: drawTaxesCollected incBoxValue decBoxValue drawCurrentFunds drawActualBox updateFunds updateCurrentCost
-        /// </summary>
-        /// <param name="numStr"></param>
-        /// <param name="dollarStr"></param>
-        public void MakeDollarDecimalStr(string numStr, char[] dollarStr)
-        {
-            int leftMostSet;
-            int numOfDigits;
-            int numOfChars;
-            int numOfCommas;
-            int dollarIndex = 0;
-            int numIndex = 0;
-            int x;
-
-            numOfDigits = (short)numStr.Length;
-
-            if (numOfDigits == 1)
-            {
-                dollarStr[0] = '$';
-                dollarStr[1] = numStr[0];
-                dollarStr[2] = (char)0;
-                return;
-            }
-            else if (numOfDigits == 2)
-            {
-                dollarStr[0] = '$';
-                dollarStr[1] = numStr[0];
-                dollarStr[2] = numStr[1];
-                dollarStr[3] = (char)0;
-                return;
-            }
-            else if (numOfDigits == 3)
-            {
-                dollarStr[0] = '$';
-                dollarStr[1] = numStr[0];
-                dollarStr[2] = numStr[1];
-                dollarStr[3] = numStr[2];
-                dollarStr[4] = (char)0;
-            }
-            else
-            {
-                leftMostSet = numOfDigits % 3;
-
-                if (leftMostSet == 0)
-                {
-                    leftMostSet = 3;
-                }
-
-                numOfCommas = (numOfDigits - 1) / 3;
-
-                /* add 1 for the dollar sign */
-                numOfChars = numOfDigits + numOfCommas + 1;
-
-                dollarStr[numOfChars] = (char)0;
-
-                dollarStr[dollarIndex++] = '$';
-
-                for (x = 1; x <= leftMostSet; x++)
-                {
-                    dollarStr[dollarIndex++] = numStr[numIndex++];
-                }
-
-                for (x = 1; x <= numOfCommas; x++)
-                {
-                    dollarStr[dollarIndex++] = ',';
-                    dollarStr[dollarIndex++] = numStr[numIndex++];
-                    dollarStr[dollarIndex++] = numStr[numIndex++];
-                    dollarStr[dollarIndex++] = numStr[numIndex++];
-                }
-
+                dollarStr[dollarIndex++] = ',';
+                dollarStr[dollarIndex++] = numStr[numIndex++];
+                dollarStr[dollarIndex++] = numStr[numIndex++];
+                dollarStr[dollarIndex++] = numStr[numIndex++];
             }
         }
     }

@@ -64,334 +64,293 @@
  * CONSUMER, SO SOME OR ALL OF THE ABOVE EXCLUSIONS AND LIMITATIONS MAY
  * NOT APPLY TO YOU.
  */
-using MicropolisSharp.Types;
-using System;
 
-namespace MicropolisSharp
+using System;
+using MicropolisSharp.Types;
+
+namespace MicropolisSharp;
+
+/// <summary>
+///     Partial Class Containing the content of graph.cpp
+/// </summary>
+public partial class Micropolis
 {
     /// <summary>
-    /// Partial Class Containing the content of graph.cpp
+    ///     TODO: Never used, can it be removed?
     /// </summary>
-    public partial class Micropolis
+    public bool HistoryInitialized { get; private set; }
+
+    /// <summary>
+    ///     TODO: Write Only variable, can it be removed?
+    /// </summary>
+    public int Graph10Max { get; private set; }
+
+    /// <summary>
+    ///     TODO: Write Only Variable, can it be removed?
+    /// </summary>
+    public int Graph120Max { get; private set; }
+
+    /// <summary>
+    ///     Copy history data to new array, scaling as needed.
+    ///     TODO: Why do we copy this data
+    /// </summary>
+    /// <param name="hist">Source history data.</param>
+    /// <param name="scale">Scale factor.</param>
+    /// <returns>Destination byte array.</returns>
+    public char[] DrawMonth(short[] hist, float scale)
     {
-        /// <summary>
-        /// TODO: Never used, can it be removed?
-        /// </summary>
-        public bool HistoryInitialized { get; private set; }
+        var result = new char[120];
+        int val, x;
 
-        /// <summary>
-        /// TODO: Write Only variable, can it be removed?
-        /// </summary>
-        public int Graph10Max { get; private set; }
-
-        /// <summary>
-        /// TODO: Write Only Variable, can it be removed?
-        /// </summary>
-        public int Graph120Max { get; private set; }
-
-        /// <summary>
-        /// Copy history data to new array, scaling as needed.
-        /// 
-        /// TODO: Why do we copy this data
-        /// </summary>
-        /// <param name="hist">Source history data.</param>
-        /// <param name="scale">Scale factor.</param>
-        /// <returns>Destination byte array.</returns>
-        public char[] DrawMonth(short[] hist, float scale)
+        for (x = 0; x < 120; x++)
         {
-            var result = new char[120];
-            int val, x;
-
-            for (x = 0; x < 120; x++)
-            {
-                val = (int)(hist[x] * scale);
-                result[119 - x] = (char)Utilities.Restrict(val, 0, 255);
-            }
-            return result;
+            val = (int)(hist[x] * scale);
+            result[119 - x] = (char)Utilities.Restrict(val, 0, 255);
         }
 
-        /// <summary>
-        /// Set flag that graph data has been changed and graphs should be updated.
-        /// 
-        /// TODO: Rename Function
-        /// </summary>
-        public void ChangeCensus() { CensusChanged = true; }
+        return result;
+    }
 
-        /// <summary>
-        /// If graph data has been changed, update all graphs.
-        /// 
-        /// If graphs have been changed, tell the user front-end about it.
-        /// </summary>
-        public void GraphDoer()
+    /// <summary>
+    ///     Set flag that graph data has been changed and graphs should be updated.
+    ///     TODO: Rename Function
+    /// </summary>
+    public void ChangeCensus()
+    {
+        CensusChanged = true;
+    }
+
+    /// <summary>
+    ///     If graph data has been changed, update all graphs.
+    ///     If graphs have been changed, tell the user front-end about it.
+    /// </summary>
+    public void GraphDoer()
+    {
+        if (CensusChanged)
         {
-            if (CensusChanged)
-            {
-                Callback("update", "s", "history");
-                CensusChanged = false;
-            }
+            Callback("update", "s", "history");
+            CensusChanged = false;
         }
+    }
 
-        /// <summary>
-        /// Initialize graphs
-        /// </summary>
-        public void InitGraphs()
+    /// <summary>
+    ///     Initialize graphs
+    /// </summary>
+    public void InitGraphs()
+    {
+        if (!HistoryInitialized) HistoryInitialized = true;
+    }
+
+    /// <summary>
+    ///     Compute various max ranges of graphs
+    /// </summary>
+    public void InitGraphMax()
+    {
+        int x;
+
+        ResHist10Max = 0;
+        ComHist10Max = 0;
+        IndHist10Max = 0;
+
+        for (x = 118; x >= 0; x--)
         {
-            if (!HistoryInitialized)
-            {
-                HistoryInitialized = true;
-            }
+            if (ResHist[x] < 0) ResHist[x] = 0;
+            if (ComHist[x] < 0) ComHist[x] = 0;
+            if (IndHist[x] < 0) IndHist[x] = 0;
+
+            ResHist10Max = Math.Max(ResHist10Max, ResHist[x]);
+            ComHist10Max = Math.Max(ComHist10Max, ComHist[x]);
+            IndHist10Max = Math.Max(IndHist10Max, IndHist[x]);
         }
 
-        /// <summary>
-        /// Compute various max ranges of graphs
-        /// </summary>
-        public void InitGraphMax() {
-            int x;
+        Graph10Max = (short)Math.Max(ResHist10Max, Math.Max(ComHist10Max, IndHist10Max));
 
-            ResHist10Max = 0;
-            ComHist10Max = 0;
-            IndHist10Max = 0;
+        ResHist120Max = 0;
+        ComHist120Max = 0;
+        IndHist120Max = 0;
 
-            for (x = 118; x >= 0; x--)
-            {
-
-                if (ResHist[x] < 0)
-                {
-                    ResHist[x] = 0;
-                }
-                if (ComHist[x] < 0)
-                {
-                    ComHist[x] = 0;
-                }
-                if (IndHist[x] < 0)
-                {
-                    IndHist[x] = 0;
-                }
-
-                ResHist10Max = Math.Max(ResHist10Max, ResHist[x]);
-                ComHist10Max = Math.Max(ComHist10Max, ComHist[x]);
-                IndHist10Max = Math.Max(IndHist10Max, IndHist[x]);
-
-            }
-
-            Graph10Max = (short)Math.Max(ResHist10Max, Math.Max(ComHist10Max, IndHist10Max));
-
-            ResHist120Max = 0;
-            ComHist120Max = 0;
-            IndHist120Max = 0;
-
-            for (x = 238; x >= 120; x--)
-            {
-
-                if (ResHist[x] < 0)
-                {
-                    ResHist[x] = 0;
-                }
-                if (ComHist[x] < 0)
-                {
-                    ComHist[x] = 0;
-                }
-                if (IndHist[x] < 0)
-                {
-                    IndHist[x] = 0;
-                }
-
-                ResHist10Max = Math.Max(ResHist10Max, ResHist[x]);
-                ComHist10Max = Math.Max(ComHist10Max, ComHist[x]);
-                IndHist10Max = Math.Max(IndHist10Max, IndHist[x]);
-
-            }
-
-            Graph120Max = (short)Math.Max(ResHist120Max, Math.Max(ComHist120Max, IndHist120Max));
-        }
-
-        /// <summary>
-        /// Get the minimal and maximal values of a historic graph.
-        /// </summary>
-        /// <param name="historyType">Type of history information. @see HistoryType</param>
-        /// <param name="historyScale">Scale of history data. @see HistoryScale</param>
-        /// <param name="minValResult">Pointer to variable to write minimal value to.</param>
-        /// <param name="maxValResult">Pointer to variable to write maximal value to.</param>
-        public void GetHistoryRange(HistoryType historyType, HistoryScale historyScale, ref short minValResult, ref short maxValResult) {
-            if (historyType < 0 || historyType >= HistoryType.Count || historyScale < 0 || historyScale >= HistoryScale.Count)
-            {
-                minValResult = 0;
-                maxValResult = 0;
-                return;
-            }
-
-            short[] history = null;
-            switch (historyType)
-            {
-                case HistoryType.Res:
-                    history = ResHist;
-                    break;
-                case HistoryType.Com:
-                    history = ComHist;
-                    break;
-                case HistoryType.Ind:
-                    history = IndHist;
-                    break;
-                case HistoryType.Money:
-                    history = MoneyHist;
-                    break;
-                case HistoryType.Crime:
-                    history = CrimeHist;
-                    break;
-                case HistoryType.Pollution:
-                    history = PollutionHist;
-                    break;
-                default:
-                    //NOT_REACHED();
-                    break;
-            }
-
-            int offset = 0;
-            switch (historyScale)
-            {
-                case HistoryScale.Short:
-                    offset = 0;
-                    break;
-                case HistoryScale.Long:
-                    offset = 120;
-                    break;
-                default:
-                    //NOT_REACHED();
-                    break;
-            }
-
-            short minVal = 32000;
-            short maxVal = -32000;
-
-            for (int i = 0; i < Constants.HistoryCount; i++)
-            {
-                short val = history[i + offset];
-
-                minVal = Math.Min(val, minVal);
-                maxVal = Math.Max(val, maxVal);
-            }
-
-            minValResult = minVal;
-            maxValResult = maxVal;
-        }
-
-        /// <summary>
-        /// Get a value from the history tables.
-        /// </summary>
-        /// <param name="historyType">Type of history information. @see HistoryType</param>
-        /// <param name="historyScale">Scale of history data. @see HistoryScale</param>
-        /// <param name="historyIndex">Index in the data to obtain</param>
-        /// <returns>Historic data value of the requested graph</returns>
-        public short GetHistory(HistoryType historyType, HistoryScale historyScale, int historyIndex) {
-            if (historyType < 0 || historyType >= HistoryType.Count
-                || historyScale < 0 || historyScale >= HistoryScale.Count
-                || historyIndex < 0 || historyIndex >= Constants.HistoryCount)
-            {
-                return 0;
-            }
-
-            short[] history = null;
-            switch (historyType)
-            {
-                case HistoryType.Res:
-                    history = ResHist;
-                    break;
-                case HistoryType.Com:
-                    history = ComHist;
-                    break;
-                case HistoryType.Ind:
-                    history = IndHist;
-                    break;
-                case HistoryType.Money:
-                    history = MoneyHist;
-                    break;
-                case HistoryType.Crime:
-                    history = CrimeHist;
-                    break;
-                case HistoryType.Pollution:
-                    history = PollutionHist;
-                    break;
-                default:
-                    //NOT_REACHED();
-                    break;
-            }
-
-            int offset = 0;
-            switch (historyScale)
-            {
-                case HistoryScale.Short:
-                    offset = 0;
-                    break;
-                case HistoryScale.Long:
-                    offset = 120;
-                    break;
-                default:
-                    //NOT_REACHED();
-                    break;
-            }
-
-            short result = history[historyIndex + offset];
-
-            return result;
-        }
-
-        /// <summary>
-        /// Store a value into the history tables.
-        /// </summary>
-        /// <param name="historyType">Type of history information. @see HistoryType</param>
-        /// <param name="historyScale">Scale of history data. @see HistoryScale</param>
-        /// <param name="historyIndex">Index in the data to obtain</param>
-        /// <param name="historyValue">Index in the value to store</param>
-        public void SetHistory(HistoryType historyType, HistoryScale historyScale, int historyIndex, short historyValue)
+        for (x = 238; x >= 120; x--)
         {
-            if (historyType < 0 || historyType >= HistoryType.Count
-                || historyScale < 0 || historyScale >= HistoryScale.Count
-                || historyIndex < 0 || historyIndex >= Constants.HistoryCount)
-            {
-                return;
-            }
+            if (ResHist[x] < 0) ResHist[x] = 0;
+            if (ComHist[x] < 0) ComHist[x] = 0;
+            if (IndHist[x] < 0) IndHist[x] = 0;
 
-            short[] history = null;
-            switch (historyType)
-            {
-                case HistoryType.Res:
-                    history = ResHist;
-                    break;
-                case HistoryType.Com:
-                    history = ComHist;
-                    break;
-                case HistoryType.Ind:
-                    history = IndHist;
-                    break;
-                case HistoryType.Money:
-                    history = MoneyHist;
-                    break;
-                case HistoryType.Crime:
-                    history = CrimeHist;
-                    break;
-                case HistoryType.Pollution:
-                    history = PollutionHist;
-                    break;
-                default:
-                    //NOT_REACHED();
-                    break;
-            }
-
-            int offset = 0;
-            switch (historyScale)
-            {
-                case HistoryScale.Short:
-                    offset = 0;
-                    break;
-                case HistoryScale.Long:
-                    offset = 120;
-                    break;
-                default:
-                    //NOT_REACHED();
-                    break;
-            }
-
-            history[historyIndex + offset] = historyValue;
+            ResHist10Max = Math.Max(ResHist10Max, ResHist[x]);
+            ComHist10Max = Math.Max(ComHist10Max, ComHist[x]);
+            IndHist10Max = Math.Max(IndHist10Max, IndHist[x]);
         }
+
+        Graph120Max = (short)Math.Max(ResHist120Max, Math.Max(ComHist120Max, IndHist120Max));
+    }
+
+    /// <summary>
+    ///     Get the minimal and maximal values of a historic graph.
+    /// </summary>
+    /// <param name="historyType">Type of history information. @see HistoryType</param>
+    /// <param name="historyScale">Scale of history data. @see HistoryScale</param>
+    /// <param name="minValResult">Pointer to variable to write minimal value to.</param>
+    /// <param name="maxValResult">Pointer to variable to write maximal value to.</param>
+    public void GetHistoryRange(HistoryType historyType, HistoryScale historyScale, ref short minValResult,
+        ref short maxValResult)
+    {
+        if (historyType < 0 || historyType >= HistoryType.Count || historyScale < 0 ||
+            historyScale >= HistoryScale.Count)
+        {
+            minValResult = 0;
+            maxValResult = 0;
+            return;
+        }
+
+        short[] history = null;
+        switch (historyType)
+        {
+            case HistoryType.Res:
+                history = ResHist;
+                break;
+            case HistoryType.Com:
+                history = ComHist;
+                break;
+            case HistoryType.Ind:
+                history = IndHist;
+                break;
+            case HistoryType.Money:
+                history = MoneyHist;
+                break;
+            case HistoryType.Crime:
+                history = CrimeHist;
+                break;
+            case HistoryType.Pollution:
+                history = PollutionHist;
+                break;
+        }
+
+        var offset = 0;
+        switch (historyScale)
+        {
+            case HistoryScale.Short:
+                offset = 0;
+                break;
+            case HistoryScale.Long:
+                offset = 120;
+                break;
+        }
+
+        short minVal = 32000;
+        short maxVal = -32000;
+
+        for (var i = 0; i < Constants.HistoryCount; i++)
+        {
+            var val = history[i + offset];
+
+            minVal = Math.Min(val, minVal);
+            maxVal = Math.Max(val, maxVal);
+        }
+
+        minValResult = minVal;
+        maxValResult = maxVal;
+    }
+
+    /// <summary>
+    ///     Get a value from the history tables.
+    /// </summary>
+    /// <param name="historyType">Type of history information. @see HistoryType</param>
+    /// <param name="historyScale">Scale of history data. @see HistoryScale</param>
+    /// <param name="historyIndex">Index in the data to obtain</param>
+    /// <returns>Historic data value of the requested graph</returns>
+    public short GetHistory(HistoryType historyType, HistoryScale historyScale, int historyIndex)
+    {
+        if (historyType < 0 || historyType >= HistoryType.Count
+                            || historyScale < 0 || historyScale >= HistoryScale.Count
+                            || historyIndex < 0 || historyIndex >= Constants.HistoryCount)
+            return 0;
+
+        short[] history = null;
+        switch (historyType)
+        {
+            case HistoryType.Res:
+                history = ResHist;
+                break;
+            case HistoryType.Com:
+                history = ComHist;
+                break;
+            case HistoryType.Ind:
+                history = IndHist;
+                break;
+            case HistoryType.Money:
+                history = MoneyHist;
+                break;
+            case HistoryType.Crime:
+                history = CrimeHist;
+                break;
+            case HistoryType.Pollution:
+                history = PollutionHist;
+                break;
+        }
+
+        var offset = 0;
+        switch (historyScale)
+        {
+            case HistoryScale.Short:
+                offset = 0;
+                break;
+            case HistoryScale.Long:
+                offset = 120;
+                break;
+        }
+
+        var result = history[historyIndex + offset];
+
+        return result;
+    }
+
+    /// <summary>
+    ///     Store a value into the history tables.
+    /// </summary>
+    /// <param name="historyType">Type of history information. @see HistoryType</param>
+    /// <param name="historyScale">Scale of history data. @see HistoryScale</param>
+    /// <param name="historyIndex">Index in the data to obtain</param>
+    /// <param name="historyValue">Index in the value to store</param>
+    public void SetHistory(HistoryType historyType, HistoryScale historyScale, int historyIndex, short historyValue)
+    {
+        if (historyType < 0 || historyType >= HistoryType.Count
+                            || historyScale < 0 || historyScale >= HistoryScale.Count
+                            || historyIndex < 0 || historyIndex >= Constants.HistoryCount)
+            return;
+
+        short[] history = null;
+        switch (historyType)
+        {
+            case HistoryType.Res:
+                history = ResHist;
+                break;
+            case HistoryType.Com:
+                history = ComHist;
+                break;
+            case HistoryType.Ind:
+                history = IndHist;
+                break;
+            case HistoryType.Money:
+                history = MoneyHist;
+                break;
+            case HistoryType.Crime:
+                history = CrimeHist;
+                break;
+            case HistoryType.Pollution:
+                history = PollutionHist;
+                break;
+        }
+
+        var offset = 0;
+        switch (historyScale)
+        {
+            case HistoryScale.Short:
+                offset = 0;
+                break;
+            case HistoryScale.Long:
+                offset = 120;
+                break;
+        }
+
+        history[historyIndex + offset] = historyValue;
     }
 }

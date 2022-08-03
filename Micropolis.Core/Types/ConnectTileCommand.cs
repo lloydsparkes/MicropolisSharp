@@ -64,17 +64,27 @@
  * CONSUMER, SO SOME OR ALL OF THE ABOVE EXCLUSIONS AND LIMITATIONS MAY
  * NOT APPLY TO YOU.
  */
-namespace MicropolisSharp.Types
+
+namespace MicropolisSharp.Types;
+
+/// <summary>
+///     Particular commands that can be used to connect tiles (in connect.cpp) - from micropolis.h
+/// </summary>
+public enum ConnectTileCommand
 {
-    /// <summary>
-    /// Particular commands that can be used to connect tiles (in connect.cpp) - from micropolis.h
-    /// </summary>
-    public enum ConnectTileCommand
-    {
-        Fix, ///< Fix zone (connect wire, road, and rail).
-        Bulldoze, ///< Bulldoze and fix zone.
-        Road, ///< Lay road and fix zone.
-        RailRoad, ///< Lay rail and fix zone.
-        Wire, ///< Lay wire and fix zone.
-    }
+    Fix,
+
+    /// < Fix zone ( connect wire, road, and rail
+    /// )
+    /// .
+    Bulldoze,
+
+    ///< Bulldoze and fix zone.
+    Road,
+
+    ///< Lay road and fix zone.
+    RailRoad,
+
+    ///< Lay rail and fix zone.
+    Wire ///< Lay wire and fix zone.
 }

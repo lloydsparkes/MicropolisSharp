@@ -64,24 +64,49 @@
  * CONSUMER, SO SOME OR ALL OF THE ABOVE EXCLUSIONS AND LIMITATIONS MAY
  * NOT APPLY TO YOU.
  */
-namespace MicropolisSharp.Types
+
+namespace MicropolisSharp.Types;
+
+/// <summary>
+///     Available Scenarios - from micropolis.h
+/// </summary>
+public enum Scenario
 {
-    /// <summary>
-    /// Available Scenarios - from micropolis.h
-    /// </summary>
-    public enum Scenario
-    {
-        None,           ///< No scenario (free playing)
+    None,
 
-        Dullsville,     ///< Dullsville (boredom)
-        SanFrancisco,  ///< San francisco (earthquake)
-        Hamburg,        ///< Hamburg (fire bombs)
-        Bern,           ///< Bern (traffic)
-        Tokyo,          ///< Tokyo (scary monster)
-        Detroit,        ///< Detroit (crime)
-        Boston,         ///< Boston (nuclear meltdown)
-        Rio,            ///< Rio (flooding)
+    /// < No scenario ( free playing
+    /// )
+    Dullsville,
 
-        Count,          ///< Number of scenarios
-    }
+    /// < Dullsville ( boredom
+    /// )
+    SanFrancisco,
+
+    /// < San francisco ( earthquake
+    /// )
+    Hamburg,
+
+    /// < Hamburg ( fire bombs
+    /// )
+    Bern,
+
+    /// < Bern ( traffic
+    /// )
+    Tokyo,
+
+    /// < Tokyo ( scary monster
+    /// )
+    Detroit,
+
+    /// < Detroit ( crime
+    /// )
+    Boston,
+
+    /// < Boston ( nuclear meltdown
+    /// )
+    Rio,
+
+    /// < Rio ( flooding
+    /// )
+    Count ///< Number of scenarios
 }

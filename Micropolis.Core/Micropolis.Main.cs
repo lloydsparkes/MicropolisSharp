@@ -64,478 +64,454 @@
  * CONSUMER, SO SOME OR ALL OF THE ABOVE EXCLUSIONS AND LIMITATIONS MAY
  * NOT APPLY TO YOU.
  */
-using MicropolisSharp.Types;
+
 using System;
 using System.Collections.Generic;
 using System.IO;
+using MicropolisSharp.Types;
 
-namespace MicropolisSharp
+namespace MicropolisSharp;
+
+/// <summary>
+///     Partial Class Containing the content of main.cpp
+/// </summary>
+public partial class Micropolis
 {
     /// <summary>
-    /// Partial Class Containing the content of main.cpp
+    ///     ???
     /// </summary>
-    public partial class Micropolis
+    public int SimLoops { get; private set; }
+
+    /// <summary>
+    ///     The count of the current pass through the simulator loop.
+    /// </summary>
+    public int SimPass { get; private set; }
+
+    /// <summary>
+    ///     Is the simulation paused?
+    ///     TODO: Variable has reversed logic, maybe rename to sim running?
+    /// </summary>
+    public bool SimPaused { get; private set; }
+
+    /// <summary>
+    ///     Simulator Paused Speed
+    ///     TODO: Again too, Variable has reversed logic
+    /// </summary>
+    public int SimPausedSpeed { get; private set; }
+
+    /// <summary>
+    ///     The number of passes through the simulator, loop to take each tick
+    /// </summary>
+    public int SimPasses { get; private set; }
+
+    /// <summary>
+    ///     TODO: Currently not used - should it be hooked up?
+    /// </summary>
+    public bool TilesAnimated { get; private set; }
+
+    /// <summary>
+    ///     TODO: Currently not used - should it be hooked up?
+    /// </summary>
+    public bool DoMessages { get; private set; }
+
+    /// <summary>
+    ///     Enable Animation - currently always true
+    ///     TODO: Currently not used - should it be hooked up?
+    /// </summary>
+    public bool DoAnimation { get; private set; }
+
+    /// <summary>
+    ///     TODO: Currently not used - should it be hooked up?
+    /// </summary>
+    public bool DoNotices { get; private set; }
+
+    /// <summary>
+    ///     Filename of last city loaded
+    /// </summary>
+    public string CityFileName { get; private set; }
+
+    /// <summary>
+    ///     Name of the City
+    /// </summary>
+    public string CityName { get; private set; }
+
+    /// <summary>
+    ///     ????
+    /// </summary>
+    public int HeatSteps { get; private set; }
+
+    /// <summary>
+    ///     TODO: Always -7 - make constant
+    /// </summary>
+    [Obsolete]
+    public int HeatFlow { get; private set; }
+
+    /// <summary>
+    ///     Get version of Micropolis program.
+    ///     TODO: Use this function or Eliminate it
+    /// </summary>
+    /// <returns>Textual version</returns>
+    public string GetMicropolisVersion()
     {
-        /// <summary>
-        /// ???
-        /// </summary>
-        public int SimLoops { get; private set; }
+        return "5.0";
+    }
 
-        /// <summary>
-        /// The count of the current pass through the simulator loop.
-        /// </summary>
-        public int SimPass { get; private set; }
+    /// <summary>
+    ///     Check whether \a dir points to a directory.
+    ///     If not report an error
+    /// </summary>
+    /// <param name="dir">Directory to search.</param>
+    /// <returns>Directory has been found</returns>
+    public static bool TestDirectory(string dir)
+    {
+        return Directory.Exists(dir);
+    }
 
-        /// <summary>
-        /// Is the simulation paused? 
-        /// 
-        /// TODO: Variable has reversed logic, maybe rename to sim running?
-        /// </summary>
-        public bool SimPaused { get; private set; }
+    /// <summary>
+    ///     Locate resource directory.
+    /// </summary>
+    public void EnvironmentInit()
+    {
+        var simHome = Environment.GetEnvironmentVariable("SIMHOME");
+        if (string.IsNullOrWhiteSpace(simHome)) simHome = Directory.GetCurrentDirectory();
 
-        /// <summary>
-        /// Simulator Paused Speed
-        /// 
-        /// TODO: Again too, Variable has reversed logic
-        /// </summary>
-        public int SimPausedSpeed { get; private set; }
-
-        /// <summary>
-        /// The number of passes through the simulator, loop to take each tick
-        /// </summary>
-        public int SimPasses { get; private set; }
-
-        /// <summary>
-        /// TODO: Currently not used - should it be hooked up?
-        /// </summary>
-        public bool TilesAnimated { get; private set; }
-
-        /// <summary>
-        /// TODO: Currently not used - should it be hooked up?
-        /// </summary>
-        public bool DoMessages { get; private set; }
-
-        /// <summary>
-        /// Enable Animation - currently always true
-        /// 
-        /// TODO: Currently not used - should it be hooked up?
-        /// </summary>
-        public bool DoAnimation { get; private set; }
-
-        /// <summary>
-        /// TODO: Currently not used - should it be hooked up?
-        /// </summary>
-        public bool DoNotices { get; private set; }
-
-        /// <summary>
-        /// Filename of last city loaded
-        /// </summary>
-        public string CityFileName { get; private set; }
-
-        /// <summary>
-        /// Name of the City
-        /// </summary>
-        public string CityName { get; private set; }
-
-        /// <summary>
-        /// ????
-        /// </summary>
-        public int HeatSteps { get; private set; }
-
-        /// <summary>
-        /// TODO: Always -7 - make constant
-        /// </summary>
-        [Obsolete]
-        public int HeatFlow { get; private set; }
-
-        /// <summary>
-        /// Get version of Micropolis program.
-        /// 
-        /// TODO: Use this function or Eliminate it
-        /// </summary>
-        /// <returns>Textual version</returns>
-        public string GetMicropolisVersion()
+        if (TestDirectory(simHome))
         {
-            return "5.0";
+            resourceDir = simHome + Path.PathSeparator + "res" + Path.PathSeparator;
+            if (TestDirectory(resourceDir)) return;
         }
 
-        /// <summary>
-        /// Check whether \a dir points to a directory.
-        /// 
-        /// If not report an error
-        /// </summary>
-        /// <param name="dir">Directory to search.</param>
-        /// <returns>Directory has been found</returns>
-        public static bool TestDirectory(string dir)
+        //TODO: Exception - cannot find res dir
+    }
+
+    /// <summary>
+    ///     Initialize for a simulation
+    /// </summary>
+    public void SimInit()
+    {
+        SpriteList = new List<SimSprite>();
+
+        SetEnableSound(true); // Enable sound
+        MustUpdateOptions = true; // Update options displayed at user
+        Scenario = Scenario.None;
+        StartingYear = 1900;
+        SimPasses = 1;
+        SimPass = 0;
+        SetAutoGoTo(true); // Enable auto-goto
+        SetCityTax(7);
+        CityTime = 50;
+        SetEnableDisasters(true); // Enable disasters
+        SetAutoBulldoze(true); // Enable auto bulldoze
+        SetAutoBudget(true); // Enable auto-budget
+        BlinkFlag = 1;
+        SimSpeed = 3;
+        ChangeEval();
+        SimPaused = false; // Simulation is running
+        SimLoops = 0;
+        InitSimLoad = 2;
+
+        InitMapArrays();
+        InitGraphs();
+        InitFundingLevel();
+        ResetMapState();
+        ResetEditorState();
+        ClearMap();
+        InitWillStuff();
+        SetFunds(5000);
+        SetGameLevelFunds(Levels.Easy);
+        SetSpeed(0);
+        SetPasses(1);
+    }
+
+    /// <summary>
+    ///     Update ??
+    ///     TODO: WHat is the purpose of this function (along with, SimTick)
+    /// </summary>
+    public void SimUpdate()
+    {
+        //printf("simUpdate\n");
+        BlinkFlag = (short)(TickCount() % 60 < 30 ? 1 : -1);
+
+        if (SimSpeed.IsTrue() && HeatSteps.IsFalse()) TilesAnimated = false;
+
+        DoUpdateHeads();
+        GraphDoer();
+        UpdateBudget();
+        ScoreDoer();
+    }
+
+    private ushort SimHeat_GetValue(ushort[,] map, int pos)
+    {
+        var posX = pos / map.GetLength(1);
+        var posY = pos - map.GetLength(1) * posX;
+        return map[posX, posY];
+    }
+
+    private void SimHeat_SetValue(ushort[,] map, int pos, ushort value)
+    {
+        var posX = pos / map.GetLength(1);
+        var posY = pos - map.GetLength(1) * posX;
+        map[posX, posY] = value;
+    }
+
+    private void SimHeat_CopyPosition(int destInd, int srcInd, ushort[,] dest, ushort[,] src)
+    {
+        var srcPosX = srcInd / src.GetLength(1);
+        var srcPosY = srcInd - src.GetLength(1) * srcPosX;
+
+        var destPosX = destInd / dest.GetLength(1);
+        var destPosY = destInd - dest.GetLength(1) * destPosX;
+
+        dest[destPosX, destPosY] = src[srcPosX, srcPosY];
+    }
+
+    private void SimHeat_MemCopy(int destInd, int srcInd, int count, ushort[,] dest, ushort[,] src)
+    {
+        for (var i = 0; i < count; ++i) SimHeat_CopyPosition(destInd + i, srcInd + i, dest, src);
+    }
+
+    /// <summary>
+    ///     ????
+    ///     TODO: Why is Micropolis::cellSrc not allocated together with all the other variables
+    ///     TODO: What is the purpose of this function?
+    /// </summary>
+    public void SimHeat()
+    {
+        int x, y;
+        var a = 0;
+        int src, dst;
+        var fl = (short)HeatFlow;
+
+        const int SRCCOL = Constants.WorldHeight + 2;
+        const int DSTCOL = Constants.WorldHeight;
+
+        //cellSrc, cellDst, src, dst, - are all pointers to arrays;
+        //In c# they will just be indexes to positions in said array
+        const int CellSrc = 0;
+        const int CellDest = 0;
+
+        var CellMap = new ushort[Constants.WorldWidth + 2, Constants.WorldHeight * 2];
+
+        /** - See above initialization
+        if (cellSrc == 0)
         {
-            return Directory.Exists(dir);
+            cellSrc = (short*)newPtr((WORLD_W + 2) * (WORLD_H + 2) * sizeof(short));
+            cellDst = (short*)&map[0][0];
+        }**/
+
+        /*
+            *Copy wrapping edges:
+            *
+            *   0   ff f0 f1...fe ff f0
+            *
+            *   1   0f  00 01... 0e 0f     00
+            *   2   1f  10 11... 1e 1f     10
+            *       ..  .. ..     .. ..     ..
+            *       ef  e0 e1 ... ee ef     e0
+            *   h   ff f0 f1...fe ff f0
+            *
+            *   h+1 0f  00 01... 0e 0f     00
+            *
+            *   wrap value: effect:
+            *
+            *   0   no effect
+            *   1   copy future=>past, no wrap
+            *   2   no copy, wrap edges
+            *   3   copy future=>past, wrap edges
+            *   4   copy future=>past, same edges
+        */
+
+        /**
+         * What does this code do? 
+         * It builds up a Second Map which has wrapped edges.
+         *
+         * e.g. A B       ->   D C D C
+         *      C D            B A B A
+         *                     D C D C
+         *                     B A B A
+         */
+        //FROM case#3 from old switch on HeatWrap --  3   copy future=>past, wrap edges
+        src = CellSrc + SRCCOL + 1;
+        dst = CellSrc;
+
+        for (x = 0; x < Constants.WorldWidth; x++)
+        {
+            //Copy a column from Map -> to a Offset in CellMap (Cell Map seems to have a boundary around it
+            SimHeat_MemCopy(src, dst, Constants.WorldHeight, CellMap, Map);
+            //Wrap the Edges
+            SimHeat_CopyPosition(src - 1, src + (Constants.WorldHeight - 1), CellMap, CellMap);
+            SimHeat_CopyPosition(src + Constants.WorldHeight, src, CellMap, CellMap);
+            src += SRCCOL;
+            dst += DSTCOL;
         }
 
-        /// <summary>
-        /// Locate resource directory.
-        /// </summary>
-        public void EnvironmentInit()
-        {
-            string simHome = Environment.GetEnvironmentVariable("SIMHOME");
-            if (string.IsNullOrWhiteSpace(simHome))
-            {
-                simHome = Directory.GetCurrentDirectory();
-            }
+        //Copy the map from CellMap into CellMap again (so its there twice - wrapped)
+        SimHeat_MemCopy(CellSrc, CellSrc + SRCCOL * Constants.WorldWidth, SRCCOL, CellMap, CellMap);
+        //Wrap Edges
+        SimHeat_MemCopy(CellSrc + SRCCOL * (Constants.WorldWidth + 1), CellSrc + SRCCOL, SRCCOL, CellMap, CellMap);
+        //END FROM case#3 from old switch on HeatWrap
 
-            if (TestDirectory(simHome))
+        /**
+         * What does this code do? 
+         * Reads a Square Square out of the Map - Applies a mutuation to it - Square Application Order Matters!
+         *
+         * Step 1 -> Read Square with Center Index @ 0 -> MutationFunction -> Set Result to Center Index @ 0
+         * Step 1 -> Read Square with Center Index @ 1 -> MutationFunction -> Set Result to Center Index @ 1
+         * 
+         * Center Index @ 0 = if the map was represented a 1D array, then 0,0 = 0, 0,1 = 1 etc.
+         * 
+         * From a 2D persective, it snakes through the map for e.g
+         *
+         *  A B         -> A C D B is the order the Squares are processed in
+         *  C D
+         *
+         *  The Mutation Function = 
+         *  
+         *  res = (lastRes & 7) + (sum(Square) + 7) >> 3
+         *
+         *  The 7 = the heat flow
+         *  >> 3 is the same as divided by 8
+         *  This seems to operate on the whole map value -> how does it not change the terrain?
+         *
+         */
+
+        //FROM case#0 from old switch on HeatRule
+        src = CellSrc;
+        dst = CellDest;
+        for (x = 0; x < Constants.WorldWidth;)
+        {
+            short nw, n, ne, w, c, e, sw, s, se;
+            src = CellSrc + x * SRCCOL;
+            dst = CellDest + x * DSTCOL;
+
+            w = (short)SimHeat_GetValue(CellMap, src);
+            //w = src[0];
+            c = (short)SimHeat_GetValue(CellMap, src + SRCCOL);
+            //c = src[SRCCOL];
+            e = (short)SimHeat_GetValue(CellMap, src + 2 * SRCCOL);
+            //e = src[2 * SRCCOL];
+            sw = (short)SimHeat_GetValue(CellMap, src + 1);
+            //sw = src[1];
+            s = (short)SimHeat_GetValue(CellMap, src + SRCCOL + 1);
+            //s = src[SRCCOL + 1];
+            se = (short)SimHeat_GetValue(CellMap, src + 2 * SRCCOL + 1);
+            //se = src[(2 * SRCCOL) + 1];
+
+            for (y = 0; y < Constants.WorldHeight; y++)
             {
-                resourceDir = simHome + Path.PathSeparator + "res" + Path.PathSeparator;
-                if (TestDirectory(resourceDir))
+                nw = w;
+                w = sw;
+                sw = (short)SimHeat_GetValue(CellMap, src + 2);
+                //sw = src[2];
+                n = c;
+                c = s;
+                s = (short)SimHeat_GetValue(CellMap, src + SRCCOL + 2);
+                //s = src[SRCCOL + 2];
+                ne = e;
+                e = se;
+                se = (short)SimHeat_GetValue(CellMap, src + 2 * SRCCOL + 2);
+                //se = src[(2 * SRCCOL) + 2];
                 {
-                    return;
+                    a += nw + n + ne + w + e + sw + s + se + fl;
+                    SimHeat_SetValue(Map, dst,
+                        (ushort)(((a >> 3) & (ushort)MapTileBits.LowMask) | (ushort)MapTileBits.Animated |
+                                 (ushort)MapTileBits.Burnable | (ushort)MapTileBits.Bulldozable));
+                    //dst[0] = ((a >> 3) & LOMASK) | ANIMBIT | BURNBIT | BULLBIT;
+                    a &= 7;
                 }
+                src++;
+                dst++;
             }
 
-            //TODO: Exception - cannot find res dir
-        }
-
-        /// <summary>
-        /// Initialize for a simulation
-        /// </summary>
-        public void SimInit()
-        {
-            SpriteList = new List<SimSprite>();
-
-            SetEnableSound(true); // Enable sound
-            MustUpdateOptions = true; // Update options displayed at user
-            Scenario = Scenario.None;
-            StartingYear = 1900;
-            SimPasses = 1;
-            SimPass = 0;
-            SetAutoGoTo(true); // Enable auto-goto
-            SetCityTax(7);
-            CityTime = 50;
-            SetEnableDisasters(true); // Enable disasters
-            SetAutoBulldoze(true); // Enable auto bulldoze
-            SetAutoBudget(true); // Enable auto-budget
-            BlinkFlag = 1;
-            SimSpeed = 3;
-            ChangeEval();
-            SimPaused = false; // Simulation is running
-            SimLoops = 0;
-            InitSimLoad = 2;
-
-            InitMapArrays();
-            InitGraphs();
-            InitFundingLevel();
-            ResetMapState();
-            ResetEditorState();
-            ClearMap();
-            InitWillStuff();
-            SetFunds(5000);
-            SetGameLevelFunds(Levels.Easy);
-            SetSpeed(0);
-            SetPasses(1);
-        }
-
-        /// <summary>
-        /// Update ??
-        /// 
-        /// TODO: WHat is the purpose of this function (along with, SimTick)
-        /// </summary>
-        public void SimUpdate()
-        {     
-            
-            //printf("simUpdate\n");
-            BlinkFlag = (short)(((TickCount() % 60) < 30) ? 1 : -1);
-
-            if (SimSpeed.IsTrue() && HeatSteps.IsFalse())
+            x++;
+            src = CellSrc + (x + 1) * SRCCOL - 3;
+            dst = CellDest + (x + 1) * DSTCOL - 1;
+            nw = (short)SimHeat_GetValue(CellMap, src + 1);
+            //nw = src[1]; 
+            n = (short)SimHeat_GetValue(CellMap, src + SRCCOL + 1);
+            //n = src[SRCCOL + 1];
+            ne = (short)SimHeat_GetValue(CellMap, src + 2 * SRCCOL + 1);
+            //ne = src[(2 * SRCCOL) + 1];
+            w = (short)SimHeat_GetValue(CellMap, src + 2);
+            //w = src[2]; 
+            c = (short)SimHeat_GetValue(CellMap, src + SRCCOL + 2);
+            //c = src[SRCCOL + 2];
+            e = (short)SimHeat_GetValue(CellMap, src + 2 * SRCCOL + 2);
+            //e = src[(2 * SRCCOL) + 2];
+            for (y = Constants.WorldHeight - 1; y >= 0; y--)
             {
-                TilesAnimated = false;
-            }
-
-            DoUpdateHeads();
-            GraphDoer();
-            UpdateBudget();
-            ScoreDoer();
-        }
-
-        private ushort SimHeat_GetValue(ushort[,] map, int pos)
-        {
-            int posX = pos / map.GetLength(1);
-            int posY = pos - (map.GetLength(1) * posX);
-            return map[posX, posY];
-        }
-
-        private void SimHeat_SetValue(ushort[,] map, int pos, ushort value)
-        {
-            int posX = pos / map.GetLength(1);
-            int posY = pos - (map.GetLength(1) * posX);
-            map[posX, posY] = value;
-        }
-
-        private void SimHeat_CopyPosition(int destInd, int srcInd, ushort[,] dest, ushort[,] src)
-        {
-            int srcPosX = srcInd / src.GetLength(1);
-            int srcPosY = srcInd - (src.GetLength(1) * srcPosX);
-
-            int destPosX = destInd / dest.GetLength(1);
-            int destPosY = destInd - (dest.GetLength(1) * destPosX);
-
-            dest[destPosX, destPosY] = src[srcPosX, srcPosY];
-        }
-
-        private void SimHeat_MemCopy(int destInd, int srcInd, int count, ushort[,] dest, ushort[,] src)
-        {
-            for(int i = 0; i < count; ++i)
-            {
-                SimHeat_CopyPosition(destInd + i, srcInd + i, dest, src);
-            }
-        }
-
-        /// <summary>
-        /// ????
-        /// 
-        /// TODO: Why is Micropolis::cellSrc not allocated together with all the other variables
-        /// TODO: What is the purpose of this function?
-        /// </summary>
-        public void SimHeat() {
-            int x, y;
-            int a = 0;
-            int src, dst;
-            short fl = (short)HeatFlow;
-
-            const int SRCCOL = Constants.WorldHeight + 2;
-            const int DSTCOL = Constants.WorldHeight;
-
-            //cellSrc, cellDst, src, dst, - are all pointers to arrays;
-            //In c# they will just be indexes to positions in said array
-            const int CellSrc = 0;
-            const int CellDest = 0;
-
-            ushort[,] CellMap = new ushort[Constants.WorldWidth + 2, Constants.WorldHeight * 2];
-
-            /** - See above initialization
-            if (cellSrc == 0)
-            {
-                cellSrc = (short*)newPtr((WORLD_W + 2) * (WORLD_H + 2) * sizeof(short));
-                cellDst = (short*)&map[0][0];
-            }**/
-
-            /*
-                *Copy wrapping edges:
-                *
-                *   0   ff f0 f1...fe ff f0
-                *
-                *   1   0f  00 01... 0e 0f     00
-                *   2   1f  10 11... 1e 1f     10
-                *       ..  .. ..     .. ..     ..
-                *       ef  e0 e1 ... ee ef     e0
-                *   h   ff f0 f1...fe ff f0
-                *
-                *   h+1 0f  00 01... 0e 0f     00
-                *
-                *   wrap value: effect:
-                *
-                *   0   no effect
-                *   1   copy future=>past, no wrap
-                *   2   no copy, wrap edges
-                *   3   copy future=>past, wrap edges
-                *   4   copy future=>past, same edges
-            */
-
-            /**
-             * What does this code do? 
-             * It builds up a Second Map which has wrapped edges.
-             *
-             * e.g. A B       ->   D C D C
-             *      C D            B A B A
-             *                     D C D C
-             *                     B A B A
-             */
-            //FROM case#3 from old switch on HeatWrap --  3   copy future=>past, wrap edges
-            src = CellSrc + SRCCOL + 1;
-            dst = CellSrc;
-
-            for (x = 0; x < Constants.WorldWidth; x++)
-            {
-                //Copy a column from Map -> to a Offset in CellMap (Cell Map seems to have a boundary around it
-                SimHeat_MemCopy(src, dst, Constants.WorldHeight, CellMap, Map);
-                //Wrap the Edges
-                SimHeat_CopyPosition(src - 1, src + (Constants.WorldHeight - 1), CellMap, CellMap);
-                SimHeat_CopyPosition(src + Constants.WorldHeight, src, CellMap, CellMap);
-                src += SRCCOL;
-                dst += DSTCOL;
-            }
-            //Copy the map from CellMap into CellMap again (so its there twice - wrapped)
-            SimHeat_MemCopy(CellSrc, CellSrc + (SRCCOL * Constants.WorldWidth), SRCCOL, CellMap, CellMap);
-            //Wrap Edges
-            SimHeat_MemCopy(CellSrc + SRCCOL * (Constants.WorldWidth + 1), CellSrc + SRCCOL, SRCCOL, CellMap, CellMap);
-            //END FROM case#3 from old switch on HeatWrap
-
-            /**
-             * What does this code do? 
-             * Reads a Square Square out of the Map - Applies a mutuation to it - Square Application Order Matters!
-             *
-             * Step 1 -> Read Square with Center Index @ 0 -> MutationFunction -> Set Result to Center Index @ 0
-             * Step 1 -> Read Square with Center Index @ 1 -> MutationFunction -> Set Result to Center Index @ 1
-             * 
-             * Center Index @ 0 = if the map was represented a 1D array, then 0,0 = 0, 0,1 = 1 etc.
-             * 
-             * From a 2D persective, it snakes through the map for e.g
-             *
-             *  A B         -> A C D B is the order the Squares are processed in
-             *  C D
-             *
-             *  The Mutation Function = 
-             *  
-             *  res = (lastRes & 7) + (sum(Square) + 7) >> 3
-             *
-             *  The 7 = the heat flow
-             *  >> 3 is the same as divided by 8
-             *  This seems to operate on the whole map value -> how does it not change the terrain?
-             *
-             */
-
-            //FROM case#0 from old switch on HeatRule
-            src = CellSrc;
-            dst = CellDest;
-            for (x = 0; x < Constants.WorldWidth;)
-            {
-                short nw, n, ne, w, c, e, sw, s, se;
-                src = CellSrc + (x * SRCCOL);
-                dst = CellDest + (x * DSTCOL);
-
-                w = (short)SimHeat_GetValue(CellMap, src);
-                //w = src[0];
-                c = (short)SimHeat_GetValue(CellMap, src + SRCCOL);
-                //c = src[SRCCOL];
-                e = (short)SimHeat_GetValue(CellMap, src + (2 * SRCCOL));
-                //e = src[2 * SRCCOL];
-                sw = (short)SimHeat_GetValue(CellMap, src + 1);
-                //sw = src[1];
-                s = (short)SimHeat_GetValue(CellMap, src + (SRCCOL + 1));
-                //s = src[SRCCOL + 1];
-                se = (short)SimHeat_GetValue(CellMap, src + ((2 * SRCCOL) + 1));
-                //se = src[(2 * SRCCOL) + 1];
-
-                for (y = 0; y < Constants.WorldHeight; y++)
+                sw = w;
+                w = nw;
+                nw = (short)SimHeat_GetValue(CellMap, src);
+                //nw = src[0];
+                s = c;
+                c = n;
+                n = (short)SimHeat_GetValue(CellMap, src + SRCCOL);
+                //n = src[SRCCOL];
+                se = e;
+                e = ne;
+                ne = (short)SimHeat_GetValue(CellMap, src + 2 * SRCCOL);
+                //ne = src[2 * SRCCOL];
                 {
-                    nw = w;
-                    w = sw;
-                    sw = (short)SimHeat_GetValue(CellMap, src + 2);
-                    //sw = src[2];
-                    n = c;
-                    c = s;
-                    s = (short)SimHeat_GetValue(CellMap, src + (SRCCOL + 2));
-                    //s = src[SRCCOL + 2];
-                    ne = e;
-                    e = se;
-                    se = (short)SimHeat_GetValue(CellMap, src + ((2 * SRCCOL) + 2));
-                    //se = src[(2 * SRCCOL) + 2];
-                    {
-                        a += nw + n + ne + w + e + sw + s + se + fl;
-                        SimHeat_SetValue(Map, dst, (ushort)(((a >> 3) & (ushort)MapTileBits.LowMask) | (ushort)MapTileBits.Animated | (ushort)MapTileBits.Burnable | (ushort)MapTileBits.Bulldozable));
-                        //dst[0] = ((a >> 3) & LOMASK) | ANIMBIT | BURNBIT | BULLBIT;
-                        a &= 7;
-                    }
-                    src++;
-                    dst++;
+                    a += nw + n + ne + w + e + sw + s + se + fl;
+                    SimHeat_SetValue(Map, dst,
+                        (ushort)(((a >> 3) & (ushort)MapTileBits.LowMask) | (ushort)MapTileBits.Animated |
+                                 (ushort)MapTileBits.Burnable | (ushort)MapTileBits.Bulldozable));
+                    //dst[0] = ((a >> 3) & LOMASK) | ANIMBIT | BURNBIT | BULLBIT;
+                    a &= 7;
                 }
-                x++;
-                src = CellSrc + ((x + 1) * SRCCOL) - 3;
-                dst = CellDest + ((x + 1) * DSTCOL) - 1;
-                nw = (short)SimHeat_GetValue(CellMap, src + 1);
-                //nw = src[1]; 
-                n = (short)SimHeat_GetValue(CellMap, src + (SRCCOL + 1));
-                //n = src[SRCCOL + 1];
-                ne = (short)SimHeat_GetValue(CellMap, src + ((2 * SRCCOL) + 1));
-                //ne = src[(2 * SRCCOL) + 1];
-                w = (short)SimHeat_GetValue(CellMap, src + 2);
-                //w = src[2]; 
-                c = (short)SimHeat_GetValue(CellMap, src + (SRCCOL + 2));
-                //c = src[SRCCOL + 2];
-                e = (short)SimHeat_GetValue(CellMap, src + ((2 * SRCCOL) + 2));
-                //e = src[(2 * SRCCOL) + 2];
-                for (y = Constants.WorldHeight - 1; y >= 0; y--)
-                {
-                    sw = w;
-                    w = nw;
-                    nw = (short)SimHeat_GetValue(CellMap, src);
-                    //nw = src[0];
-                    s = c;
-                    c = n;
-                    n = (short)SimHeat_GetValue(CellMap, src + (SRCCOL));
-                    //n = src[SRCCOL];
-                    se = e;
-                    e = ne;
-                    ne = (short)SimHeat_GetValue(CellMap, src + (2 * SRCCOL));
-                    //ne = src[2 * SRCCOL];
-                    {
-                        a += nw + n + ne + w + e + sw + s + se + fl;
-                        SimHeat_SetValue(Map, dst, (ushort)(((a >> 3) & (ushort)MapTileBits.LowMask) | (ushort)MapTileBits.Animated | (ushort)MapTileBits.Burnable | (ushort)MapTileBits.Bulldozable));
-                        //dst[0] = ((a >> 3) & LOMASK) | ANIMBIT | BURNBIT | BULLBIT;
-                        a &= 7;
-                    }
-                    src--;
-                    dst--;
-                }
-                x++;
-            };
-            //END FROM case#0 from old switch on HeatRule
-
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="doSim"></param>
-        public void SimLoop(bool doSim)
-        {
-            if (HeatSteps.IsTrue())
-            {
-                int j;
-
-                for (j = 0; j < HeatSteps; j++)
-                {
-                    SimHeat();
-                }
-
-                MoveObjects();
-                SimRobots();
-
-                NewMap = 1;
-
-            }
-            else
-            {
-                if (doSim)
-                {
-                    SimFrame();
-                }
-
-                MoveObjects();
-                SimRobots();
+                src--;
+                dst--;
             }
 
-            SimLoops++;
+            x++;
         }
 
-        /// <summary>
-        /// Move simulation forward
-        /// 
-        /// TODO: What is the purpose of this function? (along side SimUpdate)
-        /// </summary>
-        public void SimTick()
+        ;
+        //END FROM case#0 from old switch on HeatRule
+    }
+
+    /// <summary>
+    /// </summary>
+    /// <param name="doSim"></param>
+    public void SimLoop(bool doSim)
+    {
+        if (HeatSteps.IsTrue())
         {
-            if (SimSpeed.IsTrue())
-            {
-                for (SimPass = 0; SimPass < SimPasses; SimPass++)
-                {
-                    SimLoop(true);
-                }
-            }
-            SimUpdate();
+            int j;
+
+            for (j = 0; j < HeatSteps; j++) SimHeat();
+
+            MoveObjects();
+            SimRobots();
+
+            NewMap = 1;
+        }
+        else
+        {
+            if (doSim) SimFrame();
+
+            MoveObjects();
+            SimRobots();
         }
 
-        public void SimRobots()
-        {
-            Callback("simRobots", "");
-        }
+        SimLoops++;
+    }
+
+    /// <summary>
+    ///     Move simulation forward
+    ///     TODO: What is the purpose of this function? (along side SimUpdate)
+    /// </summary>
+    public void SimTick()
+    {
+        if (SimSpeed.IsTrue())
+            for (SimPass = 0; SimPass < SimPasses; SimPass++)
+                SimLoop(true);
+        SimUpdate();
+    }
+
+    public void SimRobots()
+    {
+        Callback("simRobots", "");
     }
 }
