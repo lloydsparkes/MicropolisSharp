@@ -662,7 +662,7 @@ public partial class Micropolis
 
         resRatio = Math.Min(resRatio, resRatioMax);
         comRatio = Math.Min(comRatio, comRatioMax);
-        resRatio = Math.Min(indRatio, indRatioMax);
+        indRatio = Math.Min(indRatio, indRatioMax);
 
         // Global tax and game level effects.
         var z = Math.Min((short)(CityTax + GameLevel), taxMax);

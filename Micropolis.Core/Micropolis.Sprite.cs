@@ -1248,8 +1248,8 @@ public partial class Micropolis
     /// <param name="sprite">Bus sprite.</param>
     public void DoBusSprite(SimSprite sprite)
     {
-        short[] dx = { 0, 1, 0, -1, 0 };
-        short[] dy = { -1, 0, 1, 0, 0 };
+        short[] Dx = { 0, 1, 0, -1, 0 };
+        short[] Dy = { -1, 0, 1, 0, 0 };
         short[] dir2Frame = { 1, 2, 1, 2 };
 
         int dx, dy, tx, ty, otx, oty;
