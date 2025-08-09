@@ -23,5 +23,6 @@ namespace Micropolis.Core.Test
         public short PhaseCycle { get; set; }
         public ushort[,] Map { get; set; }
         public byte[,] PowerGridMap { get; set; }
+        public string AsciiPowerMap { get; set; }
     }
 }

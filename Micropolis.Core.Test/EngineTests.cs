@@ -43,7 +43,8 @@ namespace Micropolis.Core.Test
                     FireSpend = engine.FireSpend,
                     PhaseCycle = engine.PhaseCycle,
                     Map = (ushort[,])engine.Map.Clone(),
-                    PowerGridMap = ConvertPowerGridMap(engine.PowerGridMap)
+                    PowerGridMap = ConvertPowerGridMap(engine.PowerGridMap),
+                    AsciiPowerMap = GenerateAsciiPowerMap(engine.PowerGridMap)
                 };
 
                 history.Add(state);
@@ -70,6 +71,26 @@ namespace Micropolis.Core.Test
             }
 
             return data2D;
+        }
+
+        private string GenerateAsciiPowerMap(MicropolisSharp.Types.ByteMap1 powerGridMap)
+        {
+            var width = powerGridMap.width;
+            var height = powerGridMap.height;
+            var data = powerGridMap.getBase();
+            var sb = new System.Text.StringBuilder();
+
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    var value = data[x * height + y];
+                    sb.Append(value > 0 ? '#' : ' ');
+                }
+                sb.AppendLine();
+            }
+
+            return sb.ToString();
         }
     }
 }
