@@ -22,5 +22,6 @@ namespace Micropolis.Core.Test
         public long FireSpend { get; set; }
         public short PhaseCycle { get; set; }
         public ushort[,] Map { get; set; }
+        public byte[,] PowerGridMap { get; set; }
     }
 }

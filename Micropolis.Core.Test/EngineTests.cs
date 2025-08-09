@@ -42,7 +42,8 @@ namespace Micropolis.Core.Test
                     PoliceSpend = engine.PoliceSpend,
                     FireSpend = engine.FireSpend,
                     PhaseCycle = engine.PhaseCycle,
-                    Map = (ushort[,])engine.Map.Clone()
+                    Map = (ushort[,])engine.Map.Clone(),
+                    PowerGridMap = ConvertPowerGridMap(engine.PowerGridMap)
                 };
 
                 history.Add(state);
@@ -51,6 +52,24 @@ namespace Micropolis.Core.Test
             var options = new JsonSerializerOptions { WriteIndented = true };
             string jsonString = JsonSerializer.Serialize(history, options);
             File.WriteAllText("engine_history.json", jsonString);
+        }
+
+        private byte[,] ConvertPowerGridMap(MicropolisSharp.Types.ByteMap1 powerGridMap)
+        {
+            var width = powerGridMap.width;
+            var height = powerGridMap.height;
+            var data1D = powerGridMap.getBase();
+            var data2D = new byte[width, height];
+
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    data2D[x, y] = data1D[x * height + y];
+                }
+            }
+
+            return data2D;
         }
     }
 }
