@@ -123,11 +123,7 @@ public partial class Micropolis
     /// <returns></returns>
     public int GetRandom16Signed()
     {
-        var i = GetRandom16();
-
-        if (i > 0x7fff) i = 0x7fff - i;
-
-        return i;
+        return (short)GetRandom16();
     }
 
     /// <summary>

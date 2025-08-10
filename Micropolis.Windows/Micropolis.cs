@@ -128,6 +128,8 @@ public class Micropolis : Game
             _simulator.AnimateTiles();
 
             _mapLayer.Update();
+
+            Console.WriteLine($"R: {_simulator.ResValve}, C: {_simulator.ComValve}, I: {_simulator.IndValve}, T: {_simulator.TotalPop}");
         }
 
         Console.WriteLine("Residential Population: " + _simulator.ResPop);
@@ -138,7 +140,7 @@ public class Micropolis : Game
     /// <summary>
     ///     This is called when the game should draw itself.
     /// </summary>
-    /// <param name="gameTime">Provides a snapshot of timing values.</param>
+    /// <param name="gameTime">Provides a snapshot of timing values.</param>Si
     protected override void Draw(GameTime gameTime)
     {
         GraphicsDevice.Clear(Color.CornflowerBlue);
