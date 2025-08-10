@@ -1,0 +1,96 @@
+using MicropolisSharp;
+using System.Collections.Generic;
+using System.IO;
+using System.Text.Json;
+using Xunit;
+
+namespace Micropolis.Core.Test
+{
+    public class EngineTests
+    {
+        [Fact]
+        public void RunSimulationAndCaptureState()
+        {
+            Micropolis engine = new Micropolis();
+            engine.SimInit();
+            engine.GenerateMap();
+
+            List<EngineState> history = new List<EngineState>();
+
+            for (int i = 0; i < 100; i++)
+            {
+                engine.SimTick();
+
+                var state = new EngineState
+                {
+                    CityTime = engine.CityTime,
+                    TotalPop = engine.TotalPop,
+                    TotalFunds = engine.TotalFunds,
+                    ResPop = engine.ResPop,
+                    ComPop = engine.ComPop,
+                    IndPop = engine.IndPop,
+                    ResValve = engine.ResValve,
+                    ComValve = engine.ComValve,
+                    IndValve = engine.IndValve,
+                    CrimeAverage = engine.CrimeAverage,
+                    PollutionAverage = engine.PollutionAverage,
+                    LandValueAverage = engine.LandValueAverage,
+                    RoadFund = engine.RoadFund,
+                    PoliceFund = engine.PoliceFund,
+                    FireFund = engine.FireFund,
+                    RoadSpend = engine.RoadSpend,
+                    PoliceSpend = engine.PoliceSpend,
+                    FireSpend = engine.FireSpend,
+                    PhaseCycle = engine.PhaseCycle,
+                    Map = (ushort[,])engine.Map.Clone(),
+                    PowerGridMap = ConvertPowerGridMap(engine.PowerGridMap),
+                    AsciiPowerMap = GenerateAsciiPowerMap(engine.PowerGridMap)
+                };
+
+                history.Add(state);
+            }
+
+            var options = new JsonSerializerOptions { WriteIndented = true };
+            string jsonString = JsonSerializer.Serialize(history, options);
+            File.WriteAllText("engine_history.json", jsonString);
+        }
+
+        private byte[,] ConvertPowerGridMap(MicropolisSharp.Types.ByteMap1 powerGridMap)
+        {
+            var width = powerGridMap.width;
+            var height = powerGridMap.height;
+            var data1D = powerGridMap.getBase();
+            var data2D = new byte[width, height];
+
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    data2D[x, y] = data1D[x * height + y];
+                }
+            }
+
+            return data2D;
+        }
+
+        private string GenerateAsciiPowerMap(MicropolisSharp.Types.ByteMap1 powerGridMap)
+        {
+            var width = powerGridMap.width;
+            var height = powerGridMap.height;
+            var data = powerGridMap.getBase();
+            var sb = new System.Text.StringBuilder();
+
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    var value = data[x * height + y];
+                    sb.Append(value > 0 ? '#' : ' ');
+                }
+                sb.AppendLine();
+            }
+
+            return sb.ToString();
+        }
+    }
+}

@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Micropolis.Core", "Micropol
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Micropolis.Windows", "Micropolis.Windows\Micropolis.Windows.csproj", "{A4F88EA5-F359-404A-A49A-20348A73451B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Micropolis.Core.Test", "Micropolis.Core.Test\Micropolis.Core.Test.csproj", "{86A2AC73-2334-400A-A626-75B7F3469A4B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +33,14 @@ Global
 		{A4F88EA5-F359-404A-A49A-20348A73451B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A4F88EA5-F359-404A-A49A-20348A73451B}.Release|x86.ActiveCfg = Release|Any CPU
 		{A4F88EA5-F359-404A-A49A-20348A73451B}.Release|x86.Build.0 = Release|Any CPU
+		{86A2AC73-2334-400A-A626-75B7F3469A4B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86A2AC73-2334-400A-A626-75B7F3469A4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86A2AC73-2334-400A-A626-75B7F3469A4B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{86A2AC73-2334-400A-A626-75B7F3469A4B}.Debug|x86.Build.0 = Debug|Any CPU
+		{86A2AC73-2334-400A-A626-75B7F3469A4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86A2AC73-2334-400A-A626-75B7F3469A4B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86A2AC73-2334-400A-A626-75B7F3469A4B}.Release|x86.ActiveCfg = Release|Any CPU
+		{86A2AC73-2334-400A-A626-75B7F3469A4B}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
