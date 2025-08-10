@@ -130,6 +130,8 @@ public class Micropolis : Game
             _mapLayer.Update();
         }
 
+        Console.WriteLine("Residential Population: " + _simulator.ResPop);
+
         base.Update(gameTime);
     }
 
