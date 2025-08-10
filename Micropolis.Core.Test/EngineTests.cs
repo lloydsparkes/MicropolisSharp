@@ -13,7 +13,10 @@ namespace Micropolis.Core.Test
         {
             Micropolis engine = new Micropolis();
             engine.SimInit();
-            engine.GenerateMap();
+
+            string cityPath = "../../../Micropolis.Windows/cities/kobe.cty";
+            bool success = engine.LoadCity(cityPath);
+            Assert.True(success, "Failed to load city file.");
 
             List<EngineState> history = new List<EngineState>();
 
