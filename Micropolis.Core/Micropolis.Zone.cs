@@ -559,7 +559,7 @@ public partial class Micropolis
             if (!zonePower) zscore = -500;
 
             if (zscore > -350 &&
-                (short)(zscore - 26380) > (short)GetRandom16Signed())
+                (zscore - GetRandom(26380)) > 0)
             {
                 if (tpop.IsFalse() && (GetRandom16() & 3).IsFalse())
                 {
@@ -568,13 +568,13 @@ public partial class Micropolis
                 }
 
                 value = GetLandPollutionValue(pos);
-                
+
                 DoResIn(pos, tpop, value);
                 return;
             }
 
             if (zscore < 350 &&
-                (short)(zscore + 26380) < (short)GetRandom16Signed())
+                (zscore + GetRandom(26380)) < 0)
             {
                 value = GetLandPollutionValue(pos);
                 DoResOut(pos, tpop, value);
@@ -781,7 +781,7 @@ public partial class Micropolis
 
             if (trfGood.IsTrue() &&
                 zscore > -350 &&
-                (short)(zscore - 26380) > (short)GetRandom16Signed())
+                (zscore - GetRandom(26380)) > 0)
             {
                 value = GetLandPollutionValue(pos);
                 DoComIn(pos, tpop, value);
@@ -789,7 +789,7 @@ public partial class Micropolis
             }
 
             if (zscore < 350 &&
-                (short)(zscore + 26380) < (short)GetRandom16Signed())
+                (zscore + GetRandom(26380)) < 0)
             {
                 value = GetLandPollutionValue(pos);
                 DoComOut(pos, tpop, value);
@@ -920,14 +920,14 @@ public partial class Micropolis
             if (!zonePower) zscore = -500;
 
             if (zscore > -350 &&
-                (short)(zscore - 26380) > (short)GetRandom16Signed())
+                (zscore - GetRandom(26380)) > 0)
             {
                 DoIndIn(pos, tpop, GetRandom16() & 1);
                 return;
             }
 
             if (zscore < 350 &&
-                (short)(zscore + 26380) < (short)GetRandom16Signed())
+                (zscore + GetRandom(26380)) < 0)
                 DoIndOut(pos, tpop, GetRandom16() & 1);
         }
     }
