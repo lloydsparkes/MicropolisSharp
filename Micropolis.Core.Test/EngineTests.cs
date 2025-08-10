@@ -45,8 +45,8 @@ namespace Micropolis.Core.Test
                     PoliceSpend = engine.PoliceSpend,
                     FireSpend = engine.FireSpend,
                     PhaseCycle = engine.PhaseCycle,
-                    Map = (ushort[,])engine.Map.Clone(),
-                    PowerGridMap = ConvertPowerGridMap(engine.PowerGridMap),
+                    Map = ConvertMapToJagged(engine.Map),
+                    PowerGridMap = ConvertPowerGridMapToJagged(engine.PowerGridMap),
                     AsciiPowerMap = GenerateAsciiPowerMap(engine.PowerGridMap)
                 };
 
@@ -58,22 +58,41 @@ namespace Micropolis.Core.Test
             File.WriteAllText("engine_history.json", jsonString);
         }
 
-        private byte[,] ConvertPowerGridMap(MicropolisSharp.Types.ByteMap1 powerGridMap)
+        private ushort[][] ConvertMapToJagged(ushort[,] map)
+        {
+            int width = map.GetLength(0);
+            int height = map.GetLength(1);
+            ushort[][] jaggedMap = new ushort[height][];
+
+            for (int y = 0; y < height; y++)
+            {
+                jaggedMap[y] = new ushort[width];
+                for (int x = 0; x < width; x++)
+                {
+                    jaggedMap[y][x] = map[x, y];
+                }
+            }
+
+            return jaggedMap;
+        }
+
+        private byte[][] ConvertPowerGridMapToJagged(MicropolisSharp.Types.ByteMap1 powerGridMap)
         {
             var width = powerGridMap.width;
             var height = powerGridMap.height;
             var data1D = powerGridMap.getBase();
-            var data2D = new byte[width, height];
+            var jaggedMap = new byte[height][];
 
-            for (int x = 0; x < width; x++)
+            for (int y = 0; y < height; y++)
             {
-                for (int y = 0; y < height; y++)
+                jaggedMap[y] = new byte[width];
+                for (int x = 0; x < width; x++)
                 {
-                    data2D[x, y] = data1D[x * height + y];
+                    jaggedMap[y][x] = data1D[x * height + y];
                 }
             }
 
-            return data2D;
+            return jaggedMap;
         }
 
         private string GenerateAsciiPowerMap(MicropolisSharp.Types.ByteMap1 powerGridMap)
