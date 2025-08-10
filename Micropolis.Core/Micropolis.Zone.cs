@@ -568,7 +568,7 @@ public partial class Micropolis
                 }
 
                 value = GetLandPollutionValue(pos);
-                
+
                 DoResIn(pos, tpop, value);
                 return;
             }
