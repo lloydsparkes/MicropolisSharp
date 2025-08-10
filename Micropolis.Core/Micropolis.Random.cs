@@ -123,11 +123,12 @@ public partial class Micropolis
     /// <returns></returns>
     public int GetRandom16Signed()
     {
-        var i = GetRandom16();
-
-        if (i > 0x7fff) i = 0x7fff - i;
-
-        return i;
+        // GetRandom16() returns an int value from 0 to 65535.
+        // Casting this to a short correctly performs the two's complement conversion,
+        // mapping the upper half of the range (32768-65535) to the negative
+        // short values (-32768 to -1). The result is implicitly cast back to an
+        // int for the return type, which is what the call sites expect.
+        return (short)GetRandom16();
     }
 
     /// <summary>

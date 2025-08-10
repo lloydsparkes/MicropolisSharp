@@ -559,7 +559,7 @@ public partial class Micropolis
             if (!zonePower) zscore = -500;
 
             if (zscore > -350 &&
-                (zscore - GetRandom(26380)) > 0)
+                (short)(zscore - 26380) > (short)GetRandom16Signed())
             {
                 if (tpop.IsFalse() && (GetRandom16() & 3).IsFalse())
                 {
@@ -574,7 +574,7 @@ public partial class Micropolis
             }
 
             if (zscore < 350 &&
-                (zscore + GetRandom(26380)) < 0)
+                (short)(zscore + 26380) < (short)GetRandom16Signed())
             {
                 value = GetLandPollutionValue(pos);
                 DoResOut(pos, tpop, value);
@@ -781,7 +781,7 @@ public partial class Micropolis
 
             if (trfGood.IsTrue() &&
                 zscore > -350 &&
-                (zscore - GetRandom(26380)) > 0)
+                (short)(zscore - 26380) > (short)GetRandom16Signed())
             {
                 value = GetLandPollutionValue(pos);
                 DoComIn(pos, tpop, value);
@@ -789,7 +789,7 @@ public partial class Micropolis
             }
 
             if (zscore < 350 &&
-                (zscore + GetRandom(26380)) < 0)
+                (short)(zscore + 26380) < (short)GetRandom16Signed())
             {
                 value = GetLandPollutionValue(pos);
                 DoComOut(pos, tpop, value);
@@ -920,14 +920,14 @@ public partial class Micropolis
             if (!zonePower) zscore = -500;
 
             if (zscore > -350 &&
-                (zscore - GetRandom(26380)) > 0)
+                (short)(zscore - 26380) > (short)GetRandom16Signed())
             {
                 DoIndIn(pos, tpop, GetRandom16() & 1);
                 return;
             }
 
             if (zscore < 350 &&
-                (zscore + GetRandom(26380)) < 0)
+                (short)(zscore + 26380) < (short)GetRandom16Signed())
                 DoIndOut(pos, tpop, GetRandom16() & 1);
         }
     }
